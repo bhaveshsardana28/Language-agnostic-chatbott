@@ -16,6 +16,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastapi import FastAPI, File, Form, Request, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 
@@ -31,6 +32,13 @@ ALLOWED_EXT = {".pdf", ".docx", ".txt", ".md"}
 logger = logging.getLogger("gaia")
 
 app = FastAPI(title="Global Multilingual AI Assistant", version="0.1.0")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173",
+                   "http://localhost:8000", "http://127.0.0.1:8000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 templates = Jinja2Templates(directory=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "templates"))
 
 LANG_NAMES = {**config.SUPPORTED_LANGS, "ja": "Japanese"}

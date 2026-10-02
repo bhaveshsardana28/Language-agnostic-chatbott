@@ -216,7 +216,10 @@ body.debug .debug-card{display:block}
   border-radius:10px;align-items:center;justify-content:center;flex:none;
   border:1px solid var(--border)}
 #stop.show{display:inline-flex}
-.hint{max-width:780px;margin:6px auto 0;text-align:center;font-size:.7rem;color:var(--muted)}
+.hint{max-width:780px;margin:6px auto 0;text-align:center;font-size:.7rem;color:var(--muted);display:flex;justify-content:center;align-items:center;gap:8px}
+.char-count{margin-left:auto;font-variant-numeric:tabular-nums}
+.char-count.warn{color:var(--warn)}
+.char-count.over{color:var(--danger);font-weight:600}
 
 /* ============ modal / toast ============ */
 #overlay-m{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;
@@ -345,7 +348,7 @@ body.debug .debug-card{display:block}
         <button type="button" id="attach-btn" class="icon-btn" aria-label="Attach document" title="Attach PDF, DOCX or TXT">
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m21.4 11.1-8.5 8.5a5.7 5.7 0 0 1-8-8l8.5-8.5a3.8 3.8 0 0 1 5.4 5.4l-8.5 8.5a1.9 1.9 0 0 1-2.7-2.7l7.8-7.8"/></svg>
         </button>
-        <textarea id="input" rows="1" placeholder="Ask anything in any supported language…" aria-label="Message" autocomplete="off"></textarea>
+        <textarea id="input" rows="1" dir="auto" placeholder="Ask anything in any supported language…" aria-label="Message" autocomplete="off"></textarea>
         <button type="submit" id="send" aria-label="Send message">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4.5 12h14M13 6l6 6-6 6"/></svg>
         </button>
@@ -353,7 +356,7 @@ body.debug .debug-card{display:block}
           <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
         </button>
       </form>
-      <p class="hint">GAIA replies in your language · Enter to send · Shift+Enter for a new line</p>
+      <p class="hint"><span>Replies in your language · Enter to send · Shift+Enter for new line</span><span class="char-count" id="char-count"></span></p>
     </div>
   </main>
 </div>
@@ -452,7 +455,7 @@ function md(src){
     .replace(/`([^`\n]+)`/g,'<code>$1</code>')
     .replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>')
     .replace(/(^|[\s(])\*([^*\n]+)\*/g,'$1<i>$2</i>')
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
   const lines=h.split(/\n/); const out=[]; let list=null,table=null,para=[];
   const flushP=()=>{ if(para.length){ out.push('<p>'+inline(para.join('<br>'))+'</p>'); para=[]; } };
   const flushL=()=>{ if(list){ out.push(`<${list.t}>`+list.items.map(i=>'<li>'+inline(i)+'</li>').join('')+`</${list.t}>`); list=null; } };
@@ -546,7 +549,7 @@ SUGGESTIONS.forEach(([k,q])=>{
 function friendly(errText){
   if(!errText) return 'Something went wrong while generating the response.';
   if(/429|Rate limit/i.test(errText)) return 'The assistant is busy right now — wait a few seconds and try again.';
-  if(/API_KEY|not configured/i.test(errText)) return 'AI answers are not configured on the server yet. Campus and translation features still work.';
+  if(/API_KEY|not configured/i.test(errText)) return 'AI answers are not configured on the server yet. Check the server setup.';
   if(/Failed to fetch|NetworkError/i.test(errText)) return 'Unable to connect to the assistant.';
   return 'Something went wrong while generating the response.';
 }
@@ -573,7 +576,7 @@ function paintMsg(m,c,live=false){
   const w=document.createElement('div');
   w.className='msg '+(m.role==='user'?'user':'assistant')+(m.error?' err':'')+(live?' live':'');
   w.dataset.id=m.ts;
-  const b=document.createElement('div'); b.className='bubble md';
+  const b=document.createElement('div'); b.className='bubble md'; b.dir='auto';
   if(m.role==='user') b.textContent=m.content;
   else if(live) b.innerHTML='<span class="gen"><span class="pulse"></span>Generating…</span>';
   else b.innerHTML=m.content_md || md(m.content);
@@ -691,8 +694,18 @@ composer.addEventListener('submit',e=>{e.preventDefault();send();});
 input.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&!e.shiftKey&&S.enterSend){e.preventDefault();send();}
 });
-input.addEventListener('input',autoGrow);
+input.addEventListener('input',()=>{autoGrow();updateCharCount();});
+const MAX_CHARS=4000;
+const charCount=$('#char-count');
 function autoGrow(){ input.style.height='auto'; input.style.height=Math.min(input.scrollHeight,200)+'px'; }
+function updateCharCount(){
+  const len=input.value.length;
+  if(len>MAX_CHARS*0.8){
+    charCount.textContent=`${len} / ${MAX_CHARS}`;
+    charCount.className='char-count'+(len>MAX_CHARS?' over':len>MAX_CHARS*0.9?' warn':'');
+    sendBtn.disabled=len>MAX_CHARS;
+  } else { charCount.textContent=''; charCount.className='char-count'; sendBtn.disabled=false; }
+}
 stopBtn.addEventListener('click',()=>aborter&&aborter.abort());
 
 /* ---------- sidebar ---------- */
@@ -848,7 +861,7 @@ function openSettings(){
   });
   api.health().then(h=>{
     m.querySelector('#about').innerHTML=`<b>Global Multilingual AI Assistant</b> v2.0<br>
-      Multilingual general chat · cross-language document Q&A · translation · campus knowledge base<br>
+      Multilingual general chat · cross-language document Q&A · translation · web search<br>
       Provider: <b>${esc(h.llm_provider)}</b> · Model: <b>${esc(h.llm_model)}</b> · LLM ready: ${h.llm_ready?'yes':'no'}<br>
       Tested languages: English, Hindi, Punjabi, Spanish, French, German, Italian`;
   }).catch(()=>{ m.querySelector('#about').textContent='Backend unreachable.'; });
