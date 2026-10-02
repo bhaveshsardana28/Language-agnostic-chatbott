@@ -1,0 +1,183 @@
+{
+  "n_examples": 320,
+  "n_intents": 16,
+  "labels": [
+    "admission_info",
+    "attendance",
+    "events_clubs",
+    "exam_schedule",
+    "fees",
+    "food_canteen",
+    "goodbye",
+    "greet",
+    "hostel",
+    "identity",
+    "library",
+    "placements",
+    "results",
+    "thanks",
+    "timetable",
+    "transport"
+  ],
+  "best_params": {
+    "clf__C": 10.0,
+    "clf__class_weight": null,
+    "tfidf__ngram_range": [
+      1,
+      1
+    ]
+  },
+  "cv_macro_f1": 0.8114,
+  "cv_accuracy": 0.8125,
+  "cv_macro_precision": 0.822,
+  "cv_macro_recall": 0.8125,
+  "cv_macro_f1_oof": 0.8138,
+  "per_intent": {
+    "admission_info": {
+      "precision": 0.7778,
+      "recall": 0.7,
+      "f1-score": 0.7368
+    },
+    "attendance": {
+      "precision": 1.0,
+      "recall": 0.95,
+      "f1-score": 0.9744
+    },
+    "events_clubs": {
+      "precision": 0.5455,
+      "recall": 0.6,
+      "f1-score": 0.5714
+    },
+    "exam_schedule": {
+      "precision": 0.6207,
+      "recall": 0.9,
+      "f1-score": 0.7347
+    },
+    "fees": {
+      "precision": 0.9444,
+      "recall": 0.85,
+      "f1-score": 0.8947
+    },
+    "food_canteen": {
+      "precision": 0.75,
+      "recall": 0.75,
+      "f1-score": 0.75
+    },
+    "goodbye": {
+      "precision": 0.9412,
+      "recall": 0.8,
+      "f1-score": 0.8649
+    },
+    "greet": {
+      "precision": 0.85,
+      "recall": 0.85,
+      "f1-score": 0.85
+    },
+    "hostel": {
+      "precision": 0.9048,
+      "recall": 0.95,
+      "f1-score": 0.9268
+    },
+    "identity": {
+      "precision": 0.8261,
+      "recall": 0.95,
+      "f1-score": 0.8837
+    },
+    "library": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0
+    },
+    "placements": {
+      "precision": 0.8333,
+      "recall": 0.75,
+      "f1-score": 0.7895
+    },
+    "results": {
+      "precision": 0.7647,
+      "recall": 0.65,
+      "f1-score": 0.7027
+    },
+    "thanks": {
+      "precision": 0.8333,
+      "recall": 0.75,
+      "f1-score": 0.7895
+    },
+    "timetable": {
+      "precision": 0.8333,
+      "recall": 0.75,
+      "f1-score": 0.7895
+    },
+    "transport": {
+      "precision": 0.7273,
+      "recall": 0.8,
+      "f1-score": 0.7619
+    }
+  },
+  "grid": [
+    {
+      "params": {
+        "clf__C": "1.0",
+        "clf__class_weight": "None",
+        "tfidf__ngram_range": "(1, 1)"
+      },
+      "f1_macro": 0.8093
+    },
+    {
+      "params": {
+        "clf__C": "1.0",
+        "clf__class_weight": "None",
+        "tfidf__ngram_range": "(1, 2)"
+      },
+      "f1_macro": 0.7518
+    },
+    {
+      "params": {
+        "clf__C": "1.0",
+        "clf__class_weight": "balanced",
+        "tfidf__ngram_range": "(1, 1)"
+      },
+      "f1_macro": 0.8093
+    },
+    {
+      "params": {
+        "clf__C": "1.0",
+        "clf__class_weight": "balanced",
+        "tfidf__ngram_range": "(1, 2)"
+      },
+      "f1_macro": 0.7518
+    },
+    {
+      "params": {
+        "clf__C": "10.0",
+        "clf__class_weight": "None",
+        "tfidf__ngram_range": "(1, 1)"
+      },
+      "f1_macro": 0.8114
+    },
+    {
+      "params": {
+        "clf__C": "10.0",
+        "clf__class_weight": "None",
+        "tfidf__ngram_range": "(1, 2)"
+      },
+      "f1_macro": 0.7827
+    },
+    {
+      "params": {
+        "clf__C": "10.0",
+        "clf__class_weight": "balanced",
+        "tfidf__ngram_range": "(1, 1)"
+      },
+      "f1_macro": 0.8114
+    },
+    {
+      "params": {
+        "clf__C": "10.0",
+        "clf__class_weight": "balanced",
+        "tfidf__ngram_range": "(1, 2)"
+      },
+      "f1_macro": 0.7827
+    }
+  ]
+}

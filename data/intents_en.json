@@ -1,0 +1,301 @@
+{
+  "_comment": "English training set, 15 intents x 20 examples, campus-assistant domain. Train on this ONLY; never on test_multilingual.json. Responses are a static KB; one is picked at random per prediction.",
+  "intents": {
+    "greet": {
+      "examples": [
+        "hi", "hello", "hey there", "good morning", "good afternoon",
+        "hello, how are you", "hi, I need some help", "hey, are you there",
+        "greetings", "namaste, can you help me", "good evening",
+        "hi, nice to meet you", "hello sir", "hey, good to see you",
+        "hi there, I have a question", "hello hello", "how are you", "how are you doing",
+        "good morning, hope you are doing well", "how is it going"
+      ],
+      "responses": [
+        "Hello! I'm the NCU campus assistant. Ask me about timetables, exams, fees, hostel, library and more.",
+        "Hi there! How can I help you with campus-related questions today?",
+        "Hey! I can help with timetable, exam, fees, hostel, library, placement and other NCU queries.",
+        "Hello! What would you like to know about campus life at NCU?"
+      ]
+    },
+    "goodbye": {
+      "examples": [
+        "bye", "goodbye", "see you later", "that's all, thanks", "bye bye",
+        "I have to go now", "talk to you later", "see you tomorrow",
+        "ok bye", "good night", "I'm leaving, bye", "catch you later",
+        "bye for now", "that will be all", "thanks, bye", "farewell",
+        "gtg", "got to go, bye", "see you around", "I am done, goodbye"
+      ],
+      "responses": [
+        "Goodbye! Good luck with your studies.",
+        "See you! Come back anytime you have a campus question.",
+        "Bye! Take care.",
+        "Goodbye! All the best."
+      ]
+    },
+    "thanks": {
+      "examples": [
+        "thank you", "thanks a lot", "thanks for the help", "that was helpful, thanks",
+        "thank you so much", "thx", "many thanks", "I appreciate it",
+        "thanks, this is exactly what I needed", "great, thank you",
+        "thanks for the information", "awesome, thanks", "thankyou",
+        "thanks buddy", "much appreciated", "thanks a ton",
+        "that helped, thank you", "ok thanks", "nice, thank you very much", "tq"
+      ],
+      "responses": [
+        "You're welcome!",
+        "Happy to help!",
+        "Anytime — ask away if you have more questions.",
+        "Glad I could help!"
+      ]
+    },
+    "timetable": {
+      "examples": [
+        "what is my timetable today", "show me the class schedule", "when is my next class",
+        "which classes do I have tomorrow", "where can I see my timetable",
+        "what time does the first lecture start", "do I have a class at 3 pm",
+        "what is the schedule for Monday", "how many lectures do I have today",
+        "when is the AI lab session", "timetable for CSE 3rd year",
+        "what are today's classes", "is there a free period now",
+        "when do classes end today", "class timings for this semester",
+        "show my weekly schedule", "which room is my next class in",
+        "has the timetable changed", "what is the lecture schedule", "when is my tutorial"
+      ],
+      "responses": [
+        "You can view your class timetable on the NCU ERP portal under Academics → Timetable. It reflects your registered sections.",
+        "Your daily schedule is on the ERP (Academics → My Timetable). Today's classes and room numbers are listed there.",
+        "Check the ERP portal for the live timetable — it stays updated if a lecture is rescheduled.",
+        "Timetables are published per section on the ERP. Log in and open Academics → Timetable to see today's classes."
+      ]
+    },
+    "exam_schedule": {
+      "examples": [
+        "when are the exams", "when do mid semester exams start", "exam dates for this semester",
+        "what is the exam schedule", "when is the end semester examination",
+        "date sheet for exams", "when are the midsems", "when is my maths exam",
+        "has the exam date sheet been released", "exam timetable",
+        "when will the exams begin", "dates for the practical exams",
+        "when are reappear exams held", "when is the minor test",
+        "how many days until exams", "what is the date of the first exam",
+        "schedule of upcoming examinations", "when do we have our finals",
+        "when is the viva scheduled", "exam calendar for this term"
+      ],
+      "responses": [
+        "Exam date sheets are published on the NCU ERP under Examination → Date Sheet, usually 2–3 weeks before exams begin.",
+        "Check the Examination section of the ERP portal for the official date sheet of mid-semester and end-semester exams.",
+        "The examination cell releases the date sheet on the ERP and the notice board near the admin block.",
+        "Exam schedules are announced on the ERP under Examinations. Watch for the official notification too."
+      ]
+    },
+    "results": {
+      "examples": [
+        "when will the results be declared", "how do I check my results", "where can I see my grades",
+        "have the results come out", "my result is not showing", "how to check semester result",
+        "when are results announced", "result kab aayega", "what is my sgpa",
+        "how to view my marks", "where are the results published", "can I see my grade card",
+        "results of last semester", "how much did I score", "when will we get our marks",
+        "grade card download", "how do I apply for revaluation", "what is the passing criteria",
+        "cgpa calculation rules", "result declaration date"
+      ],
+      "responses": [
+        "Results are declared on the NCU ERP under Examination → Results. You're notified by email when they're out.",
+        "Log in to the ERP and open Examination → Grade Card to view your SGPA/CGPA and subject-wise marks.",
+        "Results are typically declared 3–4 weeks after end-semester exams on the ERP portal.",
+        "You can check marks and download your grade card from the ERP. Revaluation forms are also available there after result declaration."
+      ]
+    },
+    "fees": {
+      "examples": [
+        "what is the fee structure", "how much is the semester fee", "how to pay fees online",
+        "what is the last date to pay fees", "is there a late fee fine",
+        "can I pay fees in installments", "where do I pay the hostel fee",
+        "fee payment methods", "how to get a fee receipt", "what happens if I miss the fee deadline",
+        "are there any scholarships", "how to apply for a fee concession",
+        "tuition fee for btech cse", "hostel and mess fee details",
+        "exam form fees", "fee refund policy", "where is the fee counter",
+        "how much is the bus fee", "can I pay by UPI", "fee structure for first year"
+      ],
+      "responses": [
+        "The fee structure is available on the NCU website under Admissions → Fee Structure, and payment happens through the ERP or the fee portal.",
+        "Pay fees online via the ERP fee portal (UPI, cards, net banking). Deadlines and late-fee rules are notified each semester.",
+        "For fee amounts, deadlines and scholarships, check the ERP fee section or contact the accounts office in the admin block.",
+        "Fee receipts auto-generate on the ERP after payment. For installments or concessions, visit the accounts office."
+      ]
+    },
+    "hostel": {
+      "examples": [
+        "how do I apply for hostel", "is a hostel room available", "what are the hostel fees",
+        "hostel rules and timings", "is hostel mandatory for first year",
+        "how to book a hostel room", "single room or sharing in hostel",
+        "what facilities are there in the hostel", "daily mess routine in hostel",
+        "can I change my hostel room", "hostel warden contact",
+        "what time does the hostel gate close", "is wifi available in hostel",
+        "hostel for girls timings", "how to vacate the hostel",
+        "guest stay rules in hostel", "laundry facility in hostel",
+        "distance between hostel and college", "hostel admission process", "is the hostel safe"
+      ],
+      "responses": [
+        "Hostel applications open on the ERP before each semester. Rooms are allotted by the hostel office based on availability.",
+        "For hostel fees, room types (single/sharing) and rules, see the Hostel section on the NCU website or visit the hostel office.",
+        "Hostel facilities include mess, Wi-Fi and laundry. Warden contact details are posted on each hostel's notice board.",
+        "Room changes and guest requests go through your hostel warden. Gate timings are in the hostel rulebook you get at allotment."
+      ]
+    },
+    "library": {
+      "examples": [
+        "what are the library timings", "how many books can I issue", "how to renew a library book",
+        "is the library open on sunday", "where is the library",
+        "how to search for a book in the library", "library membership rules",
+        "fine for late return of books", "can I access journals online",
+        "does the library have a reading room", "how to issue a book",
+        "library card lost what to do", "e library access",
+        "can I take books home", "library contact number",
+        "is there a digital library", "how long can I keep a borrowed book",
+        "can I suggest a book for the library", "library holidays", "where do I return books"
+      ],
+      "responses": [
+        "The central library is open on working days (typically 9 am–8 pm) with reduced weekend hours — current timings are posted at the entrance and on the ERP.",
+        "Students can issue a fixed number of books (usually 4) for two weeks; renewals are possible at the circulation desk or online.",
+        "Late returns carry a small daily fine. You can access e-journals through the library section of the NCU website.",
+        "For book search use the OPAC terminal in the library; for a lost library card, report at the circulation desk to get a duplicate."
+      ]
+    },
+    "attendance": {
+      "examples": [
+        "how do I check my attendance", "what is the minimum attendance required",
+        "my attendance is short what will happen", "how much attendance do I have in maths",
+        "attendance criteria for exams", "can I sit in the exam with 70 percent attendance",
+        "where is attendance updated", "teacher marked me absent by mistake",
+        "how to apply for attendance condonation", "attendance shortage fine",
+        "does medical leave count in attendance", "attendance policy at ncu",
+        "how often is attendance updated on erp", "will I be detained for low attendance",
+        "attendance percentage calculation", "is attendance compulsory",
+        "how to correct wrong attendance entry", "attendance of last month",
+        "od duty leave attendance", "minimum attendance rule"
+      ],
+      "responses": [
+        "Attendance is tracked per subject on the ERP under Academics → Attendance and is usually updated within a day.",
+        "NCU generally requires 75% attendance per subject to sit for end-semester exams; check the academic regulations for condonation rules.",
+        "If an entry is wrong, contact the course faculty first — only they can correct attendance records.",
+        "Medical/duty leave may be condonable as per the attendance policy; apply with documents through the ERP or your school office."
+      ]
+    },
+    "placements": {
+      "examples": [
+        "which companies visit the campus", "what is the placement percentage",
+        "highest package offered", "when do placements start",
+        "am I eligible for placements", "how to register for placement drive",
+        "where is the placement cell", "what is the average package for cse",
+        "internship opportunities through college", "placement training sessions",
+        "which companies came last year", "how to prepare for campus placements",
+        "eligibility criteria for placement", "does tcs visit ncu",
+        "placement statistics", "when is the next placement drive",
+        "can backlogs affect placement", "off campus placement support",
+        "who is the placement officer", "mock interviews schedule"
+      ],
+      "responses": [
+        "The Career Development Centre (CDC) handles placements. Company visits, eligibility and drive dates are mailed to registered students and posted on the ERP.",
+        "Placement stats — visiting companies, average and highest packages — are published on the NCU website's placements page each year.",
+        "Register with the placement cell to get drive notifications; attendance in CDC training/aptitude sessions is usually mandatory for drives.",
+        "Eligibility varies by company. Contact the CDC office for criteria, schedules and interview preparation sessions."
+      ]
+    },
+    "events_clubs": {
+      "examples": [
+        "what events are happening this week", "how to join a club",
+        "which clubs are there in college", "when is the tech fest",
+        "cultural fest dates", "how to participate in events",
+        "is there a coding club", "how to start a new club",
+        "sports events this semester", "dj night on campus",
+        "when is the annual fest", "how to register for the hackathon",
+        "photography club auditions", "nss activities",
+        "upcoming workshops", "event calendar",
+        "who to contact for event sponsorship", "drama society auditions",
+        "freshers party date", "blood donation camp when"
+      ],
+      "responses": [
+        "Upcoming events are announced on the ERP notice board, the NCU Instagram page and student-club groups.",
+        "NCU has technical, cultural and sports clubs — auditions and sign-ups usually happen at the start of each semester.",
+        "Fests like the annual techno-cultural fest happen once a year; dates are announced by the student council.",
+        "To join or start a club, contact the Dean of Student Welfare office — they handle club registrations and event permissions."
+      ]
+    },
+    "transport": {
+      "examples": [
+        "is there a bus service from my area", "bus timings from gurgaon",
+        "how to reach the campus", "nearest metro station to ncu",
+        "college bus route list", "bus pass application",
+        "is parking available on campus", "shuttle service from metro",
+        "bus fee per semester", "how far is the campus from sohna road",
+        "cab facility for students", "transport contact number",
+        "bus from delhi to ncu", "does the bus run on saturday",
+        "how to apply for transport facility", "route number for my area",
+        "bus timing after evening classes", "two wheeler parking rules",
+        "is the campus accessible by public transport", "transport office location"
+      ],
+      "responses": [
+        "NCU runs buses on major routes in Delhi-NCR; route lists, timings and fees are available at the transport office and on the website.",
+        "The campus is on NH-48 near Gurugram; the nearest metro connectivity and bus routes are listed on the NCU website's contact page.",
+        "Apply for the bus facility at the transport office with your student ID; passes are usually issued per semester.",
+        "Student parking is available on campus with a valid pass — get it from the admin office."
+      ]
+    },
+    "admission_info": {
+      "examples": [
+        "how to apply for admission", "what is the eligibility for btech cse",
+        "admission process for this year", "documents required for admission",
+        "last date to apply for admission", "is jee score accepted",
+        "entrance exam for admission", "management quota seats",
+        "eligibility criteria for mtech", "how to get admission in ncu",
+        "what percentage is required for admission", "is there lateral entry",
+        "admission helpline number", "when do admissions open",
+        "counselling process details", "is there any scholarship at admission",
+        "can I get admission with 80 percent in boards", "phd admission process",
+        "eligibility for bba", "international student admission"
+      ],
+      "responses": [
+        "Admissions are through the NCU website's Apply Now portal; eligibility and accepted exams (like JEE/boards merit) are listed per program.",
+        "For eligibility, documents and deadlines, see the Admissions section of the NCU website or call the admission helpline listed there.",
+        "B.Tech admission generally considers JEE Main score or qualifying-exam merit; check the criteria for this year's cycle on the website.",
+        "The admission cell in the admin block can help with counselling dates, scholarships and document checklists."
+      ]
+    },
+    "identity": {
+      "_note": "Added 30 Sep 2026 after Phase-1 battery: 'Wer bin ich?' fell to fallback. Safe answers only — the bot never claims to know the user.",
+      "examples": [
+        "who am i", "do you know who I am", "what is my name", "can you tell me who I am",
+        "who am i logged in as", "do you know my name", "what do you know about me",
+        "tell me my name", "you know who I am right", "identify me",
+        "what is my identity", "who is this speaking", "guess who I am",
+        "do you recognize me", "what is my username", "do you have my details",
+        "who do you think I am", "am I registered with you", "do you remember me",
+        "tell me about myself"
+      ],
+      "responses": [
+        "I can't determine your identity on my own — I only see the messages you send me here. Tell me your name and I'll happily use it.",
+        "I don't have access to your account or profile in this chat. You're talking to the NCU campus assistant — feel free to introduce yourself!",
+        "Nothing about who you are is visible to me beyond this chat. But tell me what to call you, and ask me anything campus-related.",
+        "I don't know who you are until you tell me — no personal data is attached to this conversation."
+      ]
+    },
+    "food_canteen": {
+      "examples": [
+        "what are the canteen timings", "is there a canteen on campus",
+        "what food is available in the canteen", "canteen menu today",
+        "is the food in the mess good", "mess timings for hostellers",
+        "are there veg options", "cafeteria location",
+        "is there a dominos on campus", "food court on campus",
+        "how much does a meal cost in canteen", "evening snacks available",
+        "is outside food allowed", "juice shop near campus",
+        "coffee on campus", "is there a maggi point",
+        "hostel mess menu", "can day scholars eat in the mess",
+        "hygiene in canteen", "late night food options in hostel"
+      ],
+      "responses": [
+        "There's a main canteen plus food outlets on campus, open on working days; the hostel mess serves breakfast, lunch, evening snacks and dinner.",
+        "The hostel mess menu rotates weekly and includes veg options; timings are posted in the hostel.",
+        "Day scholars can buy meals at the canteen/food court on a pay-per-item basis.",
+        "For feedback on food quality or hygiene, contact the mess committee or the hostel warden."
+      ]
+    }
+  }
+}

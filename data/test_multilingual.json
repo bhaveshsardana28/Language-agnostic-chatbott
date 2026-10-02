@@ -1,0 +1,96 @@
+{
+  "_comment": "Multilingual TEST set: 30 queries (2 per intent) x 6 languages. NEVER used for training. Status: DRAFTED BY AI ASSISTANT — each language column must be verified/corrected by a fluent speaker before numbers go in the report (document any corrections in the report's methodology section).",
+  "_verified": {"en": true, "hi": false, "pa": false, "es": false, "fr": false, "de": false},
+  "queries": [
+    {"id": 1, "intent": "greet", "text": {
+      "en": "hello, good morning", "hi": "नमस्ते, सुप्रभात", "pa": "ਸਤ ਸ੍ਰੀ ਅਕਾਲ, ਸ਼ੁਭ ਸਵੇਰ",
+      "es": "hola, buenos días", "fr": "bonjour tout le monde", "de": "Hallo, guten Morgen"}},
+    {"id": 2, "intent": "greet", "text": {
+      "en": "hi, I need help with something", "hi": "नमस्ते, मुझे कुछ मदद चाहिए", "pa": "ਸਤ ਸ੍ਰੀ ਅਕਾਲ, ਮੈਨੂੰ ਕੁਝ ਮਦਦ ਚਾਹੀਦੀ ਹੈ",
+      "es": "hola, necesito ayuda con algo", "fr": "salut, j'ai besoin d'aide", "de": "Hallo, ich brauche Hilfe bei etwas"}},
+    {"id": 3, "intent": "goodbye", "text": {
+      "en": "ok thank you, bye for now", "hi": "ठीक है धन्यवाद, अलविदा", "pa": "ਠੀਕ ਹੈ ਧੰਨਵਾਦ, ਅਲਵਿਦਾ",
+      "es": "vale, gracias, adiós", "fr": "d'accord merci, au revoir", "de": "okay danke, tschüss"}},
+    {"id": 4, "intent": "goodbye", "text": {
+      "en": "see you tomorrow", "hi": "कल मिलते हैं", "pa": "ਕੱਲ੍ਹ ਮਿਲਦੇ ਹਾਂ",
+      "es": "nos vemos mañana", "fr": "à demain", "de": "bis morgen"}},
+    {"id": 5, "intent": "thanks", "text": {
+      "en": "thank you very much for your help", "hi": "आपकी मदद के लिए बहुत-बहुत धन्यवाद", "pa": "ਤੁਹਾਡੀ ਮਦਦ ਲਈ ਬਹੁਤ-ਬਹੁਤ ਧੰਨਵਾਦ",
+      "es": "muchas gracias por tu ayuda", "fr": "merci beaucoup pour votre aide", "de": "vielen Dank für deine Hilfe"}},
+    {"id": 6, "intent": "thanks", "text": {
+      "en": "that was really helpful, thanks", "hi": "यह सच में मददगार था, धन्यवाद", "pa": "ਇਹ ਸੱਚਮੁਚ ਮਦਦਗਾਰ ਸੀ, ਧੰਨਵਾਦ",
+      "es": "fue muy útil, gracias", "fr": "c'était très utile, merci", "de": "das war wirklich hilfreich, danke"}},
+    {"id": 7, "intent": "timetable", "text": {
+      "en": "what classes do I have today", "hi": "आज मेरी कौन-कौन सी क्लासें हैं", "pa": "ਅੱਜ ਮੇਰੀਆਂ ਕਿਹੜੀਆਂ ਕਲਾਸਾਂ ਹਨ",
+      "es": "¿qué clases tengo hoy?", "fr": "quels cours ai-je aujourd'hui ?", "de": "welche Kurse habe ich heute?"}},
+    {"id": 8, "intent": "timetable", "text": {
+      "en": "when does my next lecture start", "hi": "मेरा अगला लेक्चर कब शुरू होगा", "pa": "ਮੇਰਾ ਅਗਲਾ ਲੈਕਚਰ ਕਦੋਂ ਸ਼ੁਰੂ ਹੋਵੇਗਾ",
+      "es": "¿cuándo empieza mi próxima clase?", "fr": "quand commence mon prochain cours ?", "de": "wann beginnt meine nächste Vorlesung?"}},
+    {"id": 9, "intent": "exam_schedule", "text": {
+      "en": "when are the mid semester exams", "hi": "मिड सेमेस्टर परीक्षाएं कब हैं", "pa": "ਮਿਡ ਸੈਮਸਟਰ ਪ੍ਰੀਖਿਆਵਾਂ ਕਦੋਂ ਹਨ",
+      "es": "¿cuándo son los exámenes parciales?", "fr": "quand ont lieu les examens de mi-semestre ?", "de": "wann sind die Zwischenprüfungen?"}},
+    {"id": 10, "intent": "exam_schedule", "text": {
+      "en": "has the final exam date sheet been released", "hi": "क्या फाइनल परीक्षा की डेट शीट जारी हो गई है", "pa": "ਕੀ ਫਾਈਨਲ ਪ੍ਰੀਖਿਆ ਦੀ ਡੇਟ ਸ਼ੀਟ ਜਾਰੀ ਹੋ ਗਈ ਹੈ",
+      "es": "¿ya se publicó el calendario de exámenes finales?", "fr": "le calendrier des examens finaux est-il publié ?", "de": "wurde der Plan der Abschlussprüfungen schon veröffentlicht?"}},
+    {"id": 11, "intent": "results", "text": {
+      "en": "how can I check my semester result", "hi": "मैं अपना सेमेस्टर रिजल्ट कैसे देखूं", "pa": "ਮੈਂ ਆਪਣਾ ਸੈਮਸਟਰ ਨਤੀਜਾ ਕਿਵੇਂ ਦੇਖ ਸਕਦਾ ਹਾਂ",
+      "es": "¿cómo puedo ver mis resultados del semestre?", "fr": "comment puis-je consulter mes résultats du semestre ?", "de": "wie kann ich meine Semesterergebnisse einsehen?"}},
+    {"id": 12, "intent": "results", "text": {
+      "en": "when will the results be declared", "hi": "रिजल्ट कब घोषित होगा", "pa": "ਨਤੀਜੇ ਕਦੋਂ ਘੋਸ਼ਿਤ ਹੋਣਗੇ",
+      "es": "¿cuándo se publicarán los resultados?", "fr": "quand les résultats seront-ils publiés ?", "de": "wann werden die Ergebnisse bekannt gegeben?"}},
+    {"id": 13, "intent": "fees", "text": {
+      "en": "how can I pay my semester fees online", "hi": "मैं अपनी सेमेस्टर फीस ऑनलाइन कैसे भर सकता हूँ", "pa": "ਮੈਂ ਆਪਣੀ ਸੈਮਸਟਰ ਫੀਸ ਆਨਲਾਈਨ ਕਿਵੇਂ ਅਦਾ ਕਰ ਸਕਦਾ ਹਾਂ",
+      "es": "¿cómo puedo pagar la matrícula del semestre en línea?", "fr": "comment payer les frais du semestre en ligne ?", "de": "wie kann ich die Semestergebühren online bezahlen?"}},
+    {"id": 14, "intent": "fees", "text": {
+      "en": "what is the last date for fee payment", "hi": "फीस जमा करने की आखिरी तारीख क्या है", "pa": "ਫੀਸ ਜਮ੍ਹਾ ਕਰਨ ਦੀ ਆਖ਼ਰੀ ਤਾਰੀਖ਼ ਕੀ ਹੈ",
+      "es": "¿cuál es la fecha límite para pagar las tasas?", "fr": "quelle est la date limite de paiement des frais ?", "de": "bis wann muss ich die Gebühren bezahlen?"}},
+    {"id": 15, "intent": "hostel", "text": {
+      "en": "how do I apply for a hostel room", "hi": "मैं हॉस्टल के कमरे के लिए आवेदन कैसे करूं", "pa": "ਮੈਂ ਹਾਸਟਲ ਦੇ ਕਮਰੇ ਲਈ ਅਰਜ਼ੀ ਕਿਵੇਂ ਦੇਵਾਂ",
+      "es": "¿cómo solicito una habitación en la residencia?", "fr": "comment demander une chambre en résidence universitaire ?", "de": "wie bewerbe ich mich um ein Zimmer im Wohnheim?"}},
+    {"id": 16, "intent": "hostel", "text": {
+      "en": "what are the hostel gate timings", "hi": "हॉस्टल गेट का समय क्या है", "pa": "ਹਾਸਟਲ ਗੇਟ ਦਾ ਸਮਾਂ ਕੀ ਹੈ",
+      "es": "¿cuál es el horario de entrada a la residencia?", "fr": "quels sont les horaires d'ouverture de la résidence ?", "de": "wie sind die Öffnungszeiten des Wohnheimtores?"}},
+    {"id": 17, "intent": "library", "text": {
+      "en": "how many books can I borrow from the library", "hi": "मैं लाइब्रेरी से कितनी किताबें उधार ले सकता हूँ", "pa": "ਮੈਂ ਲਾਇਬ੍ਰੇਰੀ ਤੋਂ ਕਿੰਨੀਆਂ ਕਿਤਾਬਾਂ ਲੈ ਸਕਦਾ ਹਾਂ",
+      "es": "¿cuántos libros puedo sacar de la biblioteca?", "fr": "combien de livres puis-je emprunter à la bibliothèque ?", "de": "wie viele Bücher kann ich aus der Bibliothek ausleihen?"}},
+    {"id": 18, "intent": "library", "text": {
+      "en": "what time does the library open", "hi": "लाइब्रेरी कितने बजे खुलती है", "pa": "ਲਾਇਬ੍ਰੇਰੀ ਕਿੰਨੇ ਵਜੇ ਖੁੱਲ੍ਹਦੀ ਹੈ",
+      "es": "¿a qué hora abre la biblioteca?", "fr": "à quelle heure ouvre la bibliothèque ?", "de": "wann öffnet die Bibliothek?"}},
+    {"id": 19, "intent": "attendance", "text": {
+      "en": "how do I check my attendance percentage", "hi": "मैं अपनी अटेंडेंस प्रतिशत कैसे देखूं", "pa": "ਮੈਂ ਆਪਣੀ ਹਾਜ਼ਰੀ ਪ੍ਰਤੀਸ਼ਤ ਕਿਵੇਂ ਦੇਖਾਂ",
+      "es": "¿cómo reviso mi porcentaje de asistencia?", "fr": "comment vérifier mon taux d'assiduité ?", "de": "wie kann ich meine Anwesenheitsquote prüfen?"}},
+    {"id": 20, "intent": "attendance", "text": {
+      "en": "what is the minimum attendance required for exams", "hi": "परीक्षा के लिए न्यूनतम अटेंडेंस कितनी चाहिए", "pa": "ਪ੍ਰੀਖਿਆ ਲਈ ਘੱਟੋ-ਘੱਟ ਹਾਜ਼ਰੀ ਕਿੰਨੀ ਚਾਹੀਦੀ ਹੈ",
+      "es": "¿cuál es la asistencia mínima exigida para los exámenes?", "fr": "quelle est l'assiduité minimale requise pour les examens ?", "de": "wie viel Anwesenheit ist für die Prüfungen mindestens erforderlich?"}},
+    {"id": 21, "intent": "placements", "text": {
+      "en": "which companies come for campus placements", "hi": "कैंपस प्लेसमेंट के लिए कौन-कौन सी कंपनियां आती हैं", "pa": "ਕੈਂਪਸ ਪਲੇਸਮੈਂਟ ਲਈ ਕਿਹੜੀਆਂ ਕੰਪਨੀਆਂ ਆਉਂਦੀਆਂ ਹਨ",
+      "es": "¿qué empresas vienen a las prácticas del campus?", "fr": "quelles entreprises viennent recruter sur le campus ?", "de": "welche Unternehmen kommen zum Campus-Recruiting?"}},
+    {"id": 22, "intent": "placements", "text": {
+      "en": "when do placements start for final year students", "hi": "फाइनल ईयर के छात्रों के लिए प्लेसमेंट कब शुरू होते हैं", "pa": "ਫਾਈਨਲ ਈਅਰ ਦੇ ਵਿਦਿਆਰਥੀਆਂ ਲਈ ਪਲੇਸਮੈਂਟ ਕਦੋਂ ਸ਼ੁਰੂ ਹੁੰਦੀਆਂ ਹਨ",
+      "es": "¿cuándo empiezan las prácticas para los estudiantes de último año?", "fr": "quand commencent les recrutements pour les étudiants de dernière année ?", "de": "wann beginnt das Campus-Recruiting für die Abschlussjahrgänge?"}},
+    {"id": 23, "intent": "events_clubs", "text": {
+      "en": "how can I join a club in college", "hi": "मैं कॉलेज में किसी क्लब से कैसे जुड़ूं", "pa": "ਮੈਂ ਕਾਲਜ ਵਿੱਚ ਕਲੱਬ ਕਿਵੇਂ ਜੁਆਇਨ ਕਰਾਂ",
+      "es": "¿cómo puedo unirme a un club de la universidad?", "fr": "comment rejoindre un club à l'université ?", "de": "wie kann ich einem Hochschulverein beitreten?"}},
+    {"id": 24, "intent": "events_clubs", "text": {
+      "en": "when is the college fest", "hi": "कॉलेज फेस्ट कब है", "pa": "ਕਾਲਜ ਫੈਸਟ ਕਦੋਂ ਹੈ",
+      "es": "¿cuándo es el festival de la universidad?", "fr": "quand a lieu la fête de l'université ?", "de": "wann ist das Hochschulfest?"}},
+    {"id": 25, "intent": "transport", "text": {
+      "en": "which bus route goes to the university", "hi": "कौन सा बस रूट यूनिवर्सिटी जाता है", "pa": "ਕਿਹੜਾ ਬੱਸ ਰੂਟ ਯੂਨੀਵਰਸਿਟੀ ਜਾਂਦਾ ਹੈ",
+      "es": "¿qué ruta de autobús va a la universidad?", "fr": "quelle ligne de bus va à l'université ?", "de": "welche Buslinie fährt zur Universität?"}},
+    {"id": 26, "intent": "transport", "text": {
+      "en": "how do I reach the campus by metro", "hi": "मैं मेट्रो से कैंपस कैसे पहुंचूं", "pa": "ਮੈਂ ਮੈਟਰੋ ਰਾਹੀਂ ਕੈਂਪਸ ਕਿਵੇਂ ਪਹੁੰਚਾਂ",
+      "es": "¿cómo llego al campus en metro?", "fr": "comment rejoindre le campus en métro ?", "de": "wie komme ich mit der U-Bahn zum Campus?"}},
+    {"id": 27, "intent": "admission_info", "text": {
+      "en": "what is the eligibility criteria for btech admission", "hi": "बीटेक में दाखिले के लिए योग्यता क्या है", "pa": "ਬੀਟੈੱਕ ਦਾਖਲੇ ਲਈ ਲਾਜ਼ਮੀ ਯੋਗਤਾ ਕੀ ਹੈ",
+      "es": "¿cuáles son los requisitos para la admisión a btech?", "fr": "quels sont les critères d'admission au btech ?", "de": "was sind die Zulassungsvoraussetzungen für das B.Tech-Studium?"}},
+    {"id": 28, "intent": "admission_info", "text": {
+      "en": "when do admissions open for this year", "hi": "इस साल के लिए एडमिशन कब शुरू होंगे", "pa": "ਇਸ ਸਾਲ ਲਈ ਦਾਖਲੇ ਕਦੋਂ ਸ਼ੁਰੂ ਹੋਣਗੇ",
+      "es": "¿cuándo abren las admisiones de este año?", "fr": "quand ouvrent les admissions cette année ?", "de": "wann beginnen die diesjährigen Zulassungen?"}},
+    {"id": 29, "intent": "food_canteen", "text": {
+      "en": "is there a canteen on campus", "hi": "क्या कैंपस में कैंटीन है", "pa": "ਕੀ ਕੈਂਪਸ ਵਿੱਚ ਕੈਂਟੀਨ ਹੈ",
+      "es": "¿hay una cafetería en el campus?", "fr": "y a-t-il une cantine sur le campus ?", "de": "gibt es eine Mensa auf dem Campus?"}},
+    {"id": 30, "intent": "food_canteen", "text": {
+      "en": "what time does the hostel mess serve dinner", "hi": "हॉस्टल मेस में रात का खाना कितने बजे मिलता है", "pa": "ਹਾਸਟਲ ਮੈੱਸ ਵਿੱਚ ਰਾਤ ਦਾ ਖਾਣਾ ਕਿੰਨੇ ਵਜੇ ਮਿਲਦਾ ਹੈ",
+      "es": "¿a qué hora sirve la cena el comedor de la residencia?", "fr": "à quelle heure le dîner est-il servi au réfectoire ?", "de": "wann gibt es Abendessen in der Wohnheim-Mensa?"}}
+  ]
+}

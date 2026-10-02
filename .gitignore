@@ -1,0 +1,16 @@
+.Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+*.db
+.DS_Store
+.streamlit/
+.pytest_cache/
+.aikya_chatbot/
+.language_agnostic_chatbot/
+portfolio/node_modules/
+logs/
+models/

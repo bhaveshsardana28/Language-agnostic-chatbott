@@ -1,0 +1,181 @@
+id,lang,predicted,correct,text
+1,de,no,0,Hallo, guten Morgen
+1,en,en,1,hello, good morning
+1,es,es,1,hola, buenos días
+1,fr,fr,1,bonjour tout le monde
+1,hi,hi,1,नमस्ते, सुप्रभात
+1,pa,pa,1,ਸਤ ਸ੍ਰੀ ਅਕਾਲ, ਸ਼ੁਭ ਸਵੇਰ
+2,de,de,1,Hallo, ich brauche Hilfe bei etwas
+2,en,en,1,hi, I need help with something
+2,es,es,1,hola, necesito ayuda con algo
+2,fr,fi,0,salut, j'ai besoin d'aide
+2,hi,hi,1,नमस्ते, मुझे कुछ मदद चाहिए
+2,pa,pa,1,ਸਤ ਸ੍ਰੀ ਅਕਾਲ, ਮੈਨੂੰ ਕੁਝ ਮਦਦ ਚਾਹੀਦੀ ਹੈ
+3,de,tr,0,okay danke, tschüss
+3,en,en,1,ok thank you, bye for now
+3,es,es,1,vale, gracias, adiós
+3,fr,en,0,d'accord merci, au revoir
+3,hi,hi,1,ठीक है धन्यवाद, अलविदा
+3,pa,pa,1,ਠੀਕ ਹੈ ਧੰਨਵਾਦ, ਅਲਵਿਦਾ
+4,de,nl,0,bis morgen
+4,en,en,1,see you tomorrow
+4,es,es,1,nos vemos mañana
+4,fr,fr,1,à demain
+4,hi,hi,1,कल मिलते हैं
+4,pa,pa,1,ਕੱਲ੍ਹ ਮਿਲਦੇ ਹਾਂ
+5,de,de,1,vielen Dank für deine Hilfe
+5,en,en,1,thank you very much for your help
+5,es,es,1,muchas gracias por tu ayuda
+5,fr,fr,1,merci beaucoup pour votre aide
+5,hi,hi,1,आपकी मदद के लिए बहुत-बहुत धन्यवाद
+5,pa,pa,1,ਤੁਹਾਡੀ ਮਦਦ ਲਈ ਬਹੁਤ-ਬਹੁਤ ਧੰਨਵਾਦ
+6,de,de,1,das war wirklich hilfreich, danke
+6,en,en,1,that was really helpful, thanks
+6,es,es,1,fue muy útil, gracias
+6,fr,fr,1,c'était très utile, merci
+6,hi,hi,1,यह सच में मददगार था, धन्यवाद
+6,pa,pa,1,ਇਹ ਸੱਚਮੁਚ ਮਦਦਗਾਰ ਸੀ, ਧੰਨਵਾਦ
+7,de,de,1,welche Kurse habe ich heute?
+7,en,en,1,what classes do I have today
+7,es,fr,0,¿qué clases tengo hoy?
+7,fr,fr,1,quels cours ai-je aujourd'hui ?
+7,hi,hi,1,आज मेरी कौन-कौन सी क्लासें हैं
+7,pa,pa,1,ਅੱਜ ਮੇਰੀਆਂ ਕਿਹੜੀਆਂ ਕਲਾਸਾਂ ਹਨ
+8,de,de,1,wann beginnt meine nächste Vorlesung?
+8,en,en,1,when does my next lecture start
+8,es,pt,0,¿cuándo empieza mi próxima clase?
+8,fr,fr,1,quand commence mon prochain cours ?
+8,hi,hi,1,मेरा अगला लेक्चर कब शुरू होगा
+8,pa,pa,1,ਮੇਰਾ ਅਗਲਾ ਲੈਕਚਰ ਕਦੋਂ ਸ਼ੁਰੂ ਹੋਵੇਗਾ
+9,de,de,1,wann sind die Zwischenprüfungen?
+9,en,en,1,when are the mid semester exams
+9,es,es,1,¿cuándo son los exámenes parciales?
+9,fr,fr,1,quand ont lieu les examens de mi-semestr
+9,hi,hi,1,मिड सेमेस्टर परीक्षाएं कब हैं
+9,pa,pa,1,ਮਿਡ ਸੈਮਸਟਰ ਪ੍ਰੀਖਿਆਵਾਂ ਕਦੋਂ ਹਨ
+10,de,de,1,wurde der Plan der Abschlussprüfungen sc
+10,en,en,1,has the final exam date sheet been relea
+10,es,es,1,¿ya se publicó el calendario de exámenes
+10,fr,fr,1,le calendrier des examens finaux est-il 
+10,hi,hi,1,क्या फाइनल परीक्षा की डेट शीट जारी हो गई
+10,pa,pa,1,ਕੀ ਫਾਈਨਲ ਪ੍ਰੀਖਿਆ ਦੀ ਡੇਟ ਸ਼ੀਟ ਜਾਰੀ ਹੋ ਗਈ 
+11,de,de,1,wie kann ich meine Semesterergebnisse ei
+11,en,en,1,how can I check my semester result
+11,es,es,1,¿cómo puedo ver mis resultados del semes
+11,fr,fr,1,comment puis-je consulter mes résultats 
+11,hi,hi,1,मैं अपना सेमेस्टर रिजल्ट कैसे देखूं
+11,pa,pa,1,ਮੈਂ ਆਪਣਾ ਸੈਮਸਟਰ ਨਤੀਜਾ ਕਿਵੇਂ ਦੇਖ ਸਕਦਾ ਹਾਂ
+12,de,en,0,wann werden die Ergebnisse bekannt gegeb
+12,en,en,1,when will the results be declared
+12,es,es,1,¿cuándo se publicarán los resultados?
+12,fr,fr,1,quand les résultats seront-ils publiés ?
+12,hi,hi,1,रिजल्ट कब घोषित होगा
+12,pa,pa,1,ਨਤੀਜੇ ਕਦੋਂ ਘੋਸ਼ਿਤ ਹੋਣਗੇ
+13,de,de,1,wie kann ich die Semestergebühren online
+13,en,en,1,how can I pay my semester fees online
+13,es,es,1,¿cómo puedo pagar la matrícula del semes
+13,fr,fr,1,comment payer les frais du semestre en l
+13,hi,hi,1,मैं अपनी सेमेस्टर फीस ऑनलाइन कैसे भर सकत
+13,pa,pa,1,ਮੈਂ ਆਪਣੀ ਸੈਮਸਟਰ ਫੀਸ ਆਨਲਾਈਨ ਕਿਵੇਂ ਅਦਾ ਕਰ 
+14,de,de,1,bis wann muss ich die Gebühren bezahlen?
+14,en,en,1,what is the last date for fee payment
+14,es,es,1,¿cuál es la fecha límite para pagar las 
+14,fr,fr,1,quelle est la date limite de paiement de
+14,hi,hi,1,फीस जमा करने की आखिरी तारीख क्या है
+14,pa,pa,1,ਫੀਸ ਜਮ੍ਹਾ ਕਰਨ ਦੀ ਆਖ਼ਰੀ ਤਾਰੀਖ਼ ਕੀ ਹੈ
+15,de,de,1,wie bewerbe ich mich um ein Zimmer im Wo
+15,en,en,1,how do I apply for a hostel room
+15,es,es,1,¿cómo solicito una habitación en la resi
+15,fr,fr,1,comment demander une chambre en résidenc
+15,hi,hi,1,मैं हॉस्टल के कमरे के लिए आवेदन कैसे करू
+15,pa,pa,1,ਮੈਂ ਹਾਸਟਲ ਦੇ ਕਮਰੇ ਲਈ ਅਰਜ਼ੀ ਕਿਵੇਂ ਦੇਵਾਂ
+16,de,de,1,wie sind die Öffnungszeiten des Wohnheim
+16,en,en,1,what are the hostel gate timings
+16,es,es,1,¿cuál es el horario de entrada a la resi
+16,fr,fr,1,quels sont les horaires d'ouverture de l
+16,hi,hi,1,हॉस्टल गेट का समय क्या है
+16,pa,pa,1,ਹਾਸਟਲ ਗੇਟ ਦਾ ਸਮਾਂ ਕੀ ਹੈ
+17,de,de,1,wie viele Bücher kann ich aus der Biblio
+17,en,en,1,how many books can I borrow from the lib
+17,es,es,1,¿cuántos libros puedo sacar de la biblio
+17,fr,fr,1,combien de livres puis-je emprunter à la
+17,hi,hi,1,मैं लाइब्रेरी से कितनी किताबें उधार ले स
+17,pa,pa,1,ਮੈਂ ਲਾਇਬ੍ਰੇਰੀ ਤੋਂ ਕਿੰਨੀਆਂ ਕਿਤਾਬਾਂ ਲੈ ਸਕਦ
+18,de,de,1,wann öffnet die Bibliothek?
+18,en,en,1,what time does the library open
+18,es,es,1,¿a qué hora abre la biblioteca?
+18,fr,fr,1,à quelle heure ouvre la bibliothèque ?
+18,hi,hi,1,लाइब्रेरी कितने बजे खुलती है
+18,pa,pa,1,ਲਾਇਬ੍ਰੇਰੀ ਕਿੰਨੇ ਵਜੇ ਖੁੱਲ੍ਹਦੀ ਹੈ
+19,de,de,1,wie kann ich meine Anwesenheitsquote prü
+19,en,en,1,how do I check my attendance percentage
+19,es,es,1,¿cómo reviso mi porcentaje de asistencia
+19,fr,fr,1,comment vérifier mon taux d'assiduité ?
+19,hi,hi,1,मैं अपनी अटेंडेंस प्रतिशत कैसे देखूं
+19,pa,pa,1,ਮੈਂ ਆਪਣੀ ਹਾਜ਼ਰੀ ਪ੍ਰਤੀਸ਼ਤ ਕਿਵੇਂ ਦੇਖਾਂ
+20,de,de,1,wie viel Anwesenheit ist für die Prüfung
+20,en,en,1,what is the minimum attendance required 
+20,es,es,1,¿cuál es la asistencia mínima exigida pa
+20,fr,fr,1,quelle est l'assiduité minimale requise 
+20,hi,hi,1,परीक्षा के लिए न्यूनतम अटेंडेंस कितनी चा
+20,pa,pa,1,ਪ੍ਰੀਖਿਆ ਲਈ ਘੱਟੋ-ਘੱਟ ਹਾਜ਼ਰੀ ਕਿੰਨੀ ਚਾਹੀਦੀ 
+21,de,de,1,welche Unternehmen kommen zum Campus-Rec
+21,en,en,1,which companies come for campus placemen
+21,es,es,1,¿qué empresas vienen a las prácticas del
+21,fr,fr,1,quelles entreprises viennent recruter su
+21,hi,hi,1,कैंपस प्लेसमेंट के लिए कौन-कौन सी कंपनिय
+21,pa,pa,1,ਕੈਂਪਸ ਪਲੇਸਮੈਂਟ ਲਈ ਕਿਹੜੀਆਂ ਕੰਪਨੀਆਂ ਆਉਂਦੀਆ
+22,de,de,1,wann beginnt das Campus-Recruiting für d
+22,en,en,1,when do placements start for final year 
+22,es,es,1,¿cuándo empiezan las prácticas para los 
+22,fr,fr,1,quand commencent les recrutements pour l
+22,hi,hi,1,फाइनल ईयर के छात्रों के लिए प्लेसमेंट कब
+22,pa,pa,1,ਫਾਈਨਲ ਈਅਰ ਦੇ ਵਿਦਿਆਰਥੀਆਂ ਲਈ ਪਲੇਸਮੈਂਟ ਕਦੋਂ
+23,de,de,1,wie kann ich einem Hochschulverein beitr
+23,en,en,1,how can I join a club in college
+23,es,es,1,¿cómo puedo unirme a un club de la unive
+23,fr,fr,1,comment rejoindre un club à l'université
+23,hi,hi,1,मैं कॉलेज में किसी क्लब से कैसे जुड़ूं
+23,pa,pa,1,ਮੈਂ ਕਾਲਜ ਵਿੱਚ ਕਲੱਬ ਕਿਵੇਂ ਜੁਆਇਨ ਕਰਾਂ
+24,de,de,1,wann ist das Hochschulfest?
+24,en,en,1,when is the college fest
+24,es,es,1,¿cuándo es el festival de la universidad
+24,fr,fr,1,quand a lieu la fête de l'université ?
+24,hi,hi,1,कॉलेज फेस्ट कब है
+24,pa,pa,1,ਕਾਲਜ ਫੈਸਟ ਕਦੋਂ ਹੈ
+25,de,de,1,welche Buslinie fährt zur Universität?
+25,en,en,1,which bus route goes to the university
+25,es,ca,0,¿qué ruta de autobús va a la universidad
+25,fr,fr,1,quelle ligne de bus va à l'université ?
+25,hi,hi,1,कौन सा बस रूट यूनिवर्सिटी जाता है
+25,pa,pa,1,ਕਿਹੜਾ ਬੱਸ ਰੂਟ ਯੂਨੀਵਰਸਿਟੀ ਜਾਂਦਾ ਹੈ
+26,de,de,1,wie komme ich mit der U-Bahn zum Campus?
+26,en,en,1,how do I reach the campus by metro
+26,es,es,1,¿cómo llego al campus en metro?
+26,fr,fr,1,comment rejoindre le campus en métro ?
+26,hi,hi,1,मैं मेट्रो से कैंपस कैसे पहुंचूं
+26,pa,pa,1,ਮੈਂ ਮੈਟਰੋ ਰਾਹੀਂ ਕੈਂਪਸ ਕਿਵੇਂ ਪਹੁੰਚਾਂ
+27,de,de,1,was sind die Zulassungsvoraussetzungen f
+27,en,en,1,what is the eligibility criteria for bte
+27,es,es,1,¿cuáles son los requisitos para la admis
+27,fr,fr,1,quels sont les critères d'admission au b
+27,hi,hi,1,बीटेक में दाखिले के लिए योग्यता क्या है
+27,pa,pa,1,ਬੀਟੈੱਕ ਦਾਖਲੇ ਲਈ ਲਾਜ਼ਮੀ ਯੋਗਤਾ ਕੀ ਹੈ
+28,de,de,1,wann beginnen die diesjährigen Zulassung
+28,en,en,1,when do admissions open for this year
+28,es,es,1,¿cuándo abren las admisiones de este año
+28,fr,fr,1,quand ouvrent les admissions cette année
+28,hi,hi,1,इस साल के लिए एडमिशन कब शुरू होंगे
+28,pa,pa,1,ਇਸ ਸਾਲ ਲਈ ਦਾਖਲੇ ਕਦੋਂ ਸ਼ੁਰੂ ਹੋਣਗੇ
+29,de,de,1,gibt es eine Mensa auf dem Campus?
+29,en,en,1,is there a canteen on campus
+29,es,es,1,¿hay una cafetería en el campus?
+29,fr,fr,1,y a-t-il une cantine sur le campus ?
+29,hi,hi,1,क्या कैंपस में कैंटीन है
+29,pa,pa,1,ਕੀ ਕੈਂਪਸ ਵਿੱਚ ਕੈਂਟੀਨ ਹੈ
+30,de,de,1,wann gibt es Abendessen in der Wohnheim-
+30,en,en,1,what time does the hostel mess serve din
+30,es,es,1,¿a qué hora sirve la cena el comedor de 
+30,fr,fr,1,à quelle heure le dîner est-il servi au 
+30,hi,hi,1,हॉस्टल मेस में रात का खाना कितने बजे मिल
+30,pa,pa,1,ਹਾਸਟਲ ਮੈੱਸ ਵਿੱਚ ਰਾਤ ਦਾ ਖਾਣਾ ਕਿੰਨੇ ਵਜੇ ਮਿ
