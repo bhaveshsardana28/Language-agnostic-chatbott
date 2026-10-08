@@ -543,8 +543,11 @@ const _HL_KW={python:'def return if elif else for while import from class try ex
 function hl(code,lang){
   const kws=_HL_KW[(lang||'').toLowerCase()];
   if(!kws) return code;
-  const parts=[];  // pull comments+strings out first so keywords inside them stay untouched
-  code=code.replace(/(#[^\n]*|\/\/[^\n]*)|(&#34;[^&#34;\n]*&#34;|&#39;[^&#39;\n]*&#39;|`[^`]*`)/g,
+  const parts=[];  // pull strings/comments out first so keywords stay untouched.
+  // NB: strings must be tried BEFORE comments, and `#` must not match the
+  // entity fragment in &#39;/&#34; — otherwise any digit 3/9/&/#/; inside a
+  // quoted string breaks the string branch and corrupts the line (live-caught)
+  code=code.replace(/(&#34;[^&#34;\n]*&#34;|&#39;[^&#39;\n]*&#39;|`[^`]*`)|((?<!&)#[^\n]*|\/\/[^\n]*)/g,
     (m)=>{ parts.push(m); return `\x00H${parts.length-1}\x00`; });
   const re=new RegExp('\\b('+kws.trim().split(/\s+/).join('|')+')\\b','g');
   code=code.replace(re,'<span class="tok-k">$1</span>');
@@ -570,10 +573,11 @@ function md(src){
     table.rows.map(r=>'<tr>'+r.map(c=>'<td>'+inline(c)+'</td>').join('')+'</tr>').join('')+
     '</table></div>'); } table=null; };
   for(let ln of lines){
+    /* placeholder on its own line -> flush the paragraph and emit the code
+       block at BLOCK level: <pre> inside <p> auto-closes the paragraph per
+       the HTML5 parser (live-caught: DOM truncated to 190 chars) */
     const bm=ln.match(/^\x00B(\d+)\x00\s*$/);
-    if(bm){ flushP();flushL();flushT(); const b=blocks[+bm[1]];
-      out.push(`<span class="codeblock" data-cb="${+bm[1]}"><span class="cb-head"><span>${esc(b.lang)}</span><button class="cb-copy" type="button">Copy</button></span><pre><code>${hl(esc(b.code.replace(/\n$/,'')),b.lang)}</code></pre></span>`);
-      continue; }
+    if(bm){ flushP();flushL();flushT(); out.push(codeblockHTML(blocks,+bm[1])); continue; }
     if(/^\s*$/.test(ln)){ flushP();flushL();flushT(); continue; }
     const hm=ln.match(/^(#{1,3})\s+(.*)/);
     if(hm){ flushP();flushL();flushT(); out.push(`<h${hm[1].length}>${inline(hm[2])}</h${hm[1].length}>`); continue; }
@@ -593,7 +597,15 @@ function md(src){
     flushL();flushT(); para.push(ln);
   }
   flushP();flushL();flushT();
-  return out.join('');
+  /* safety net: fences that ended up INLINE (mid-sentence) still render as
+     block-level divs — the parser may close the surrounding <p>, but the
+     code never truncates and never leaks raw placeholders */
+  return out.join('').replace(/\x00B(\d+)\x00/g,(m,i)=>codeblockHTML(blocks,+i));
+
+function codeblockHTML(blocks,i){
+  const b=blocks[i];
+  return `<div class="codeblock" data-cb="${i}"><div class="cb-head"><span>${esc(b.lang)}</span><button class="cb-copy" type="button">Copy</button></div><pre><code>${hl(esc(b.code.replace(/\n$/,'')),b.lang)}</code></pre></div>`;
+}
 }
 document.addEventListener('click',e=>{
   const btn=e.target.closest('.cb-copy'); if(!btn)return;
@@ -818,6 +830,11 @@ async function run(c,um){
           am.content=am.content||friendly(am.debug_error); offline(true); }
   }finally{
     streaming=false; aborter=null; sendBtn.hidden=false; stopBtn.classList.remove('show');
+    if(!am.content && !am.error && !am.stopped){
+      /* zero-delta done = empty response from the provider: surface it
+         honestly with a retry affordance, never a silent empty bubble */
+      am.error=true; am.content='The assistant returned an empty response. Please try again.';
+    }
     am.content_md=md(am.content);
     am.intent=intent; am.confidence=conf;
     c.updatedAt=Date.now(); store.save();

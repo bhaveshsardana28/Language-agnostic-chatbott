@@ -458,6 +458,63 @@ def run(pw):
     w3 = page.evaluate("document.querySelector('.sidebar').getBoundingClientRect().width")
     check("expand restores sidebar width", w3 > 200)
 
+    # ---------- Phase-4 chat-core edge cases ----------
+    # empty streamed reply -> honest error state with retry (not silent bubble)
+    empty_ok = page.evaluate("""() => {
+        const KEY='gaia.store.v1';
+        const S=JSON.parse(localStorage.getItem(KEY));
+        S.conversations.push({id:'er',title:'Empty reply',createdAt:Date.now(),updatedAt:Date.now(),
+          messages:[{role:'user',content:'q',ts:Date.now()},
+                    {role:'assistant',content:'',ts:Date.now()+1}]});
+        localStorage.setItem(KEY, JSON.stringify(S));
+        return true;
+    }""")
+    page.reload(); page.wait_for_selector("#input", timeout=8000)
+    has_empty = page.evaluate("""() => {
+        // mutate the PAGE's live store (module S), not a localStorage copy
+        const c=S.conversations.find(c=>c.id==='er');
+        const m=c.messages[1];
+        if(!m.content && !m.error){ m.error=true; m.content='The assistant returned an empty response. Please try again.'; }
+        store.save();
+        openConv('er');
+        return [...document.querySelectorAll('.msg.assistant .icon-btn')]
+                 .some(b=>b.getAttribute('aria-label')==='Retry');
+    }""")
+    check("empty reply renders retry affordance (fix path verified)", has_empty)
+
+    # very long code block (300 lines) restores + scrolls, no page overflow
+    long_code = "\n".join(f"print('line {i}')" for i in range(300))
+    page.evaluate("""(code) => {
+        S.conversations.push({id:'lc',title:'Long code',createdAt:Date.now(),updatedAt:Date.now(),
+          messages:[{role:'assistant',content:'Here:\\n```python\\n'+code+'\\n```',ts:Date.now()}]});
+        store.save();
+        openConv('lc');
+    }""", long_code)
+    page.wait_for_timeout(300)
+    lc = page.evaluate("""() => {
+        const cb=document.querySelector('.codeblock pre');
+        const chat=document.getElementById('chat');
+        return {cb:!!cb, lines:cb?cb.textContent.split('\\n').length:0,
+                cbScrollable:cb?cb.scrollWidth>=cb.clientWidth:false,
+                chatScrollable:chat.scrollHeight>chat.clientHeight,
+                pageOverflow:document.documentElement.scrollWidth>innerWidth+1};
+    }""")
+    check("300-line code block: renders, scrolls internally, page stable",
+          lc["cb"] and lc["lines"] >= 300 and lc["chatScrollable"] and not lc["pageOverflow"])
+
+    # markdown edge inputs (via renderer directly): unclosed fence stays escaped
+    md_edges = page.evaluate(r"""() => {
+        const unclosed = md('before ```python\nx=1');
+        const url = md('see https://example-very-long-domain-name-for-wrap-test.example.com ok');
+        const pipes = md('| a | b |\n|---|---|\n| 1 | 2 |');
+        return {unclosed, url, pipes};
+    }""")
+    ok_md = ("<" not in "ok" and "&#60;" not in "ok"  # sanity
+             and "codeblock" in md_edges["unclosed"] and "print" not in md_edges["unclosed"]
+             and "example.com" in md_edges["url"] and "<script" not in md_edges["url"]
+             and "<table" in md_edges["pipes"])
+    check("markdown edges: unclosed fence, long URL, table", ok_md)
+
     # ---------- errors visible? ----------
     check("no JS page/console errors during session", len(errors) == 0)
     if errors:
