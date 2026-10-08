@@ -515,6 +515,29 @@ def run(pw):
              and "<table" in md_edges["pipes"])
     check("markdown edges: unclosed fence, long URL, table", ok_md)
 
+    # low-confidence chip hint (real backend confidence < 0.5 -> dashed hint)
+    page.evaluate("""() => {
+        S.conversations.push({id:'lowc',title:'LowConf',createdAt:Date.now(),updatedAt:Date.now(),
+          messages:[{role:'assistant',content:'resp',ts:Date.now(),
+            meta:{language_meta:{language:'hi',language_name:'Hindi',confidence:0.35}}}]});
+        store.save(); openConv('lowc');
+    }""")
+    page.wait_for_timeout(300)
+    lowconf = page.evaluate("""() => {
+        const c=document.querySelector('.lang-chip');
+        const cs=getComputedStyle(c);
+        return {cls:c.classList.contains('low-conf'),
+                style:cs.borderBottomStyle, title:c.title||''};
+    }""")
+    check("low-confidence chip gets subtle dashed hint + real %",
+          lowconf["cls"] and lowconf["style"] == "dashed" and "35%" in lowconf["title"])
+    page.evaluate("""() => {
+        const c=S.conversations.find(c=>c.id==='lowc');
+        S.conversations=S.conversations.filter(x=>x.id!=='lowc');
+        store.save();
+        if(S.conversations.some(c=>c.id==='pa')) openConv('pa');
+    }""")
+
     # ---------- errors visible? ----------
     check("no JS page/console errors during session", len(errors) == 0)
     if errors:

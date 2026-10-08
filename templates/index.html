@@ -215,6 +215,7 @@ body.debug .debug-card{display:block}
 .lang-chip{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;
   font-size:.7rem;color:var(--lang);margin-bottom:6px;font-weight:600}
 .lang-chip::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--lang)}
+.lang-chip.low-conf{border-bottom:1px dashed var(--muted);cursor:help}
 .lang-switch{align-self:center;display:flex;align-items:center;gap:8px;
   font-size:.72rem;color:var(--muted);padding:2px 0}
 .lang-switch::before,.lang-switch::after{content:'';height:1px;background:var(--border);flex:1}
@@ -722,6 +723,12 @@ function paintMsg(m,c,live=false){
   if(m.role!=='user'&&!live&&lm?.language){
     const chip=document.createElement('span'); chip.className='lang-chip';
     chip.textContent=`${NATIVE[lm.language]||lm.language} · ${lm.language_name||lm.language}`;
+    /* subtle low-detection-confidence hint — REAL backend value only;
+       threshold 0.5 is a UI-emphasis heuristic, never a claimed metric */
+    if(lm.confidence!=null && lm.confidence<0.5){
+      chip.classList.add('low-conf');
+      chip.title=`Detection confidence ${(lm.confidence*100).toFixed(0)}% — verify language`;
+    }
     b.prepend(chip);
   }
   w.appendChild(b);
