@@ -181,6 +181,7 @@ body.no-motion *,body.no-motion *::before,body.no-motion *::after{
 .tok-s{color:var(--ok)}
 .tok-c{color:var(--muted);font-style:italic}
 .listen-btn.speaking{color:var(--ok)}
+.listen-btn.paused{color:var(--warn)}
 .msg.live .bubble::after{content:'▌';color:var(--accent);margin-left:2px;
   animation:blink 1s steps(2) infinite}
 @keyframes blink{50%{opacity:0}}
@@ -1245,7 +1246,11 @@ else{ micBtn.disabled=true;
 
 /* Escape stops listening first; shortcut Cmd/Ctrl+Shift+M toggles the mic */
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){ if(recActive){ e.preventDefault(); stopVoice(); return; } closeDrawer(); }
+  if(e.key==='Escape'){
+    if(recActive){ e.preventDefault(); stopVoice(); return; }
+    if(speakingTs){ e.preventDefault(); stopSpeak(); return; }   /* §31: Escape stops speech */
+    closeDrawer();
+  }
   if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key.toLowerCase()==='m'){ e.preventDefault(); toggleVoice(); }
 });
 
@@ -1261,10 +1266,11 @@ function voicesFor(lang){
   const base=(BCP[lang]||lang||'en').split('-')[0].toLowerCase();
   return s.getVoices().filter(v=>v.lang&&v.lang.toLowerCase().startsWith(base));
 }
+let speakPaused=false;
 function stopSpeak(){
   const s=SYNTH();
   if(s){ s.cancel(); }   /* unconditional: native no-op when idle; flag-lag safe */
-  speakQueue=[]; speakingTs=null; updateListenUI();
+  speakQueue=[]; speakingTs=null; speakPaused=false; updateListenUI();
 }
 function speechText(raw){  /* markdown -> speakable plain text */
   let t=raw.replace(/```[\s\S]*?```/g,' Code block skipped. ');
@@ -1285,19 +1291,29 @@ function speakNext(){
   u.onend=u.onerror=()=>speakNext();
   s.speak(u);
 }
-function speakMessage(m){  /* per-message Listen button */
-  if(speakingTs===m.ts){ stopSpeak(); return; }
+function speakMessage(m){  /* Listen button: play / pause / resume */
+  if(speakingTs===m.ts){
+    const s=SYNTH();
+    if(!s){ stopSpeak(); return; }
+    if(speakPaused){ if(typeof s.resume==='function'){ s.resume(); speakPaused=false; } }
+    else if(typeof s.pause==='function'){ s.pause(); speakPaused=true; }
+    else{ stopSpeak(); }   /* engine without pause: fall back to stop */
+    updateListenUI();
+    return;
+  }
   stopSpeak();
   const lang=m.meta?.language_meta?.language||'en';
   const text=speechText(m.content);
   if(!text){ toast('Nothing to read aloud.'); return; }
-  speakQueue=[{text,lang}]; speakingTs=m.ts; updateListenUI(); speakNext();
+  speakQueue=[{text,lang}]; speakingTs=m.ts; speakPaused=false; updateListenUI(); speakNext();
 }
 function updateListenUI(){
   document.querySelectorAll('.listen-btn').forEach(b=>{
     const ts=b.closest('.msg')?.dataset.id;
-    b.classList.toggle('speaking',ts&&ts===String(speakingTs));
-    b.setAttribute('aria-label',ts&&ts===String(speakingTs)?'Stop reading':'Listen');
+    const mine=ts&&ts===String(speakingTs);
+    b.classList.toggle('speaking',!!mine&&!speakPaused);
+    b.classList.toggle('paused',!!mine&&speakPaused);
+    b.setAttribute('aria-label',mine?(speakPaused?'Resume reading':'Pause reading'):'Listen');
   });
 }
 /* stream-aware auto-read: speak each complete sentence as it arrives */

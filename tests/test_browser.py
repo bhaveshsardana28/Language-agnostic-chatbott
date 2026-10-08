@@ -366,6 +366,9 @@ def run(pw):
             SS.getVoices=()=>voices;
             SS.speak=u=>{window.__utts.push(u);};
             SS.cancel=()=>{window.__cancelled++;};
+            window.__paused=0; window.__resumed=0;
+            SS.pause=()=>{window.__paused++;};
+            SS.resume=()=>{window.__resumed++;};
         }""", voices)
 
     # Listen on a Hindi message -> language-matched voice
@@ -390,11 +393,26 @@ def run(pw):
           utt.get("lang") == "hi-IN" and "नमस्ते" in utt.get("text", ""))
     check("Listen button shows speaking state",
           page.locator(".listen-btn.speaking").count() == 1)
+    # second click PAUSES (engines with pause support), third RESUMES
     page.click(":nth-match(.listen-btn, 1)")
     page.wait_for_timeout(150)
-    check("clicking again stops speech",
+    paused_state = page.evaluate("""() => ({
+        p: window.__paused, label: document.querySelector('.listen-btn').getAttribute('aria-label'),
+        cls: document.querySelector('.listen-btn').classList.contains('paused')})""")
+    check("second click pauses speech (button now offers Resume)",
+          paused_state["p"] >= 1 and paused_state["label"] == "Resume reading" and paused_state["cls"])
+    page.click(":nth-match(.listen-btn, 1)")
+    page.wait_for_timeout(150)
+    resumed_state = page.evaluate("""() => ({
+        r: window.__resumed, label: document.querySelector('.listen-btn').getAttribute('aria-label')})""")
+    check("third click resumes speech (button back to Pause)",
+          resumed_state["r"] >= 1 and resumed_state["label"] == "Pause reading")
+    # Escape stops speech entirely
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(150)
+    check("Escape fully stops speech",
           page.evaluate("window.__cancelled") >= 1
-          and page.locator(".listen-btn.speaking").count() == 0)
+          and page.locator(".listen-btn.speaking,.listen-btn.paused").count() == 0)
 
     # no-voice honesty: Punjabi without a matching voice -> explicit toast
     page.evaluate("""() => {
