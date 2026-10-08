@@ -539,6 +539,51 @@ def run(pw):
         if(S.conversations.some(c=>c.id==='pa')) openConv('pa');
     }""")
 
+    # ---------- Phase-7 history/settings regressions ----------
+    # day separators between messages of different calendar days
+    page.evaluate("""() => {
+        const d0=Date.now()-86400000*2, d1=Date.now()-86400000, d2=Date.now();
+        S.conversations.push({id:'days',title:'Days',createdAt:d0,updatedAt:d2,messages:[
+          {role:'user',content:'old one',ts:d0},
+          {role:'assistant',content:'ok',meta:{language_meta:{language:'en'}},ts:d0+1000},
+          {role:'user',content:'yesterday one',ts:d1},
+          {role:'assistant',content:'ok2',meta:{language_meta:{language:'en'}},ts:d1+1000},
+          {role:'user',content:'today one',ts:d2},
+          {role:'assistant',content:'ok3',meta:{language_meta:{language:'en'}},ts:d2+1000}]});
+        store.save(); openConv('days');
+    }""")
+    page.wait_for_timeout(300)
+    seps = page.evaluate("""() => ({
+        n: document.querySelectorAll('.day-sep').length,
+        labels: [...document.querySelectorAll('.day-sep span')].map(s=>s.textContent)
+    })""")
+    check("day separators between different days (exactly 2)", seps["n"] == 2)
+
+    # delete a conversation via the trash icon + confirm modal
+    before_n = page.locator(".conv").count()
+    page.hover(":nth-match(.conv, 1)")
+    page.click(":nth-match(.conv .icon-btn.del, 1)")
+    page.wait_for_selector("#overlay-m.show", timeout=3000)
+    page.click("#overlay-m .confirm-row .yes")
+    page.wait_for_timeout(300)
+    after_n = page.locator(".conv").count()
+    check("delete-via-icon: confirm modal, then row removed",
+          after_n == before_n - 1)
+
+    # system theme follows the OS color scheme (two fresh contexts)
+    for scheme, expect in (("dark", "dark"), ("light", "light")):
+        ctx2 = browser.new_context(viewport={"width": 1280, "height": 800},
+                                   color_scheme=scheme)
+        ctx2.add_init_script(
+            "try{const s=JSON.parse(localStorage.getItem('gaia.store.v1')||'{}');"
+            "s.theme='system';localStorage.setItem('gaia.store.v1',JSON.stringify(s))}catch(e){}")
+        p2 = ctx2.new_page()
+        p2.goto(BASE)
+        p2.wait_for_selector("#input", timeout=8000)
+        got = p2.get_attribute("html", "data-theme")
+        check(f"system theme follows OS {scheme} scheme", got == expect)
+        ctx2.close()
+
     # ---------- errors visible? ----------
     check("no JS page/console errors during session", len(errors) == 0)
     if errors:

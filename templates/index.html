@@ -220,6 +220,10 @@ body.debug .debug-card{display:block}
   font-size:.72rem;color:var(--muted);padding:2px 0}
 .lang-switch::before,.lang-switch::after{content:'';height:1px;background:var(--border);flex:1}
 .lang-switch span{white-space:nowrap}
+.day-sep{display:flex;align-items:center;gap:10px;font-size:.7rem;color:var(--muted);
+  padding:6px 0}
+.day-sep::before,.day-sep::after{content:'';height:1px;background:var(--border);flex:1}
+.day-sep span{white-space:nowrap}
 #welcome h2{transition:opacity var(--t-med) var(--ease)}
 .card{animation:rise .25s var(--ease) both}
 .card:nth-child(2){animation-delay:.05s}.card:nth-child(3){animation-delay:.1s}
@@ -730,6 +734,15 @@ function paintMsg(m,c,live=false){
       chip.title=`Detection confidence ${(lm.confidence*100).toFixed(0)}% — verify language`;
     }
     b.prepend(chip);
+  }
+  /* day separator when this message falls on a new calendar day */
+  const prevMsg=c.messages[c.messages.indexOf(m)-1];
+  if(prevMsg&&prevMsg.ts&&m.ts&&
+     new Date(prevMsg.ts).toDateString()!==new Date(m.ts).toDateString()){
+    const dsep=document.createElement('div'); dsep.className='day-sep';
+    const g=groupOf(m.ts);
+    dsep.innerHTML=`<span>${(g==='Today'||g==='Yesterday')?g:new Date(m.ts).toLocaleDateString()}</span>`;
+    feed.appendChild(dsep);
   }
   w.appendChild(b);
   if(m.role!=='user'&&!live){
