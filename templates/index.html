@@ -1037,7 +1037,7 @@ async function refreshDocs(){
     const r=await api.listDocuments(c.id);
     if(!r.documents.length){ strip.classList.remove('show'); return; }
     strip.classList.add('show');
-    r.documents.forEach(d=>docChip(d.document,`${d.chunks} chunks`,'ok'));
+    r.documents.forEach(d=>docChip(d.document,`${d.chunks} chunks · Ready`,'ok'));
     const n=r.documents.length;
     const lbl=document.createElement('span'); lbl.className='st'; lbl.style.cssText='color:var(--muted);font-size:.75rem;align-self:center';
     lbl.textContent=`${n} document${n>1?'s':''} — ask questions about them`; strip.appendChild(lbl);

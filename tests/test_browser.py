@@ -80,7 +80,8 @@ def run(pw):
         f.write("Alpha policy: refunds within 30 days. Beta: shipping free over 50 euros. ")
     page.set_input_files("#file-input", doc_path)
     page.wait_for_selector("#doc-strip.show .chip.ok", timeout=30000)
-    check("document chip shows Ready state", "chunks" in page.text_content("#doc-strip"))
+    check("document chip shows Ready state",
+          "chunks" in page.text_content("#doc-strip") and "Ready" in page.text_content("#doc-strip"))
 
     # no horizontal overflow at desktop
     overflow = page.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth")
