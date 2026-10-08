@@ -298,7 +298,8 @@ def run(pw):
         class FakeRec{
           constructor(){ this.lang=''; this.continuous=false; this.interimResults=false;
             window.__mockEvents.push('constructed'); }
-          start(){ window.__mockEvents.push('start:'+this.lang); }
+          start(){ window.__mockEvents.push('start:'+this.lang);
+            setTimeout(()=>(this.onstart||(()=>{}))(),60); }  /* async like real engines */
           stop(){ window.__mockEvents.push('stop'); (this.onend||(()=>{}))(); }
           emit(kind,e){ (this['on'+kind]||(()=>{}))(e); }
         }
@@ -311,7 +312,8 @@ def run(pw):
         class FakeRec{
           constructor(){ this.lang=''; this.continuous=false; this.interimResults=false;
             window.__fake=this; window.__mockEvents.push('constructed'); }
-          start(){ window.__mockEvents.push('start:'+this.lang); }
+          start(){ window.__mockEvents.push('start:'+this.lang);
+            setTimeout(()=>(this.onstart||(()=>{}))(),60); }  /* async like real engines */
           stop(){ window.__mockEvents.push('stop'); (this.onend||(()=>{}))(); }
           emit(kind,e){ (this['on'+kind]||(()=>{}))(e); }
         }
@@ -321,7 +323,11 @@ def run(pw):
         S.lastLang='hi';
     }""")
     page.click("#mic-btn")
-    page.wait_for_timeout(200)
+    page.wait_for_timeout(30)   # BEFORE onstart fires (async, like real Chrome)
+    check("requesting-mic state shows before permission granted",
+          "Requesting microphone" in page.get_attribute("#input", "placeholder")
+          and page.evaluate("document.getElementById('mic-btn').classList.contains('requesting')"))
+    page.wait_for_timeout(250)
     listening_state = page.evaluate(
         "window.__mockEvents.some(e=>e.startsWith('start:hi-IN')) && document.getElementById('mic-btn').classList.contains('listening')")
     check("mic starts listening in last-chat language (hi-IN)", listening_state)

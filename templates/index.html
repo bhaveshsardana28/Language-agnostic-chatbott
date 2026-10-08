@@ -251,6 +251,7 @@ body.debug .debug-card{display:block}
 /* voice input */
 #mic-btn{color:var(--muted)}
 #mic-btn.listening{color:var(--danger);animation:micpulse 1.2s infinite}
+#mic-btn.requesting{color:var(--warn)}   /* permission prompt up — no pulse yet */
 #mic-btn[disabled]{opacity:.35;cursor:not-allowed}
 @keyframes micpulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.4)}70%{box-shadow:0 0 0 9px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
 .sel{background:var(--surface2);border:1px solid var(--border);color:var(--text);
@@ -1139,7 +1140,7 @@ function openSettings(){
         </select>
       </div></div>
     <div class="sect"><h3>Privacy</h4>
-      <p style="color:var(--muted);font-size:.78rem;line-height:1.6">No login required. Conversations live in this browser only; uploaded documents are scoped to each chat and deleted with it.</p>
+      <p style="color:var(--muted);font-size:.78rem;line-height:1.6">No login required. Conversations live in this browser only; uploaded documents are scoped to each chat and deleted with it. Voice input uses your browser's speech recognition — this app stores no audio.</p>
       <button class="danger-btn" id="del-all">Delete all local data</button></div>
     <div class="sect"><h3>About</h4><div class="about" id="about">Loading…</div></div>
   </div>`);
@@ -1203,12 +1204,15 @@ const MIC_ERRORS={
   'no-speech':'No speech heard. Check the Speech language in Settings and try speaking again.',
   'network':'Speech service network error. Check your connection and retry.',
 };
-function setMic(state){  // idle | listening
+function setMic(state){  // idle | requesting | listening
   recActive=state==='listening';
-  micBtn.classList.toggle('listening',recActive);
-  micBtn.setAttribute('aria-pressed',recActive);
-  input.placeholder=recActive?'Listening… speak now (Esc to stop)':'Ask anything in any supported language…';
-  if(!recActive)autoGrow();
+  micBtn.classList.toggle('listening',state==='listening');
+  micBtn.classList.toggle('requesting',state==='requesting');
+  micBtn.setAttribute('aria-pressed',state!=='idle');
+  input.placeholder=state==='listening'?'Listening… speak now (Esc to stop)'
+                   :state==='requesting'?'Requesting microphone…'
+                   :'Ask anything in any supported language…';
+  if(state==='idle')autoGrow();
 }
 function stopVoice(){ if(rec&&recActive){ try{rec.stop();}catch(e){} } }
 function toggleVoice(){
@@ -1229,7 +1233,10 @@ function toggleVoice(){
     toast(msg);
   };
   rec.onend=()=>{ setMic('idle'); if(input.value.trim())input.focus(); };
-  try{ rec.start(); setMic('listening'); }
+  /* honest states: "requesting" while the browser permission prompt is up;
+     "listening" only once the engine actually started */
+  rec.onstart=()=>{ setMic('listening'); };
+  try{ rec.start(); setMic('requesting'); }
   catch(e){ toast('Could not start the microphone. Try again.'); setMic('idle'); }
 }
 if(REC()){ micBtn.addEventListener('click',toggleVoice); }
