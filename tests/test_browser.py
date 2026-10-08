@@ -439,6 +439,25 @@ def run(pw):
           shell["scrim"] == "none" and shell["mainRightOfSidebar"]
           and shell["mainFillsColumn"] and shell["composerInMain"])
 
+    # ---------- Phase-3 shell: desktop collapse + drawer focus ----------
+    # collapse toggle at desktop width
+    w0 = page.evaluate("document.querySelector('.sidebar').getBoundingClientRect().width")
+    page.click("#menu-btn")
+    page.wait_for_timeout(400)
+    w1 = page.evaluate("document.querySelector('.sidebar').getBoundingClientRect().width")
+    check("desktop: menu button collapses sidebar", w0 > 200 and w1 < 10)
+    check("collapse aria-label updates",
+          "Show" in page.get_attribute("#menu-btn", "aria-label"))
+    # persists across reload
+    page.reload(); page.wait_for_selector("#input", timeout=8000)
+    page.wait_for_timeout(400)   # let the 250ms grid transition settle
+    w2 = page.evaluate("document.querySelector('.sidebar').getBoundingClientRect().width")
+    check("collapsed state persists after reload", w2 < 10)
+    page.click("#menu-btn")
+    page.wait_for_timeout(400)
+    w3 = page.evaluate("document.querySelector('.sidebar').getBoundingClientRect().width")
+    check("expand restores sidebar width", w3 > 200)
+
     # ---------- errors visible? ----------
     check("no JS page/console errors during session", len(errors) == 0)
     if errors:

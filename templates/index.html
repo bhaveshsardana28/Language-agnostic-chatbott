@@ -104,7 +104,8 @@ body.no-motion *,body.no-motion *::before,body.no-motion *::after{
 /* ============ topbar ============ */
 .topbar{display:flex;align-items:center;gap:10px;padding:10px 14px;
   border-bottom:1px solid var(--border);background:var(--bg)}
-#menu-btn{display:none}
+/* menu button: drawer toggle (mobile) AND sidebar collapse (desktop) */
+#menu-btn{display:inline-flex}
 .chat-title{font-size:.9rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;
   white-space:nowrap;flex:1}
 .status{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--muted)}
@@ -325,8 +326,14 @@ body.debug .debug-card{display:block}
 #scrim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:var(--z-scrim)}
 #scrim.show{display:block}
 
+/* desktop: collapsible sidebar (persisted preference) */
+@media(min-width:901px){
+  .app{transition:grid-template-columns var(--t-med) var(--ease)}
+  .app.side-off{grid-template-columns:0px 1fr}
+  .app.side-off .sidebar{overflow:hidden;min-width:0}
+}
+
 /* ============ responsive ============ */
-#menu-btn{display:none}
 @media(max-width:900px){
   .app{grid-template-columns:1fr}
   .sidebar{position:fixed;left:0;top:0;bottom:0;width:290px;z-index:var(--z-drawer);
@@ -948,9 +955,30 @@ function exportConv(c){
 }
 
 /* drawer */
+/* drawer + desktop collapse share one button */
 const sidebar=$('#sidebar'), scrim=$('#scrim');
-function closeDrawer(){ sidebar.classList.remove('open'); scrim.classList.remove('show'); }
-$('#menu-btn').addEventListener('click',()=>{ sidebar.classList.add('open'); scrim.classList.add('show'); });
+function closeDrawer(){
+  sidebar.classList.remove('open'); scrim.classList.remove('show');
+  input.focus();   /* a11y: return focus to a sane place after drawer use */
+}
+function applyShell(){
+  const app=document.querySelector('.app');
+  const desktop=innerWidth>900;
+  app.classList.toggle('side-off', desktop && !!S.sideCollapsed);
+  if(desktop) app.classList.remove('side-off') || (S.sideCollapsed && app.classList.add('side-off'));
+  const btn=$('#menu-btn');
+  btn.setAttribute('aria-label',
+    desktop ? (S.sideCollapsed?'Show sidebar':'Hide sidebar') : 'Open conversations menu');
+}
+$('#menu-btn').addEventListener('click',()=>{
+  if(innerWidth<=900){
+    sidebar.classList.add('open'); scrim.classList.add('show');
+    $('#new-chat').focus();   /* a11y: land focus inside the drawer */
+  } else {
+    S.sideCollapsed=!S.sideCollapsed; store.save(); applyShell();
+  }
+});
+addEventListener('resize',applyShell);
 scrim.addEventListener('click',closeDrawer);
 document.addEventListener('keydown',e=>{ if(e.key==='Escape')closeDrawer(); });
 
@@ -1245,6 +1273,7 @@ function feedSpeech(delta,ts,lang){
 
 /* ---------- boot ---------- */
 applyTheme();
+applyShell();
 document.body.classList.toggle('debug',S.debug);
 $('#debug-btn').setAttribute('aria-pressed',S.debug);
 api.health().then(()=>offline(false)).catch(()=>offline(true));
