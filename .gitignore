@@ -14,3 +14,4 @@ venv/
 portfolio/node_modules/
 logs/
 models/
+cache/

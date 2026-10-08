@@ -64,11 +64,14 @@ make run-v2                          # -> http://localhost:8000
 Per-message language detection, language-switch instructions ("answer in
 Hindi"), bounded conversation memory, SSE streaming, dark/light/system themes,
 welcome screen with suggestions, markdown + code blocks with copy buttons,
-per-conversation sidebar (search/rename/delete, grouped by date), message
-actions (copy/regenerate/edit), document chips, sources, professional debug
-panel, settings, offline banner, mobile drawer. Tested with real-browser
-Playwright suite: `venv/bin/python tests/test_browser.py` (19 checks, all
-green) + code-switching detection suite (26 checks).
+per-conversation sidebar (search/rename/delete/export, grouped by date),
+message actions (copy/regenerate/edit/Listen), document chips, sources,
+professional debug panel, settings, offline banner, mobile drawer,
+**voice input** (browser speech recognition, BCP-47 language selection) and
+**voice output** (language-matched synthesis, honest no-voice fallback) —
+device-level voice testing pending, see docs/VOICE_TEST_MATRIX.md.
+Tested with real-browser Playwright suite: `make test-browser` (61 checks)
++ code-switching detection suite (26 checks). Demo: docs/DEMO_SCRIPT.md.
 APIs: `/api/v1/{chat,conversations,documents,languages,intents,health}` —
 see docs/API.md. Tests: `make test` (11 v2 + 10 FYP + 26 code-switching + 19 browser).
 
