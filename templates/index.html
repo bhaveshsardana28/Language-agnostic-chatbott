@@ -5,395 +5,91 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <script>
 /* theme-flash prevention: resolve stored theme BEFORE first paint */
-try{const t=JSON.parse(localStorage.getItem('gaia.store.v1')||'{}').theme;
-if(t==='light'||(t==='system'&&matchMedia('(prefers-color-scheme: light)').matches))
-document.documentElement.dataset.theme='light';}catch(e){}
+try {
+  const t = JSON.parse(localStorage.getItem('gaia.store.v1') || '{}').theme;
+  if (t === 'light' || (t === 'system' && matchMedia('(prefers-color-scheme: light)').matches))
+    document.documentElement.dataset.theme = 'light';
+} catch (e) {}
 </script>
 <title>Global Multilingual AI Assistant</title>
+
+<!-- CSS Modules -->
+<link rel="stylesheet" href="/static/css/tokens.css">
+<link rel="stylesheet" href="/static/css/components.css">
+<link rel="stylesheet" href="/static/css/layout.css">
+<link rel="stylesheet" href="/static/css/motion.css">
+
 <style>
-/* ============ design tokens ============ */
-:root{
-  --font:-apple-system,'Segoe UI',Roboto,'Noto Sans','Noto Sans Devanagari','Noto Sans Gurmukhi',sans-serif;
-  --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
-  /* spacing scale */
-  --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:24px;--sp-6:32px;
-  /* type scale */
-  --fs-xs:.72rem;--fs-s:.82rem;--fs-m:.93rem;--fs-l:1.05rem;--fs-xl:1.4rem;
-  /* motion */
-  --t-fast:150ms;--t-med:250ms;--ease:cubic-bezier(.2,.7,.3,1);
-  /* z-index scale — one ladder, no ad-hoc values */
-  --z-jump:5;--z-drawer:35;--z-scrim:36;--z-modal:50;--z-toast:60;
-  --r-s:8px;--r-m:12px;--r-l:16px;
-  --accent:#3b82f6;--accent-2:#2f6fdd;--accent-strong:#2563eb;--danger:#ef4444;--ok:#34d399;--warn:#f59e0b;
-}
-[data-theme="dark"]{
-  --bg:#0d0f12;--surface:#16181d;--surface2:#1c1f26;--border:#262a33;
-  --text:#e9ebf0;--muted:#9aa0ae;--shadow:0 8px 28px rgba(0,0,0,.45);
-  --lang:#2dd4bf;  /* secondary accent: language indicators (AA on surface) */
-  --accent:#5c9df8;  /* lightened for AA text on surface2 (audited) */
-  --accent-strong:#5c9df8;  /* lightened for AA text on surface2 (audited) */
-  --danger:#ef4444;--ok:#34d399;--warn:#f59e0b;
-}
-[data-theme="light"]{
-  --bg:#f6f7f9;--surface:#ffffff;--surface2:#eef0f3;--border:#e2e5ea;
-  --text:#171a20;--muted:#5b6472;--shadow:0 8px 24px rgba(20,24,40,.10);
-  --lang:#0f766e;
-  /* darkened for WCAG AA text-on-white (audited: see docs/DESIGN_SYSTEM.md) */
-  --accent:#1d4ed8;--accent-strong:#2563eb;--danger:#b91c1c;--ok:#047857;--warn:#b45309;
-}
+/* Inline critical styles for immediate render (prevents FOUC) */
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{font-family:var(--font);background:var(--bg);color:var(--text);overflow:hidden;
-     transition:background var(--t-med) var(--ease),color var(--t-med) var(--ease)}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);overflow:hidden;transition:background var(--t-med) var(--ease-out),color var(--t-med) var(--ease-out)}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+:focus-visible{outline:none;box-shadow:var(--focus-ring);border-radius:var(--r-sm)}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+body.reduce-motion *,body.reduce-motion *::before,body.reduce-motion *::after{animation:none!important;transition:none!important}
 
-/* ============ layout ============ */
-/* Structural scroll rules (Safari-safe): the grid/flex chain from .app down
-   to #chat must ALL be allowed to shrink (min-height:0), or min-height:auto
-   grows .main past the viewport and no inner element ever owns scrolling. */
+/* App shell - critical for layout */
 .app{display:grid;grid-template-columns:280px 1fr;height:100vh;height:100dvh}
 .main{display:flex;flex-direction:column;min-width:0;min-height:0;position:relative}
-
-/* ============ sidebar ============ */
-.sidebar{background:var(--surface);border-right:1px solid var(--border);
-         display:flex;flex-direction:column;min-height:0}
-.brand{padding:18px 16px 14px;display:flex;gap:10px;align-items:center}
-.brand svg{flex:none;color:var(--accent)}
-.brand h1{font-size:.92rem;font-weight:650;line-height:1.2}
-.brand p{font-size:.72rem;color:var(--muted);margin-top:2px}
-.side-actions{padding:0 12px 10px;display:flex;flex-direction:column;gap:8px}
-#new-chat{display:flex;align-items:center;gap:8px;justify-content:center;
-  background:var(--accent-strong);color:#fff;padding:10px 12px;border-radius:var(--r-m);
-  font-size:.88rem;font-weight:600;transition:background .15s}
-#new-chat:hover{background:var(--accent-strong);box-shadow:0 2px 10px rgba(37,99,235,.35)}
-.search-wrap{display:flex;align-items:center;gap:8px;background:var(--surface2);
-  border:1px solid var(--border);border-radius:var(--r-m);padding:0 10px}
-.search-wrap svg{color:var(--muted);flex:none}
-.search-wrap input{flex:1;background:none;border:none;color:var(--text);
-  font-size:.85rem;padding:9px 0;min-width:0}
-.search-wrap input:focus{outline:none}
-#conv-list{flex:1;min-height:0;overflow-y:auto;padding:4px 8px 12px}
-.group-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;
-  color:var(--muted);padding:12px 8px 6px}
-.conv{display:flex;align-items:center;gap:6px;width:100%;text-align:left;
-  padding:8px 8px;border-radius:var(--r-m);font-size:.85rem;color:var(--text)}
-.conv:hover{background:var(--surface2)}
-.conv.active{background:var(--surface2)}
-.conv .t{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.conv .snip{display:block;font-size:.68rem;color:var(--muted);overflow:hidden;
-  text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
-body.no-motion *,body.no-motion *::before,body.no-motion *::after{
-  animation:none!important;transition:none!important}
-.conv .acts{display:none;gap:2px}
-.conv:hover .acts{display:flex}
-.icon-btn{display:inline-flex;align-items:center;justify-content:center;
-  width:30px;height:30px;border-radius:var(--r-s);color:var(--muted);flex:none}
-.icon-btn:hover{background:var(--surface);color:var(--text)}
-.icon-btn.del:hover{color:var(--danger)}
-.side-foot{border-top:1px solid var(--border);padding:10px 12px;display:flex;
-  align-items:center;gap:8px}
-#settings-btn{display:flex;align-items:center;gap:8px;font-size:.85rem;
-  color:var(--muted);padding:8px;border-radius:var(--r-m);flex:1}
-#settings-btn:hover{background:var(--surface2);color:var(--text)}
-.side-del{font-size:.75rem;color:var(--danger);padding:6px 12px 4px;text-align:left}
-.side-del:hover{text-decoration:underline}
-.side-note{font-size:.68rem;color:var(--muted);padding:0 12px 10px}
-#hdr-settings svg{transition:rotate var(--t-med) var(--ease)}
-.side-empty{color:var(--muted);font-size:.82rem;padding:10px 10px}
-
-/* ============ topbar ============ */
-.topbar{display:flex;align-items:center;gap:10px;padding:10px 14px;
-  border-bottom:1px solid var(--border);background:var(--bg)}
-/* menu button: drawer toggle (mobile) AND sidebar collapse (desktop) */
-#menu-btn{display:inline-flex}
-.chat-title{font-size:.9rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;
-  white-space:nowrap;flex:1}
-.status{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--muted)}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
-.dot.off{background:var(--danger)}
-.top-ctrls{display:flex;gap:4px}
-
-/* ============ offline banner ============ */
-#offline{display:none;align-items:center;gap:10px;margin:10px 14px 0;
-  background:var(--surface);border:1px solid var(--warn);border-radius:var(--r-m);
-  padding:10px 14px;font-size:.85rem}
-#offline.show{display:flex}
-#offline button{color:var(--accent);font-weight:600;font-size:.85rem}
-
-/* ============ document strip ============ */
-#doc-strip{display:none;flex-wrap:wrap;gap:8px;padding:10px 14px 0;align-items:center}
-#doc-strip.show{display:flex}
-.chip{display:flex;align-items:center;gap:6px;background:var(--surface);
-  border:1px solid var(--border);border-radius:999px;padding:5px 6px 5px 12px;
-  font-size:.78rem}
-.chip .st{color:var(--muted)}
-.chip.ok .st{color:var(--ok)}
-.chip.bad .st{color:var(--danger)}
-#clear-docs{font-size:.75rem;color:var(--muted);padding:5px 10px;
-  border:1px solid var(--border);border-radius:999px}
-#clear-docs:hover{color:var(--danger);border-color:var(--danger)}
-
-/* ============ chat area ============ */
-#chat{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:20px 14px}
-.chat-inner{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
-.msg{display:flex;flex-direction:column}
-.msg.live{animation:rise .18s ease-out}
-@keyframes rise{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-.msg .bubble{padding:11px 15px;border-radius:var(--r-l);font-size:.93rem;
-  line-height:1.6;max-width:100%;overflow-wrap:break-word;word-break:break-word}
-.msg.user{align-items:flex-end}
-.msg.user .bubble{background:var(--accent-strong);color:#fff;border-bottom-right-radius:4px;
-  max-width:82%;white-space:pre-wrap}
-.msg.assistant{align-items:flex-start}
-.msg.assistant .bubble{background:var(--surface);border:1px solid var(--border);
-  border-bottom-left-radius:4px;flex-direction:column;display:flex;min-width:0;flex:1}
-.msg .bubble>*+*{margin-top:8px}
-.gen{display:inline-flex;gap:4px;align-items:center;color:var(--muted);font-size:.88rem}
-.gen .pulse{width:7px;height:7px;border-radius:50%;background:var(--accent);
-  animation:pulse 1s infinite}
-@keyframes pulse{50%{opacity:.25}}
-
-/* markdown inside assistant bubbles */
-.md h1,.md h2,.md h3{line-height:1.3;margin-top:2px}
-.md h1{font-size:1.15rem}.md h2{font-size:1.05rem}.md h3{font-size:.98rem}
-.md ul,.md ol{padding-left:1.3rem}
-.md li{margin:3px 0}
-.md a{color:var(--accent)}
-.md blockquote{border-left:3px solid var(--border);padding:2px 0 2px 12px;color:var(--muted)}
-.md code{font-family:var(--mono);font-size:.85em;background:var(--surface2);
-  border-radius:5px;padding:2px 5px}
-.md .tblwrap{overflow-x:auto}
-.md table{border-collapse:collapse;font-size:.85rem}
-.md th,.md td{border:1px solid var(--border);padding:6px 10px;text-align:left}
-.md hr{border:none;border-top:1px solid var(--border)}
-.codeblock{border:1px solid var(--border);border-radius:var(--r-m);overflow:hidden;
-  background:var(--bg)}
-.codeblock .cb-head{display:flex;justify-content:space-between;align-items:center;
-  padding:6px 12px;font-size:.72rem;color:var(--muted);
-  background:var(--surface2);border-bottom:1px solid var(--border)}
-.codeblock .cb-copy{font-size:.72rem;color:var(--muted);padding:2px 8px;
-  border-radius:6px;border:1px solid var(--border)}
-.codeblock .cb-copy:hover{color:var(--text)}
-.codeblock pre{padding:12px;overflow-x:auto}
-.codeblock code{font-family:var(--mono);font-size:.82rem;line-height:1.5;
-  background:none;padding:0;white-space:pre}
-.tok-k{color:var(--accent);font-weight:600}
-.tok-s{color:var(--ok)}
-.tok-c{color:var(--muted);font-style:italic}
-.listen-btn.speaking{color:var(--ok)}
-.listen-btn.paused{color:var(--warn)}
-.msg.live .bubble::after{content:'▌';color:var(--accent);margin-left:2px;
-  animation:blink 1s steps(2) infinite}
-@keyframes blink{50%{opacity:0}}
-.modal{animation:pop .18s var(--ease)}
-@keyframes pop{from{opacity:0;transform:scale(.97) translateY(8px)}to{opacity:1;transform:none}}
-.icon-btn:active{transform:scale(.94)}
-#send:active{transform:scale(.94)}
-
-/* sources */
-.sources{display:flex;flex-direction:column;gap:4px;font-size:.78rem}
-.src-line{display:flex;gap:6px;align-items:baseline}
-.src-n{color:var(--accent);font-weight:700}
-.src-line a{color:var(--accent);overflow-wrap:anywhere}
-
-/* message actions + debug */
-.acts-row{display:flex;gap:4px;padding:2px 2px;opacity:0;transition:opacity .12s}
-.msg:hover .acts-row,.msg:focus-within .acts-row{opacity:1}
-.acts-row .icon-btn{width:26px;height:26px}
-.acts-row svg{width:14px;height:14px}
-.debug-card{display:none;font-size:.74rem;color:var(--muted);background:var(--surface2);
-  border:1px solid var(--border);border-radius:var(--r-m);padding:10px 12px;
-  line-height:1.8}
-body.debug .debug-card{display:block}
-.debug-card b{color:var(--text);font-weight:600}
-.tag{display:inline-block;background:var(--surface);border:1px solid var(--border);
-  border-radius:6px;padding:0 6px;margin-left:4px}
-.msg.err .bubble{border-color:var(--danger)}
-.stopped{color:var(--muted);font-style:italic;font-size:.8rem}
-
-/* multilingual UX — no per-chip animation: the message entrance covers it,
-   and a chip-only animation re-fires on restore, racing contrast audits */
-.lang-chip{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;
-  font-size:.7rem;color:var(--lang);margin-bottom:6px;font-weight:600}
-.lang-chip::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--lang)}
-.lang-chip.low-conf{border-bottom:1px dashed var(--muted);cursor:help}
-.lang-switch{align-self:center;display:flex;align-items:center;gap:8px;
-  font-size:.72rem;color:var(--muted);padding:2px 0}
-.lang-switch::before,.lang-switch::after{content:'';height:1px;background:var(--border);flex:1}
-.lang-switch span{white-space:nowrap}
-.day-sep{display:flex;align-items:center;gap:10px;font-size:.7rem;color:var(--muted);
-  padding:6px 0}
-.day-sep::before,.day-sep::after{content:'';height:1px;background:var(--border);flex:1}
-.day-sep span{white-space:nowrap}
-#welcome h2{transition:opacity var(--t-med) var(--ease)}
-.card{animation:rise .25s var(--ease) both}
-.card:nth-child(2){animation-delay:.05s}.card:nth-child(3){animation-delay:.1s}
-.card:nth-child(4){animation-delay:.15s}.card:nth-child(5){animation-delay:.2s}
-.card:nth-child(6){animation-delay:.25s}
-
-/* ============ welcome ============ */
-#welcome{max-width:780px;margin:0 auto;padding:8vh 10px 20px;display:none;
-  flex-direction:column;align-items:center;text-align:center;gap:8px}
-#welcome.show{display:flex}
-#welcome .logo{width:52px;height:52px;border-radius:14px;background:var(--surface);
-  display:flex;align-items:center;justify-content:center;color:var(--accent);
-  border:1px solid var(--border);margin-bottom:10px}
-#welcome h2{font-size:1.6rem;font-weight:700}
-#welcome .sub{color:var(--muted);font-size:.95rem;margin-bottom:18px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:10px;width:100%;max-width:640px}
-.card{text-align:left;background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r-m);padding:14px;display:flex;flex-direction:column;gap:4px;
-  transition:border-color .15s,transform .15s}
-.card:hover{border-color:var(--accent);transform:translateY(-1px)}
-.card .k{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-.card .q{font-size:.86rem;line-height:1.4}
-
-/* voice input */
-#mic-btn{color:var(--muted)}
-#mic-btn.listening{color:var(--danger);animation:micpulse 1.2s infinite}
-#mic-btn.requesting{color:var(--warn)}   /* permission prompt up — no pulse yet */
-#mic-btn[disabled]{opacity:.35;cursor:not-allowed}
-@keyframes micpulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.4)}70%{box-shadow:0 0 0 9px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
-.sel{background:var(--surface2);border:1px solid var(--border);color:var(--text);
-  border-radius:var(--r-s);padding:6px 8px;font-size:.82rem;font-family:inherit}
-
-/* ============ composer ============ */
-.composer-wrap{padding:10px 14px calc(12px + env(safe-area-inset-bottom));
-  background:linear-gradient(transparent,var(--bg) 30%);position:relative}
-/* jump-to-latest: shows only when the user is NOT near the bottom */
-#jump{position:absolute;top:-50px;left:50%;transform:translateX(-50%);
-  display:none;align-items:center;gap:6px;background:var(--surface);
-  border:1px solid var(--border);border-radius:999px;padding:7px 14px;
-  font-size:.78rem;color:var(--text);box-shadow:var(--shadow);z-index:5}
-#jump{z-index:var(--z-jump)}
-#jump.show{display:inline-flex}
-#jump:hover{border-color:var(--accent);color:var(--accent)}
-.composer{max-width:780px;margin:0 auto;background:var(--surface);
-  border:1px solid var(--border);border-radius:var(--r-l);
-  display:flex;align-items:flex-end;gap:6px;padding:8px;
-  box-shadow:0 2px 12px rgba(0,0,0,.08);transition:border-color .15s}
-.composer:focus-within{border-color:var(--accent)}
-#input{flex:1;background:none;border:none;color:var(--text);font-family:var(--font);
-  font-size:.95rem;line-height:1.5;padding:8px 4px;resize:none;max-height:200px;
-  min-height:38px}
-#input:focus{outline:none}
-#send{background:var(--accent-strong);color:#fff;width:36px;height:36px;
-  border-radius:10px;display:inline-flex;align-items:center;justify-content:center;flex:none}
-#send:disabled{opacity:.4;cursor:default}
-#stop{display:none;background:var(--surface2);color:var(--text);width:36px;height:36px;
-  border-radius:10px;align-items:center;justify-content:center;flex:none;
-  border:1px solid var(--border)}
-#stop.show{display:inline-flex}
-.hint{max-width:780px;margin:6px auto 0;text-align:center;font-size:.7rem;color:var(--muted);display:flex;justify-content:center;align-items:center;gap:8px}
-.char-count{margin-left:auto;font-variant-numeric:tabular-nums}
-.char-count.warn{color:var(--warn)}
-.char-count.over{color:var(--danger);font-weight:600}
-
-/* ============ welcome ============ */
-#overlay-m{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:var(--z-modal);
-  align-items:center;justify-content:center;padding:20px}
-#overlay-m.show{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-l);
-  width:100%;max-width:440px;max-height:80dvh;overflow-y:auto;box-shadow:var(--shadow)}
-.modal header{display:flex;justify-content:space-between;align-items:center;
-  padding:16px 18px;border-bottom:1px solid var(--border)}
-.modal header h3{font-size:.95rem}
-.modal .body{padding:16px 18px;display:flex;flex-direction:column;gap:16px;
-  font-size:.86rem}
-.sect h3{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;
-  color:var(--muted);margin-bottom:8px}
-.seg{display:flex;gap:6px}
-.seg button{flex:1;padding:8px;border:1px solid var(--border);border-radius:var(--r-m);
-  font-size:.82rem;color:var(--muted)}
-.seg button.on{border-color:var(--accent);color:var(--accent);font-weight:600}
-.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.check{display:flex;align-items:center;gap:8px;font-size:.84rem}
-.danger-btn{color:var(--danger);border:1px solid var(--danger);border-radius:var(--r-m);
-  padding:8px 12px;font-size:.82rem;font-weight:600;align-self:flex-start}
-.danger-btn:hover{background:var(--danger);color:#fff}
-.about{color:var(--muted);font-size:.78rem;line-height:1.7}
-.about b{color:var(--text)}
-.confirm-row{display:flex;gap:10px;justify-content:flex-end;padding-top:8px}
-.confirm-row .yes{background:var(--danger);color:#fff;border-radius:var(--r-m);
-  padding:8px 16px;font-size:.84rem;font-weight:600}
-/* dark: no single red passes both text-on-surface AND white-on-red, so the
-   confirm button uses near-black text on the red (5.9:1, audited) */
-[data-theme="dark"] .confirm-row .yes{color:#0d0f12}
-.confirm-row .no{border:1px solid var(--border);border-radius:var(--r-m);
-  padding:8px 16px;font-size:.84rem}
-#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(8px);
-  background:var(--surface);border:1px solid var(--border);border-radius:999px;
-  padding:8px 18px;font-size:.82rem;opacity:0;pointer-events:none;transition:opacity var(--t-fast) var(--ease);z-index:var(--z-toast)}
-#toast.show{opacity:1;transform:translateX(-50%)}
-
-/* scrim: hidden EVERYWHERE by default (base rule — a stray visible scrim is a
-   grid child that steals the main column and wraps .main under the sidebar;
-   live-caught when only the media query hid it). .show reveals it on mobile. */
-#scrim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:var(--z-scrim)}
-#scrim.show{display:block}
-
-/* desktop: collapsible sidebar (persisted preference) */
-@media(min-width:901px){
-  .app{transition:grid-template-columns var(--t-med) var(--ease)}
-  .app.side-off{grid-template-columns:0px 1fr}
-  .app.side-off .sidebar{overflow:hidden;min-width:0}
-}
-
-/* ============ responsive ============ */
-@media(max-width:900px){
-  .app{grid-template-columns:1fr}
-  .sidebar{position:fixed;left:0;top:0;bottom:0;width:290px;z-index:var(--z-drawer);
-    transform:translateX(-102%);transition:transform var(--t-med) var(--ease);box-shadow:var(--shadow)}
-  .sidebar.open{transform:none}
-  #menu-btn{display:inline-flex}
-  #chat{padding:16px 10px}
-  .chat-inner{gap:12px}
-  .msg.user .bubble{max-width:90%}
-}
-@media(max-width:430px){
-  .cards{grid-template-columns:1fr 1fr}
-  #chat{padding:12px 8px}
-  .topbar{padding:8px 10px}
-  .composer-wrap{padding:8px 8px calc(10px + env(safe-area-inset-bottom))}
-}
+@media(max-width:900px){.app{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
+
 <div class="app">
 
+  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar" aria-label="Conversations">
-    <div class="brand">
-      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3.5 12h17M12 3.3c2.6 2.4 4 5.4 4 8.7s-1.4 6.3-4 8.7c-2.6-2.4-4-5.4-4-8.7s1.4-6.3 4-8.7z"/></svg>
-      <div><h1>Global Multilingual AI Assistant</h1><p>AI that speaks your language.</p></div>
+    <div class="sidebar__brand">
+      <div class="sidebar__logo" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+          <circle cx="12" cy="12" r="9"/><path d="M3.5 12h17M12 3.3c2.6 2.4 4 5.4 4 8.7s-1.4 6.3-4 8.7c-2.6-2.4-4-5.4-4-8.7s1.4-6.3 4-8.7z"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="sidebar__title">Global Multilingual AI Assistant</h1>
+        <p class="sidebar__subtitle">AI that speaks your language.</p>
+      </div>
     </div>
-    <div class="side-actions">
-      <button id="new-chat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>New chat</button>
-      <div class="search-wrap">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+
+    <div class="sidebar__actions">
+      <button id="new-chat" class="btn btn--primary btn--sm" style="width:100%;justify-content:center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        New chat
+      </button>
+      <div class="sidebar__search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         <input id="search" placeholder="Search chats" aria-label="Search conversations" autocomplete="off">
       </div>
     </div>
-    <nav id="conv-list" aria-label="Chat history" tabindex="0"></nav>
-    <button id="settings-btn" aria-label="Settings">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></svg>
-      Settings
-    </button>
-    <button id="del-all-side" class="side-del" type="button">Delete all data</button>
-    <p class="side-note">Your chat history is stored locally on this device.</p>
-  </aside>
-  <div id="scrim" hidden></div>
 
+    <nav id="conv-list" class="sidebar__list" aria-label="Chat history" tabindex="0"></nav>
+
+    <div class="sidebar__footer">
+      <button id="settings-btn" class="sidebar__settings-btn" aria-label="Settings">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></svg>
+        Settings
+      </button>
+      <button id="del-all-side" class="sidebar__delete-all" type="button">Delete all data</button>
+      <p class="sidebar__note">Your chat history is stored locally on this device.</p>
+    </div>
+  </aside>
+
+  <div id="scrim" class="scrim" hidden></div>
+
+  <!-- Main -->
   <main class="main">
     <header class="topbar">
       <button id="menu-btn" class="icon-btn" aria-label="Open conversations menu">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <span class="chat-title" id="chat-title">New conversation</span>
-      <span class="status"><span class="dot" id="dot"></span><span id="status-txt">Online</span></span>
-      <div class="top-ctrls">
+      <span class="topbar__title" id="chat-title">New conversation</span>
+      <span class="topbar__status"><span class="topbar__dot" id="topbar-dot"></span><span id="topbar-status">Online</span></span>
+      <div class="topbar__controls">
+        <button id="voice-mode-btn" class="icon-btn" aria-label="Voice mode" title="Voice mode (full-screen)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 4v3M12 17v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2.5 12h3M18.5 12h3M4.9 19.1l2.1-2.1M17 6.9l2.1-2.1"/></svg>
+        </button>
         <button id="docs-btn" class="icon-btn" aria-label="Add document (PDF, DOCX, TXT)" title="Add document">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
         </button>
@@ -409,41 +105,44 @@ body.debug .debug-card{display:block}
       </div>
     </header>
 
-    <div id="offline" role="alert">
+    <div id="offline" class="offline-banner" role="alert">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warn)" stroke-width="2" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 2.4 17.5A1.8 1.8 0 0 0 4 20.2h16a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z"/></svg>
       <span>Unable to connect to the assistant.</span>
-      <button id="retry-btn">Retry</button>
+      <button id="retry-btn" class="offline-banner__btn">Retry</button>
     </div>
 
-    <div id="doc-strip" aria-label="Uploaded documents"></div>
+    <div id="doc-strip" class="doc-strip" aria-label="Uploaded documents"></div>
 
-    <div id="chat" role="log" aria-live="polite">
-      <div id="welcome">
-        <div class="logo"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3.5 12h17M12 3.3c2.6 2.4 4 5.4 4 8.7s-1.4 6.3-4 8.7c-2.6-2.4-4-5.4-4-8.7s1.4-6.3 4-8.7z"/></svg></div>
-        <h2 id="greet">Hello</h2>
-        <p class="sub">How can I help? Ask anything in your language.</p>
-        <div class="cards" id="cards"></div>
+    <div id="chat" class="chat" role="log" aria-live="polite">
+      <div id="welcome" class="welcome">
+        <div class="welcome__logo" aria-hidden="true">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3.5 12h17M12 3.3c2.6 2.4 4 5.4 4 8.7s-1.4 6.3-4 8.7c-2.6-2.4-4-5.4-4-8.7s1.4-6.3 4-8.7z"/></svg>
+        </div>
+        <h2 id="welcome-greeting" class="welcome__greeting">Hello</h2>
+        <p class="welcome__sub">How can I help? Ask anything in your language.</p>
+        <div id="welcome-cards" class="welcome__cards"></div>
       </div>
-      <div class="chat-inner" id="feed"></div>
+      <div class="chat__inner" id="feed"></div>
     </div>
 
     <div class="composer-wrap">
-      <button id="jump" type="button" aria-label="Scroll to latest message">
+      <button id="jump" class="jump-btn" type="button" aria-label="Scroll to latest message">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
         New messages
       </button>
       <form class="composer" id="composer">
-        <button type="button" id="attach-btn" class="icon-btn" aria-label="Attach document" title="Attach PDF, DOCX or TXT">
+        <button type="button" id="attach-btn" class="composer__btn" aria-label="Attach document" title="Attach PDF, DOCX or TXT">
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m21.4 11.1-8.5 8.5a5.7 5.7 0 0 1-8-8l8.5-8.5a3.8 3.8 0 0 1 5.4 5.4l-8.5 8.5a1.9 1.9 0 0 1-2.7-2.7l7.8-7.8"/></svg>
         </button>
-        <button type="button" id="mic-btn" class="icon-btn" aria-label="Voice input" aria-pressed="false" title="Voice input (Cmd/Ctrl+Shift+M)">
+        <button type="button" id="mic-btn" class="composer__btn mic-btn" aria-label="Voice input" aria-pressed="false" title="Voice input (Cmd/Ctrl+Shift+M)">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+          <canvas id="mic-waveform" width="48" height="24" aria-hidden="true" style="position:absolute;left:50%;bottom:100%;transform:translateX(-50%);display:none;"></canvas>
         </button>
-        <textarea id="input" rows="1" dir="auto" placeholder="Ask anything in any supported language…" aria-label="Message" autocomplete="off"></textarea>
-        <button type="submit" id="send" aria-label="Send message">
+        <textarea id="input" class="composer__textarea" rows="1" dir="auto" placeholder="Ask anything in any supported language…" aria-label="Message" autocomplete="off"></textarea>
+        <button type="submit" id="send" class="composer__send" aria-label="Send message">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4.5 12h14M13 6l6 6-6 6"/></svg>
         </button>
-        <button type="button" id="stop" aria-label="Stop generating">
+        <button type="button" id="stop" class="composer__stop" aria-label="Stop generating">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
         </button>
       </form>
@@ -452,909 +151,48 @@ body.debug .debug-card{display:block}
   </main>
 </div>
 
+<!-- Hidden file input -->
 <input type="file" id="file-input" accept=".pdf,.docx,.txt,.md" hidden>
-<div id="overlay-m"></div>
-<div id="toast" role="status"></div>
-<div id="palette" role="dialog" aria-label="Quick switch conversation" hidden>
-  <div class="pal-box">
-    <input id="pal-input" placeholder="Jump to conversation…" aria-label="Jump to conversation" autocomplete="off">
-    <div id="pal-list" role="listbox"></div>
+
+<!-- Modal overlay -->
+<div id="overlay-m" class="dialog-overlay" hidden></div>
+
+<!-- Voice Mode Overlay -->
+<div id="voice-mode" class="dialog-overlay" role="dialog" aria-modal="true" aria-label="Voice mode" hidden>
+  <div class="dialog voice-modal" style="max-width:420px;background:var(--bg);border-color:var(--border);">
+    <button id="vm-close" class="icon-btn" style="position:absolute;top:var(--sp-3);right:var(--sp-3);" aria-label="Exit voice mode">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <div class="voice-state" id="vm-state" aria-live="polite" style="display:flex;flex-direction:column;align-items:center;gap:var(--sp-4);padding:var(--sp-6) var(--sp-4);">
+      <div class="voice-orb voice-orb--idle" id="vm-orb" aria-hidden="true">
+        <div class="voice-orb__inner">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+        </div>
+        <div class="voice-orb__eq" id="vm-eq" style="display:none;">
+          <div class="voice-orb__eq-bar"></div><div class="voice-orb__eq-bar"></div><div class="voice-orb__eq-bar"></div>
+          <div class="voice-orb__eq-bar"></div><div class="voice-orb__eq-bar"></div>
+        </div>
+      </div>
+      <div class="vm-label" id="vm-label" style="font-size:var(--fs-lg);font-weight:600;color:var(--text);">Tap to start</div>
+    </div>
+    <div class="vm-transcript" id="vm-transcript" aria-live="polite" style="min-height:60px;max-height:200px;overflow-y:auto;font-size:var(--fs-md);line-height:var(--lh-relaxed);color:var(--text-subtle);text-align:left;padding:0 var(--sp-4);width:100%;"></div>
+    <button id="vm-end" class="btn btn--danger btn--lg vm-end-btn" style="margin-top:var(--sp-3);" aria-label="End voice session">End</button>
   </div>
 </div>
 
-<script>
-/* =================================================================
-   GAIA frontend — vanilla, zero deps. Sections:
-   utils · icons · api · store · markdown · chat machine ·
-   sidebar · documents · settings · theme · offline
-   ================================================================= */
-'use strict';
+<!-- JS Modules (loaded in dependency order) -->
+<script src="/static/js/api.js"></script>
+<script src="/static/js/store.js"></script>
+<script src="/static/js/markdown.js"></script>
+<script src="/static/js/components.js"></script>
+<script src="/static/js/chat.js"></script>
+<script src="/static/js/sidebar.js"></script>
+<script src="/static/js/documents.js"></script>
+<script src="/static/js/voiceInput.js"></script>
+<script src="/static/js/voiceOutput.js"></script>
+<script src="/static/js/voiceMode.js"></script>
+<script src="/static/js/settings.js"></script>
+<script src="/static/js/main.js"></script>
 
-/* ---------- utils ---------- */
-const $ = s => document.querySelector(s);
-/* numeric entities — mangling-proof and XSS-safe by construction */
-const esc = s => String(s).replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';');
-const uid = () => Math.random().toString(36).slice(2, 10);
-function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.add('show');
-  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),1600); }
-function relTime(ts){
-  const d=new Date(ts), now=new Date(), day=864e5;
-  const t=Math.floor((now-d)/day);
-  if(t<=0)return 'Today'; if(t===1)return 'Yesterday'; if(t<7)return `${t} days ago`;
-  return d.toLocaleDateString();
-}
-function groupOf(ts){
-  const d=new Date(ts); d.setHours(0,0,0,0);
-  const n=new Date(); n.setHours(0,0,0,0);
-  const diff=(n-d)/864e5;
-  if(diff===0)return 'Today'; if(diff===1)return 'Yesterday';
-  if(diff<7)return 'Previous 7 days'; return 'Older';
-}
-const copyText = t => navigator.clipboard?.writeText(t)
-  .catch(()=>{ const ta=document.createElement('textarea'); ta.value=t;
-    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); });
-
-/* ---------- api layer (all backend calls live here) ---------- */
-const api = {
-  health: () => fetch('/api/v1/health').then(r => r.ok ? r.json() : Promise.reject(r.status)),
-  newConversation: () => fetch('/api/v1/conversations',{method:'POST'}).then(r=>r.json()),
-  deleteConversation: id => fetch(`/api/v1/chat/${id}`,{method:'DELETE'}).then(r=>r.json()),
-  listDocuments: id => fetch(`/api/v1/documents/${id}`).then(r=>r.json()),
-  clearDocuments: id => fetch(`/api/v1/documents/${id}`,{method:'DELETE'}).then(r=>r.json()),
-  uploadDocument(id, file){
-    const fd=new FormData(); fd.append('file',file); fd.append('conversation_id',id);
-    return fetch('/api/v1/documents',{method:'POST',body:fd}).then(async r=>{
-      const j=await r.json(); if(!r.ok) throw new Error(j.error||r.status); return j; });
-  },
-  /* SSE chat stream — the ONLY place that talks to /api/v1/chat */
-  chat(message, cid, h, signal){
-    return fetch('/api/v1/chat',{method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message, conversation_id:cid}), signal})
-      .then(async res=>{
-        if(!res.ok){ const j=await res.json().catch(()=>({})); throw new Error(j.error||('HTTP '+res.status)); }
-        const rd=res.body.getReader(), dec=new TextDecoder(); let buf='';
-        for(;;){
-          const {done,value}=await rd.read(); if(done)break;
-          buf+=dec.decode(value,{stream:true}); let i;
-          while((i=buf.indexOf('\n\n'))>=0){
-            const line=buf.slice(0,i).trim().replace(/^data:\s*/,''); buf=buf.slice(i+2);
-            if(!line)continue;
-            let ev; try{ ev=JSON.parse(line); }catch{ continue; }
-            if(ev.type==='meta')h.meta(ev);
-            else if(ev.type==='delta')h.delta(ev);
-            else if(ev.type==='error')h.error(ev);
-            else if(ev.type==='done')h.done(ev);
-          }
-        }
-      });
-  }
-};
-
-/* ---------- store (localStorage; no accounts by design) ---------- */
-const KEY='gaia.store.v1';
-const store={ data:null,
-  load(){ try{ this.data=JSON.parse(localStorage.getItem(KEY)); }catch{ this.data=null; }
-    this.data = this.data || {conversations:[],currentId:null,theme:'dark',enterSend:true,debug:false,
-      speechLang:'auto',lastLang:'en',noMotion:false,autoRead:false,speakRate:1};
-    return this.data; },
-  save(){ try{ localStorage.setItem(KEY,JSON.stringify(this.data)); }
-    catch(e){ console.warn('storage quota',e);
-      if(!this._warned||Date.now()-this._warned>60000){ this._warned=Date.now();
-        toast('Storage is full — export and delete old chats to save new ones.'); } } }
-};
-const S=store.load();
-const cur=()=>S.conversations.find(c=>c.id===S.currentId);
-
-/* ---------- markdown (escape-first: XSS-safe by construction) ---------- */
-/* basic escape-safe syntax highlighting — no dependency, token colors only */
-const _HL_KW={python:'def return if elif else for while import from class try except with as pass not in is None True False lambda print',javascript:'function return if else for while const let var class import export new async await try catch typeof null undefined true false',js:'function return if else for while const let var class import export new async await try catch typeof null undefined true false',bash:'if then else fi for while do done echo export cd sudo',sh:'if then else fi for while do done echo export cd sudo'};
-function hl(code,lang){
-  const kws=_HL_KW[(lang||'').toLowerCase()];
-  if(!kws) return code;
-  const parts=[];  // pull strings/comments out first so keywords stay untouched.
-  // NB: strings must be tried BEFORE comments, and `#` must not match the
-  // entity fragment in &#39;/&#34; — otherwise any digit 3/9/&/#/; inside a
-  // quoted string breaks the string branch and corrupts the line (live-caught)
-  code=code.replace(/(&#34;[^&#34;\n]*&#34;|&#39;[^&#39;\n]*&#39;|`[^`]*`)|((?<!&)#[^\n]*|\/\/[^\n]*)/g,
-    (m)=>{ parts.push(m); return `\x00H${parts.length-1}\x00`; });
-  const re=new RegExp('\\b('+kws.trim().split(/\s+/).join('|')+')\\b','g');
-  code=code.replace(re,'<span class="tok-k">$1</span>');
-  code=code.replace(/\x00H(\d+)\x00/g,(m,i)=>`<span class="${parts[i].startsWith('#')||parts[i].startsWith('//')?'tok-c':'tok-s'}">${parts[i]}</span>`);
-  return code;
-}
-
-function md(src){
-  const blocks=[];
-  src=String(src).replace(/```([\w+-]*)\n?([\s\S]*?)(?:```|$)/g,(m,lang,code)=>{
-    blocks.push({lang:lang||'text',code}); return `\x00B${blocks.length-1}\x00`; });
-  let h=esc(src);
-  const inline=s=>s
-    .replace(/`([^`\n]+)`/g,'<code>$1</code>')
-    .replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>')
-    .replace(/(^|[\s(])\*([^*\n]+)\*/g,'$1<i>$2</i>')
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-  const lines=h.split(/\n/); const out=[]; let list=null,table=null,para=[];
-  const flushP=()=>{ if(para.length){ out.push('<p>'+inline(para.join('<br>'))+'</p>'); para=[]; } };
-  const flushL=()=>{ if(list){ out.push(`<${list.t}>`+list.items.map(i=>'<li>'+inline(i)+'</li>').join('')+`</${list.t}>`); list=null; } };
-  const flushT=()=>{ if(table&&table.rows.length){ out.push('<div class="tblwrap"><table>'+
-    '<tr>'+table.head.map(c=>'<th>'+inline(c)+'</th>').join('')+'</tr>'+
-    table.rows.map(r=>'<tr>'+r.map(c=>'<td>'+inline(c)+'</td>').join('')+'</tr>').join('')+
-    '</table></div>'); } table=null; };
-  for(let ln of lines){
-    /* placeholder on its own line -> flush the paragraph and emit the code
-       block at BLOCK level: <pre> inside <p> auto-closes the paragraph per
-       the HTML5 parser (live-caught: DOM truncated to 190 chars) */
-    const bm=ln.match(/^\x00B(\d+)\x00\s*$/);
-    if(bm){ flushP();flushL();flushT(); out.push(codeblockHTML(blocks,+bm[1])); continue; }
-    if(/^\s*$/.test(ln)){ flushP();flushL();flushT(); continue; }
-    const hm=ln.match(/^(#{1,3})\s+(.*)/);
-    if(hm){ flushP();flushL();flushT(); out.push(`<h${hm[1].length}>${inline(hm[2])}</h${hm[1].length}>`); continue; }
-    if(/^\s*(---|\*\*\*)\s*$/.test(ln)){ flushP();flushL();flushT(); out.push('<hr>'); continue; }
-    const qm=ln.match(/^>\s?(.*)/);
-    if(qm){ flushP();flushL();flushT(); out.push('<blockquote>'+inline(qm[1])+'</blockquote>'); continue; }
-    const um=ln.match(/^\s*[-*•]\s+(.*)/);
-    if(um){ flushP();flushT(); if(!list||list.t!=='ul')flushL(),list={t:'ul',items:[]}; list.items.push(um[1]); continue; }
-    const om=ln.match(/^\s*\d+[.)]\s+(.*)/);
-    if(om){ flushP();flushT(); if(!list||list.t!=='ol')flushL(),list={t:'ol',items:[]}; list.items.push(om[1]); continue; }
-    const cells=ln.split('|').map(c=>c.trim());
-    if(cells.length>=2 && ln.trim().startsWith('|')){
-      flushP();flushL();
-      if(/^\s*:?-{2,}:?\s*$/.test(cells[1])&&table){ continue; }
-      if(!table){ table={head:cells.filter(c=>c!==''),rows:[]}; continue; }
-      table.rows.push(cells.filter(c=>c!=='')); continue; }
-    flushL();flushT(); para.push(ln);
-  }
-  flushP();flushL();flushT();
-  /* safety net: fences that ended up INLINE (mid-sentence) still render as
-     block-level divs — the parser may close the surrounding <p>, but the
-     code never truncates and never leaks raw placeholders */
-  return out.join('').replace(/\x00B(\d+)\x00/g,(m,i)=>codeblockHTML(blocks,+i));
-
-function codeblockHTML(blocks,i){
-  const b=blocks[i];
-  return `<div class="codeblock" data-cb="${i}"><div class="cb-head"><span>${esc(b.lang)}</span><button class="cb-copy" type="button">Copy</button></div><pre><code>${hl(esc(b.code.replace(/\n$/,'')),b.lang)}</code></pre></div>`;
-}
-}
-document.addEventListener('click',e=>{
-  const btn=e.target.closest('.cb-copy'); if(!btn)return;
-  const blk=btn.closest('[data-cb]'); const m=blk.querySelector('code').textContent;
-  copyText(m).then(()=>toast('Copied')); btn.textContent='Copied';
-  setTimeout(()=>btn.textContent='Copy',1200);
-});
-
-/* ---------- chat machine ---------- */
-const feed=$('#feed'), welcome=$('#welcome'), input=$('#input');
-const sendBtn=$('#send'), stopBtn=$('#stop'), composer=$('#composer');
-const chatEl=$('#chat');
-let streaming=false, aborter=null;
-
-/* ---------- scroll engine ----------
-   #chat owns scrolling. The ONLY programmatic scrolls are:
-   - scrollBottom(): explicit (user sent message / pressed the jump button)
-   - scheduleFollow(): during streaming — one per animation frame, and ONLY
-     if the user is currently near the bottom. If they scrolled up to read,
-     their viewport is never moved; a "New messages" pill appears instead.
-   No scroll-behavior:smooth (queued smooth animations fight user input). */
-const NEAR_BOTTOM_PX = 120;
-function isNearBottom(){
-  return chatEl.scrollHeight - chatEl.scrollTop - chatEl.clientHeight <= NEAR_BOTTOM_PX;
-}
-function scrollBottom(){
-  chatEl.scrollTop = chatEl.scrollHeight;   // instant by design
-  updateJump();
-}
-let _rafPending = false;
-function scheduleFollow(){
-  if(_rafPending) return;
-  _rafPending = true;
-  requestAnimationFrame(() => {
-    _rafPending = false;
-    if(isNearBottom()) chatEl.scrollTop = chatEl.scrollHeight;
-    updateJump();
-  });
-}
-function updateJump(){
-  const has = feed.children.length > 0;
-  $('#jump').classList.toggle('show', has && !isNearBottom());
-}
-chatEl.addEventListener('scroll', updateJump, {passive:true});
-$('#jump').addEventListener('click', scrollBottom);
-
-const SUGGESTIONS=[
-  ['Ask anything','Explain quantum computing simply.'],
-  ['Code','Write a Python function for binary search.'],
-  ['Multilingual','मशीन लर्निंग कैसे काम करती है?'],
-  ['Translate','Translate this into German.'],
-  ['Documents','Summarize the uploaded document.'],
-  ['Current info','What are the latest developments in AI?']];
-/* native display names for the language chip / switch divider (7 tested langs) */
-const NATIVE={en:'English',hi:'हिन्दी',pa:'ਪੰਜਾਬੀ',es:'Español',fr:'Français',de:'Deutsch',it:'Italiano'};
-SUGGESTIONS.forEach(([k,q])=>{
-  const b=document.createElement('button'); b.type='button'; b.className='card';
-  b.innerHTML=`<span class="k">${k}</span><span class="q">${esc(q)}</span>`;
-  b.addEventListener('click',()=>send(q)); $('#cards').appendChild(b);
-});
-
-function friendly(errText){
-  if(!errText) return 'Something went wrong while generating the response.';
-  if(/429|Rate limit/i.test(errText)) return 'The assistant is busy right now — wait a few seconds and try again.';
-  if(/API_KEY|not configured/i.test(errText)) return 'AI answers are not configured on the server yet. Check the server setup.';
-  if(/Failed to fetch|NetworkError/i.test(errText)) return 'Unable to connect to the assistant.';
-  return 'Something went wrong while generating the response.';
-}
-
-function newConv(activate=true){
-  const c={id:uid(),title:'New conversation',createdAt:Date.now(),updatedAt:Date.now(),messages:[]};
-  S.conversations.unshift(c); if(activate){S.currentId=c.id;} store.save();
-  if(activate)openConv(c.id); renderSidebar();
-  return c;
-}
-function openConv(id){
-  if(streaming&&aborter)aborter.abort();   // chat-switch must kill in-flight streams
-  S.currentId=id; store.save();
-  const c=cur();
-  $('#chat-title').textContent=c.title;
-  feed.innerHTML='';
-  const has=c.messages.length;
-  welcome.classList.toggle('show',!has);
-  c.messages.forEach(m=>paintMsg(m,c,false));
-  scrollBottom();                 // ONE scroll after the batch restore
-  renderSidebar(); refreshDocs();
-  if(innerWidth<=900)closeDrawer();
-}
-function paintMsg(m,c,live=false){
-  const w=document.createElement('div');
-  w.className='msg '+(m.role==='user'?'user':'assistant')+(m.error?' err':'')+(live?' live':'');
-  w.dataset.id=m.ts;
-  const b=document.createElement('div'); b.className='bubble md'; b.dir='auto';
-  if(m.role==='user') b.textContent=m.content;
-  else if(live) b.innerHTML='<span class="gen"><span class="pulse"></span>Generating…</span>';
-  else b.innerHTML=m.content_md || md(m.content);
-  const lm=m.meta?.language_meta;
-  /* language-switch divider: only when the language actually changed
-     between consecutive assistant replies in this conversation */
-  if(m.role==='assistant'&&lm?.language&&!live){
-    const i=c.messages.indexOf(m);
-    for(let j=i-1;j>=0;j--){
-      const p=c.messages[j].meta?.language_meta?.language;
-      if(c.messages[j].role==='assistant'&&p){ 
-        if(p!==lm.language){
-          const d=document.createElement('div'); d.className='lang-switch';
-          d.innerHTML=`<span>Language switched: ${esc(NATIVE[p]||p)} → ${esc(NATIVE[lm.language]||lm.language)}</span>`;
-          feed.appendChild(d);
-        }
-        break;
-      }
-    }
-  }
-  if(m.role!=='user'&&!live&&lm?.language){
-    const chip=document.createElement('span'); chip.className='lang-chip';
-    chip.textContent=`${NATIVE[lm.language]||lm.language} · ${lm.language_name||lm.language}`;
-    /* subtle low-detection-confidence hint — REAL backend value only;
-       threshold 0.5 is a UI-emphasis heuristic, never a claimed metric */
-    if(lm.confidence!=null && lm.confidence<0.5){
-      chip.classList.add('low-conf');
-      chip.title=`Detection confidence ${(lm.confidence*100).toFixed(0)}% — verify language`;
-    }
-    b.prepend(chip);
-  }
-  /* day separator when this message falls on a new calendar day */
-  const prevMsg=c.messages[c.messages.indexOf(m)-1];
-  if(prevMsg&&prevMsg.ts&&m.ts&&
-     new Date(prevMsg.ts).toDateString()!==new Date(m.ts).toDateString()){
-    const dsep=document.createElement('div'); dsep.className='day-sep';
-    const g=groupOf(m.ts);
-    dsep.innerHTML=`<span>${(g==='Today'||g==='Yesterday')?g:new Date(m.ts).toLocaleDateString()}</span>`;
-    feed.appendChild(dsep);
-  }
-  w.appendChild(b);
-  if(m.role!=='user'&&!live){
-    if(m.sources&&m.sources.length) w.appendChild(sourcesEl(m.sources));
-    w.appendChild(actsEl(m,c));
-    const d=debugEl(m); if(d)w.appendChild(d);
-  }
-  feed.appendChild(w); if(live)scheduleFollow();   // no scroll on restore: caller batches
-  return w;
-}
-function sourcesEl(sources){
-  const d=document.createElement('div'); d.className='sources';
-  d.innerHTML='Sources'+sources.map((s,i)=>{
-    if(s.url) return `<div class="src-line"><span class="src-n">${i+1}.</span><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title||s.url)}</a></div>`;
-    if(s.document) return `<div class="src-line"><span class="src-n">${i+1}.</span>${esc(s.document)} — chunk ${s.chunk}</div>`;
-    return `<div class="src-line"><span class="src-n">${i+1}.</span>${esc(s.note||'source')}</div>`;
-  }).join('');
-  return d;
-}
-function actsEl(m,c){
-  const d=document.createElement('div'); d.className='acts-row';
-  if(m.ts){ const t=document.createElement('span'); t.className='time';
-    t.textContent=new Date(m.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    t.title=new Date(m.ts).toLocaleString(); t.style.cssText='font-size:.68rem;color:var(--muted);align-self:center;margin-left:2px';
-    d.appendChild(t); }
-  const copyBtn=`<button class="icon-btn" aria-label="Copy message" data-a="copy"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>`;
-  d.innerHTML+=copyBtn;
-  if(m.role==='assistant'){
-    const label=m.error?'Retry':'Regenerate response';
-    const act=m.error?'retry':'regen';
-    d.innerHTML+=`<button class="icon-btn" aria-label="${label}" data-a="${act}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5"/></svg></button>`;
-  } else {
-    d.innerHTML+=`<button class="icon-btn" aria-label="Edit and resend" data-a="edit"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17z"/></svg></button>`;
-  }
-  if(m.role==='assistant'&&!m.error){
-    d.innerHTML+=`<button class="icon-btn listen-btn" aria-label="Listen" data-a="listen"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12"/></svg></button>`;
-  }
-  d.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{
-    const a=btn.dataset.a;
-    if(a==='copy') copyText(m.content).then(()=>toast('Copied'));
-    if(a==='regen'||a==='retry') regenerate();
-    if(a==='edit') editMsg(m,c);
-    if(a==='listen') speakMessage(m);
-  }));
-  return d;
-}
-function debugEl(m){
-  const lm=m.meta?.language_meta||{}; if(!lm.language&&!m.meta?.route&&!m.latency)return null;
-  const rows=[];
-  if(lm.language) rows.push(`<b>Language:</b> ${esc(lm.language_name||lm.language)}${lm.confidence!=null?` (${lm.confidence})`:''}`);
-  if(lm.secondary_languages?.length) rows.push(`<b>Secondary:</b> ${lm.secondary_languages.join(', ')}`);
-  if(lm.code_switched) rows.push(`<b>Code-switched:</b> Yes${lm.mixed_script?' · mixed-script':''}`);
-  if(lm.scripts&&Object.keys(lm.scripts).length) rows.push(`<b>Scripts:</b> ${Object.keys(lm.scripts).join(' + ')}`);
-  if(lm.detection_reason) rows.push(`<b>Detection:</b> ${esc(lm.detection_reason)}`);
-  if(m.meta?.route) rows.push(`<b>Router:</b> ${esc(m.meta.route)}${m.meta.reason?` — ${esc(m.meta.reason)}`:''}`);
-  if(m.intent) rows.push(`<b>Intent:</b> ${esc(m.intent)} (${Math.round((m.confidence||0)*100)}%)`);
-  if(m.model) rows.push(`<b>Model:</b> ${esc(m.model)}`);
-  if(m.latency!=null) rows.push(`<b>Latency:</b> ${Math.round(m.latency)} ms`);
-  if(m.debug_error) rows.push(`<b>Technical:</b> ${esc(m.debug_error)}`);
-  const d=document.createElement('div'); d.className='debug-card';
-  d.innerHTML=rows.join('<br>'); return d;
-}
-
-async function send(text){
-  text=(text??input.value).trim();
-  if(!text||streaming)return;
-  if(text.length>4000){ toast('Message too long (max 4,000 characters)'); input.value=text; autoGrow(); return; }
-  stopSpeak();   /* barge-in: new message stops any running speech */
-  input.value=''; autoGrow();
-  let c=cur(); if(!c) c=newConv(true);
-  welcome.classList.remove('show');
-  const um={role:'user',content:text,ts:Date.now()}; c.messages.push(um);
-  paintMsg(um,c);
-  if(c.title==='New conversation'){
-    c.title=text.split(/\s+/).slice(0,6).join(' ').slice(0,48);
-    $('#chat-title').textContent=c.title;
-  }
-  c.updatedAt=Date.now(); store.save();
-  await run(c,um);
-}
-async function run(c,um){
-  const am={role:'assistant',content:'',ts:Date.now(),meta:null};
-  c.messages.push(am);
-  speechBuf=''; spokenSentences=0;   /* per-stream auto-read state */
-  const w=paintMsg(am,c,true);
-  streaming=true; sendBtn.hidden=true; stopBtn.classList.add('show');
-  aborter=new AbortController();
-  const bubble=w.querySelector('.bubble');
-  let gotMeta=null,intent=null,conf=null;
-  try{
-    await api.chat(um.content,c.id,{
-      meta(ev){ gotMeta=ev; am.meta=ev;
-        const l=ev?.language_meta?.language; if(l&&BCP[l]){ S.lastLang=l; store.save(); } },
-      delta(ev){ am.content+=ev.text; if(ev.intent!==undefined){intent=ev.intent;conf=ev.confidence;}
-        bubble.textContent=am.content; scheduleFollow();
-        feedSpeech(ev.text, am.ts,
-          (gotMeta&&gotMeta.response_lang) || (gotMeta&&gotMeta.language_meta&&gotMeta.language_meta.language) || 'en'); },
-      error(ev){ am.error=true; am.debug_error=ev.message; am.content=am.content||friendly(ev.message); },
-      done(ev){ am.latency=ev.latency_ms; am.model=ev.model; am.sources=ev.sources||[];
-                if(ev.model==='retrieval-gate')am.model=ev.model; }
-    },aborter.signal);
-  }catch(err){
-    if(err.name==='AbortError'){ am.content=am.content||''; am.stopped=true; }
-    else{ am.error=true; am.debug_error=String(err.message||err);
-          am.content=am.content||friendly(am.debug_error); offline(true); }
-  }finally{
-    streaming=false; aborter=null; sendBtn.hidden=false; stopBtn.classList.remove('show');
-    if(!am.content && !am.error && !am.stopped){
-      /* zero-delta done = empty response from the provider: surface it
-         honestly with a retry affordance, never a silent empty bubble */
-      am.error=true; am.content='The assistant returned an empty response. Please try again.';
-    }
-    am.content_md=md(am.content);
-    am.intent=intent; am.confidence=conf;
-    c.updatedAt=Date.now(); store.save();
-    /* repaint only if we're still on the same conversation: switching chats
-       aborts the stream and must NOT paint a partial reply into another
-       conversation's feed */
-    if(c.id===S.currentId && w.parentNode===feed){
-      feed.removeChild(w); paintMsg(am,c,false); scrollBottom();
-      if(am.stopped){ const s=document.createElement('div'); s.className='stopped';
-        s.textContent='(stopped)'; feed.lastChild.appendChild(s); }
-    }
-    renderSidebar(); refreshDocs();
-  }
-}
-function regenerate(){
-  if(streaming)return;
-  const c=cur(); if(!c)return;
-  /* drop trailing assistant message, resend last user message */
-  while(c.messages.length&&c.messages[c.messages.length-1].role!=='user')c.messages.pop();
-  const um=c.messages[c.messages.length-1];
-  if(!um)return; store.save();
-  openConv(c.id); run(c,um);
-}
-function editMsg(m,c){
-  if(streaming)return;
-  const i=c.messages.indexOf(m);
-  c.messages.splice(i); store.save(); openConv(c.id);
-  input.value=m.content; autoGrow(); input.focus();
-}
-composer.addEventListener('submit',e=>{e.preventDefault();send();});
-input.addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&!e.shiftKey&&S.enterSend){e.preventDefault();send();}
-});
-input.addEventListener('input',()=>{autoGrow();updateCharCount();});
-const MAX_CHARS=4000;
-const charCount=$('#char-count');
-function autoGrow(){ input.style.height='auto'; input.style.height=Math.min(input.scrollHeight,200)+'px'; }
-function updateCharCount(){
-  const len=input.value.length;
-  if(len>MAX_CHARS*0.8){
-    charCount.textContent=`${len} / ${MAX_CHARS}`;
-    charCount.className='char-count'+(len>MAX_CHARS?' over':len>MAX_CHARS*0.9?' warn':'');
-    sendBtn.disabled=len>MAX_CHARS;
-  } else { charCount.textContent=''; charCount.className='char-count'; sendBtn.disabled=false; }
-}
-stopBtn.addEventListener('click',()=>aborter&&aborter.abort());
-
-/* ---------- sidebar ---------- */
-const listEl=$('#conv-list');
-function renderSidebar(){
-  const q=$('#search').value.trim().toLowerCase();
-  const cs=S.conversations.filter(c=>!q||c.title.toLowerCase().includes(q)||
-    c.messages.some(m=>m.content.toLowerCase().includes(q)));
-  listEl.innerHTML='';
-  if(!cs.length){ listEl.innerHTML=`<p class="side-empty">${q?'No matching chats.':'No conversations yet.'}</p>`; return; }
-  let lastG=null;
-  [...cs].sort((a,b)=>b.updatedAt-a.updatedAt).forEach(c=>{
-    const g=groupOf(c.updatedAt);
-    if(g!==lastG){ lastG=g;
-      const h=document.createElement('div'); h.className='group-label'; h.textContent=g;
-      listEl.appendChild(h); }
-    /* content-match snippet: show WHERE the query hit, not just the title */
-    let snip='';
-    if(q){
-      const hit=c.messages.find(m=>m.content.toLowerCase().includes(q));
-      if(hit && !c.title.toLowerCase().includes(q)){
-        const at=hit.content.toLowerCase().indexOf(q);
-        snip=esc((at>25?'…':'')+hit.content.slice(Math.max(0,at-25),at+45).trim()+(hit.content.length>at+45?'…':''));
-      }
-    }
-    const it=document.createElement('div');
-    it.innerHTML=`<div class="conv${c.id===S.currentId?' active':''}" role="button" tabindex="0" aria-label="Open chat: ${esc(c.title)}" title="${esc(c.title)}">
-        <span class="t">${esc(c.title)}${snip?`<span class="snip">${snip}</span>`:''}</span>
-        <span class="acts">
-          <button class="icon-btn ex" aria-label="Export chat"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg></button>
-          <button class="icon-btn rn" aria-label="Rename chat"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17z"/></svg></button>
-          <button class="icon-btn del" aria-label="Delete chat"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg></button>
-        </span></div>`;
-    const row=it.querySelector('.conv');
-    row.addEventListener('click',e=>{
-      if(e.target.closest('.rn')||e.target.closest('.del')||e.target.closest('.ex'))return;
-      openConv(c.id); closeDrawer();
-    });
-    row.addEventListener('keydown',e=>{
-      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openConv(c.id); closeDrawer(); }
-    });
-    it.querySelector('.ex').addEventListener('click',()=>exportConv(c));
-    it.querySelector('.rn').addEventListener('click',()=>renameConv(c));
-    it.querySelector('.del').addEventListener('click',async()=>{
-      if(!await confirmM('Delete chat?','“'+c.title.slice(0,40)+'” and its server-side documents will be deleted.'))return;
-      api.deleteConversation(c.id).catch(()=>{});
-      S.conversations=S.conversations.filter(x=>x.id!==c.id);
-      if(S.currentId===c.id){ S.currentId=null; feed.innerHTML='';
-        if(S.conversations.length)openConv(S.conversations[0].id);
-        else{ welcome.classList.add('show'); $('#chat-title').textContent='New conversation'; $('#doc-strip').classList.remove('show'); } }
-      store.save(); renderSidebar();
-    });
-    listEl.appendChild(it);
-  });
-}
-$('#search').addEventListener('input',renderSidebar);
-$('#new-chat').addEventListener('click',()=>{ if(streaming)return; newConv(true); input.focus(); closeDrawer(); });
-
-/* rename via the accessible modal (replaces window.prompt) */
-function renameConv(c){
-  const m=modal(`<header><h2 id="modal-h" style="font-size:.95rem">Rename chat</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
-    <div class="body">
-      <input id="rn-input" class="sel" style="width:100%" value="${esc(c.title)}" maxlength="80" aria-label="Chat title">
-      <div class="confirm-row"><button class="no" data-x>Cancel</button>
-        <button class="yes" data-y style="background:var(--accent-strong)">Save</button></div>
-    </div>`);
-  const inp=m.el.querySelector('#rn-input'); inp.focus(); inp.select();
-  const save=()=>{ const t=inp.value.trim(); if(t){ c.title=t.slice(0,80); store.save(); renderSidebar();
-    if(cur()&&cur().id===c.id)$('#chat-title').textContent=c.title; toast('Chat renamed'); } m.close(); };
-  m.el.querySelector('[data-y]').onclick=save;
-  m.el.querySelector('[data-x]').onclick=()=>m.close();
-  inp.addEventListener('keydown',e=>{ if(e.key==='Enter')save(); });
-}
-
-/* export a conversation as markdown */
-function exportConv(c){
-  const lines=[`# ${c.title}`,'',
-    ...c.messages.map(m=>{
-      const who=m.role==='user'?'**You**':'**GAIA**';
-      const when=m.ts?` _(${new Date(m.ts).toLocaleString()})_`:'';
-      const lang=m.meta?.language_meta?.language?` _[${m.meta.language_meta.language}]_`:'';
-      return `${who}${when}${lang}:\n\n${m.content}`;
-    })];
-  const blob=new Blob([lines.join('\n\n---\n\n')],{type:'text/markdown'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=c.title.replace(/[^\w\u0900-\u097F\u0A00-\u0A7F -]/g,'').trim().slice(0,60)+'.md';
-  a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
-  toast('Chat exported');
-}
-
-/* drawer */
-/* drawer + desktop collapse share one button */
-const sidebar=$('#sidebar'), scrim=$('#scrim');
-function closeDrawer(){
-  sidebar.classList.remove('open'); scrim.classList.remove('show');
-  input.focus();   /* a11y: return focus to a sane place after drawer use */
-}
-function applyShell(){
-  const app=document.querySelector('.app');
-  const desktop=innerWidth>900;
-  app.classList.toggle('side-off', desktop && !!S.sideCollapsed);
-  if(desktop) app.classList.remove('side-off') || (S.sideCollapsed && app.classList.add('side-off'));
-  const btn=$('#menu-btn');
-  btn.setAttribute('aria-label',
-    desktop ? (S.sideCollapsed?'Show sidebar':'Hide sidebar') : 'Open conversations menu');
-}
-$('#menu-btn').addEventListener('click',()=>{
-  if(innerWidth<=900){
-    sidebar.classList.add('open'); scrim.classList.add('show');
-    $('#new-chat').focus();   /* a11y: land focus inside the drawer */
-  } else {
-    S.sideCollapsed=!S.sideCollapsed; store.save(); applyShell();
-  }
-});
-addEventListener('resize',applyShell);
-scrim.addEventListener('click',closeDrawer);
-document.addEventListener('keydown',e=>{ if(e.key==='Escape')closeDrawer(); });
-
-/* ---------- documents ---------- */
-const strip=$('#doc-strip');
-let uploading=false;
-$('#attach-btn').addEventListener('click',()=>$('#docs-btn').click());
-$('#docs-btn').addEventListener('click',()=>{
-  const c=cur(); if(!c){ newConv(true); }
-  if(!cur()||uploading)return; $('#file-input').click();
-});
-$('#file-input').addEventListener('change',async e=>{
-  const f=e.target.files[0]; e.target.value=''; if(!f)return;
-  let c=cur(); if(!c)c=newConv(true);
-  uploading=true;
-  const chip=docChip(f.name,'Processing…','');
-  try{ const r=await api.uploadDocument(c.id,f);
-    chip.querySelector('.st').textContent=`Ready — ${r.chunks} chunks`; chip.classList.add('ok');
-    toast('Document ready'); }
-  catch(err){ chip.querySelector('.st').textContent='Failed — try again'; chip.classList.add('bad'); }
-  uploading=false; refreshDocs();
-});
-function docChip(name,st,cls){
-  const d=document.createElement('span'); d.className='chip '+cls;
-  d.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>${esc(name)} <span class="st">${esc(st)}</span>`;
-  strip.appendChild(d); return d;
-}
-async function refreshDocs(){
-  const c=cur(); strip.innerHTML='';
-  if(!c){ strip.classList.remove('show'); return; }
-  try{
-    const r=await api.listDocuments(c.id);
-    if(!r.documents.length){ strip.classList.remove('show'); return; }
-    strip.classList.add('show');
-    r.documents.forEach(d=>docChip(d.document,`${d.chunks} chunks · Ready`,'ok'));
-    const n=r.documents.length;
-    const lbl=document.createElement('span'); lbl.className='st'; lbl.style.cssText='color:var(--muted);font-size:.75rem;align-self:center';
-    lbl.textContent=`${n} document${n>1?'s':''} — ask questions about them`; strip.appendChild(lbl);
-    const cl=document.createElement('button'); cl.id='clear-docs'; cl.textContent='Clear documents';
-    cl.addEventListener('click',async()=>{ await api.clearDocuments(c.id).catch(()=>{}); refreshDocs(); });
-    strip.appendChild(cl);
-  }catch{ strip.classList.remove('show'); }
-}
-
-/* ---------- theme (dark / light / system) ---------- */
-const mq=matchMedia('(prefers-color-scheme: dark)');
-function applyTheme(){
-  const t=S.theme;
-  document.documentElement.dataset.theme=(t==='system')?(mq.matches?'dark':'light'):t;
-  store.save();
-}
-mq.addEventListener?.('change',()=>{ if(S.theme==='system')applyTheme(); });
-$('#theme-btn').addEventListener('click',()=>{
-  S.theme=(document.documentElement.dataset.theme==='dark')?'light':'dark'; applyTheme();
-});
-
-/* ---------- settings modal ---------- */
-$('#settings-btn').addEventListener('click',openSettings);
-$('#hdr-settings').addEventListener('click',openSettings);
-$('#del-all-side').addEventListener('click',()=>deleteAllData());
-function modal(html,onClose){
-  const ov=$('#overlay-m');
-  ov.innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-h">${html}</div>`;
-  ov.classList.add('show');
-  const close=()=>{ ov.classList.remove('show'); document.removeEventListener('keydown',esc); };
-  const escFn=e=>{ if(e.key==='Escape'){ onClose&&onClose(); close(); } };
-  document.addEventListener('keydown',escFn);
-  ov.onclick=e=>{ if(e.target===ov){ onClose&&onClose(); close(); } };
-  ov.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{ onClose&&onClose(); close(); }));
-  ov.querySelector('button')?.focus();   /* a11y: land focus in the dialog */
-  return { el: ov.firstElementChild, close };
-}
-function confirmM(title,body){
-  return new Promise(res=>{
-    const m=modal(`<header><h2 id="modal-h" style="font-size:.95rem">${esc(title)}</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
-      <div class="body"><p>${esc(body)}</p>
-      <div class="confirm-row"><button class="no" data-x>Cancel</button><button class="yes" data-y>Delete</button></div></div>`,
-      ()=>res(false));
-    m.el.querySelector('[data-y]').onclick=()=>{ m.close(); res(true); };
-    m.el.querySelector('[data-x]').onclick=()=>{ m.close(); res(false); };
-  });
-}
-async function deleteAllData(){
-  if(!await confirmM('Delete everything?','All local chats will be removed. Server-side conversation data for the current chat will also be deleted.'))return;
-  if(cur())api.deleteConversation(cur().id).catch(()=>{});
-  localStorage.removeItem(KEY);
-  S.conversations=[];S.currentId=null;S.theme='dark';S.enterSend=true;S.debug=false;
-  S.speechLang='auto';S.lastLang='en';S.noMotion=false;S.autoRead=false;S.speakRate=1;
-  document.body.classList.remove('debug'); $('#debug-btn').setAttribute('aria-pressed','false');
-  applyTheme();
-  store.save(); feed.innerHTML=''; welcome.classList.add('show');
-  $('#chat-title').textContent='New conversation'; renderSidebar(); refreshDocs();
-  toast('All local data deleted');
-}
-function openSettings(){
-  const m=modal(`<header><h2 id="modal-h" style="font-size:.95rem">Settings</h2><button class="icon-btn" data-close aria-label="Close"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
-  <div class="body">
-    <div class="sect"><h3>Appearance</h4>
-      <div class="seg" id="theme-seg">
-        <button data-t="dark">Dark</button><button data-t="light">Light</button><button data-t="system">System</button>
-      </div></div>
-    <div class="sect"><h3>Chat</h4>
-      <label class="check"><input type="checkbox" id="etm"> Enter key sends the message</label>
-      <label class="check" style="margin-top:8px"><input type="checkbox" id="nom"> Reduce motion (disable animations)</label>
-      <div class="row" style="margin-top:10px">
-        <label for="slang" style="font-size:.84rem">Speech language</label>
-        <select id="slang" class="sel" aria-label="Speech language">
-          <option value="auto">Auto (last chat language)</option>
-          <option value="en-IN">English</option><option value="hi-IN">हिन्दी — Hindi</option>
-          <option value="pa-IN">ਪੰਜਾਬੀ — Punjabi</option><option value="es-ES">Español</option>
-          <option value="fr-FR">Français</option><option value="de-DE">Deutsch</option>
-          <option value="it-IT">Italiano</option>
-        </select>
-      </div>
-      <label class="check" style="margin-top:10px"><input type="checkbox" id="autoread"> Read replies aloud</label>
-      <div class="row" style="margin-top:8px">
-        <label for="srate" style="font-size:.84rem">Speech rate</label>
-        <select id="srate" class="sel" aria-label="Speech rate">
-          <option value="0.75">0.75×</option><option value="1">1.0×</option>
-          <option value="1.25">1.25×</option><option value="1.5">1.5×</option>
-        </select>
-      </div></div>
-    <div class="sect"><h3>Privacy</h4>
-      <p style="color:var(--muted);font-size:.78rem;line-height:1.6">No login required. Conversations live in this browser only; uploaded documents are scoped to each chat and deleted with it. Voice input uses your browser's speech recognition — this app stores no audio.</p>
-      <button class="danger-btn" id="del-all">Delete all local data</button></div>
-    <div class="sect"><h3>About</h4><div class="about" id="about">Loading…</div></div>
-  </div>`);
-  const seg=m.el.querySelector('#theme-seg');
-  const sync=()=>seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.t===S.theme));
-  sync();
-  seg.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ S.theme=b.dataset.t; applyTheme(); sync(); }));
-  m.el.querySelector('#etm').checked=S.enterSend;
-  m.el.querySelector('#etm').addEventListener('change',e=>{ S.enterSend=e.target.checked; store.save(); });
-  m.el.querySelector('#nom').checked=!!S.noMotion;
-  m.el.querySelector('#nom').addEventListener('change',e=>{ S.noMotion=e.target.checked; applyMotion(); store.save(); });
-  const slang=m.el.querySelector('#slang');
-  slang.value=S.speechLang||'auto';
-  slang.addEventListener('change',e=>{ S.speechLang=e.target.value; store.save(); });
-  const ar=m.el.querySelector('#autoread');
-  ar.checked=!!S.autoRead;
-  ar.addEventListener('change',e=>{ S.autoRead=e.target.checked; store.save();
-    if(!S.autoRead)stopSpeak(); });
-  const sr=m.el.querySelector('#srate');
-  sr.value=String(S.speakRate||'1');
-  sr.addEventListener('change',e=>{ S.speakRate=parseFloat(e.target.value); store.save(); });
-  m.el.querySelector('#del-all').addEventListener('click',()=>{ m.close(); deleteAllData(); });
-  api.health().then(h=>{
-    m.el.querySelector('#about').innerHTML=`<b>Global Multilingual AI Assistant</b> v2.0<br>
-      Multilingual general chat · cross-language document Q&A · translation · web search<br>
-      Provider: <b>${esc(h.llm_provider)}</b> · Model: <b>${esc(h.llm_model)}</b> · LLM ready: ${h.llm_ready?'yes':'no'}<br>
-      Tested languages: English, Hindi, Punjabi, Spanish, French, German, Italian`;
-  }).catch(()=>{ m.el.querySelector('#about').textContent='Backend unreachable.'; });
-}
-
-/* ---------- debug toggle + offline ---------- */
-$('#debug-btn').addEventListener('click',()=>{
-  S.debug=!S.debug; document.body.classList.toggle('debug',S.debug);
-  $('#debug-btn').setAttribute('aria-pressed',S.debug); store.save();
-});
-function offline(off){
-  $('#offline').classList.toggle('show',off);
-  $('#dot').classList.toggle('off',off);
-  $('#status-txt').textContent=off?'Offline':'Online';
-}
-$('#retry-btn').addEventListener('click',()=>{ offline(false); api.health().then(()=>offline(false)).catch(()=>offline(true)); });
-
-/* ---------- motion preference ---------- */
-function applyMotion(){
-  document.body.classList.toggle('no-motion',!!S.noMotion);
-}
-applyMotion();
-
-/* ---------- voice input (browser SpeechRecognition; no audio stored) ----------
-   BCP-47 codes — the browser API does NOT auto-detect spoken language, so
-   "Auto" = last reliable chat language. Errors must explain the fix (§21). */
-const BCP={en:'en-IN',hi:'hi-IN',pa:'pa-IN',es:'es-ES',fr:'fr-FR',de:'de-DE',it:'it-IT'};
-const REC=()=>window.SpeechRecognition||window.webkitSpeechRecognition||null;
-const micBtn=$('#mic-btn');
-let rec=null, recActive=false;
-
-const MIC_ERRORS={
-  'not-allowed':'Microphone permission denied. Allow it in your browser site settings, then try again.',
-  'service-not-allowed':'Microphone blocked by the browser/OS privacy settings. Enable it in system preferences.',
-  'audio-capture':'No microphone found. Connect one and try again.',
-  'no-speech':'No speech heard. Check the Speech language in Settings and try speaking again.',
-  'network':'Speech service network error. Check your connection and retry.',
-};
-function setMic(state){  // idle | requesting | listening
-  recActive=state==='listening';
-  micBtn.classList.toggle('listening',state==='listening');
-  micBtn.classList.toggle('requesting',state==='requesting');
-  micBtn.setAttribute('aria-pressed',state!=='idle');
-  input.placeholder=state==='listening'?'Listening… speak now (Esc to stop)'
-                   :state==='requesting'?'Requesting microphone…'
-                   :'Ask anything in any supported language…';
-  if(state==='idle')autoGrow();
-}
-function stopVoice(){ if(rec&&recActive){ try{rec.stop();}catch(e){} } }
-function toggleVoice(){
-  const R=REC();
-  if(!R){ toast('Voice input is not supported in this browser.'); return; }
-  if(recActive){ stopVoice(); return; }
-  stopSpeak();   /* barge-in: mic activation stops speech */
-  rec=new R();
-  rec.lang=S.speechLang==='auto'?(BCP[S.lastLang]||'en-IN'):S.speechLang;
-  rec.continuous=false; rec.interimResults=true;
-  rec.onresult=e=>{
-    let interim='',final='';
-    for(const r of e.results)(r.isFinal?final+=r[0].transcript:interim+=r[0].transcript);
-    input.value=(final||interim).trim(); autoGrow();
-  };
-  rec.onerror=e=>{
-    const msg=MIC_ERRORS[e.error]||('Voice input failed ('+(e.error||'unknown')+').');
-    toast(msg);
-  };
-  rec.onend=()=>{ setMic('idle'); if(input.value.trim())input.focus(); };
-  /* honest states: "requesting" while the browser permission prompt is up;
-     "listening" only once the engine actually started */
-  rec.onstart=()=>{ setMic('listening'); };
-  try{ rec.start(); setMic('requesting'); }
-  catch(e){ toast('Could not start the microphone. Try again.'); setMic('idle'); }
-}
-if(REC()){ micBtn.addEventListener('click',toggleVoice); }
-else{ micBtn.disabled=true;
-  micBtn.title='Voice input not supported in this browser (use Chrome or Safari)'; }
-
-/* Escape stops listening first; shortcut Cmd/Ctrl+Shift+M toggles the mic */
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){
-    if(recActive){ e.preventDefault(); stopVoice(); return; }
-    if(speakingTs){ e.preventDefault(); stopSpeak(); return; }   /* §31: Escape stops speech */
-    closeDrawer();
-  }
-  if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key.toLowerCase()==='m'){ e.preventDefault(); toggleVoice(); }
-});
-
-/* ---------- voice output (browser SpeechSynthesis; language-matched) ----------
-   §22–24: per-message Listen, optional auto-read (streams sentence-by-
-   sentence), markdown stripped, code fences -> "Code block skipped.",
-   no silent wrong-language voice, barge-in on new message / mic. */
-const SYNTH=()=>window.speechSynthesis||null;
-let speakQueue=[], speakingTs=null, spokenSentences=0, speechBuf='';
-
-function voicesFor(lang){
-  const s=SYNTH(); if(!s)return [];
-  const base=(BCP[lang]||lang||'en').split('-')[0].toLowerCase();
-  return s.getVoices().filter(v=>v.lang&&v.lang.toLowerCase().startsWith(base));
-}
-let speakPaused=false;
-function stopSpeak(){
-  const s=SYNTH();
-  if(s){ s.cancel(); }   /* unconditional: native no-op when idle; flag-lag safe */
-  speakQueue=[]; speakingTs=null; speakPaused=false; updateListenUI();
-}
-function speechText(raw){  /* markdown -> speakable plain text */
-  let t=raw.replace(/```[\s\S]*?```/g,' Code block skipped. ');
-  t=t.replace(/`([^`]+)`/g,'$1')
-     .replace(/\[([^\]]+)\]\([^)]*\)/g,'$1')
-     .replace(/[*_>#|]+/g,' ')
-     .replace(/\s+/g,' ').trim();
-  return t;
-}
-function speakNext(){
-  const s=SYNTH();
-  if(!s||!speakQueue.length){ speakingTs=null; updateListenUI(); return; }
-  const item=speakQueue.shift();
-  const vs=voicesFor(item.lang);
-  if(!vs.length){ toast(`No voice available for ${NATIVE[item.lang]||item.lang} on this device.`); return speakNext(); }
-  const u=new SpeechSynthesisUtterance(item.text);
-  u.voice=vs[0]; u.lang=vs[0].lang; u.rate=S.speakRate||1;
-  u.onend=u.onerror=()=>speakNext();
-  s.speak(u);
-}
-function speakMessage(m){  /* Listen button: play / pause / resume */
-  if(speakingTs===m.ts){
-    const s=SYNTH();
-    if(!s){ stopSpeak(); return; }
-    if(speakPaused){ if(typeof s.resume==='function'){ s.resume(); speakPaused=false; } }
-    else if(typeof s.pause==='function'){ s.pause(); speakPaused=true; }
-    else{ stopSpeak(); }   /* engine without pause: fall back to stop */
-    updateListenUI();
-    return;
-  }
-  stopSpeak();
-  const lang=m.meta?.language_meta?.language||'en';
-  const text=speechText(m.content);
-  if(!text){ toast('Nothing to read aloud.'); return; }
-  speakQueue=[{text,lang}]; speakingTs=m.ts; speakPaused=false; updateListenUI(); speakNext();
-}
-function updateListenUI(){
-  document.querySelectorAll('.listen-btn').forEach(b=>{
-    const ts=b.closest('.msg')?.dataset.id;
-    const mine=ts&&ts===String(speakingTs);
-    b.classList.toggle('speaking',!!mine&&!speakPaused);
-    b.classList.toggle('paused',!!mine&&speakPaused);
-    b.setAttribute('aria-label',mine?(speakPaused?'Resume reading':'Pause reading'):'Listen');
-  });
-}
-/* stream-aware auto-read: speak each complete sentence as it arrives */
-function feedSpeech(delta,ts,lang){
-  if(!S.autoRead||!SYNTH())return;
-  speechBuf+=delta;
-  /* recompute sentence list each delta (cheap, idempotent); speak only the
-     sentences beyond what we already queued (lookbehind: Safari 16.4+) */
-  const parts=speechText(speechBuf).split(/(?<=[.!?।])\s+/).filter(s=>s.trim().length>1);
-  while(parts.length>spokenSentences){
-    const text=parts[spokenSentences++].trim();
-    speakQueue.push({text,lang});
-    if(!speakingTs){speakingTs=Number(ts);updateListenUI();}
-    speakNext();
-  }
-}
-
-/* ---------- boot ---------- */
-applyTheme();
-applyShell();
-document.body.classList.toggle('debug',S.debug);
-$('#debug-btn').setAttribute('aria-pressed',S.debug);
-api.health().then(()=>offline(false)).catch(()=>offline(true));
-if(S.conversations.length){ openConv(S.currentId||S.conversations[0].id); }
-else{ welcome.classList.add('show'); }
-renderSidebar();
-input.focus();
-/* welcome greeting cycles through the 7 tested languages;
-   static for prefers-reduced-motion users */
-(() => {
-  const GREET=['Hello','नमस्ते','ਸਤ ਸ੍ਰੀ ਅਕਾਲ','Hola','Bonjour','Hallo','Ciao'];
-  const gw=$('#greet');
-  if(!gw||matchMedia('(prefers-reduced-motion: reduce)').matches||S.noMotion) return;
-  let gi=0;
-  setInterval(()=>{
-    gw.style.opacity='0';
-    setTimeout(()=>{ gi=(gi+1)%GREET.length; gw.textContent=GREET[gi]; gw.style.opacity='1'; },260);
-  },3000);
-})();
-</script>
 </body>
 </html>
