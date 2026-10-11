@@ -28,6 +28,12 @@ class QuietHandler(SimpleHTTPRequestHandler):
         pass
 
 
+class PreviewServer(ThreadingHTTPServer):
+    # Routed Chromium requests can open a burst of module/asset connections.
+    # TCPServer's default backlog of 5 caused ERR_CONNECTION_RESET on macOS.
+    request_queue_size = 64
+
+
 def passed(name):
     PASSED.append(name)
     print(f"PASS {name}")
@@ -353,7 +359,7 @@ def main():
     args = parser.parse_args()
     if args.capture:
         (ROOT / "docs/screenshots/phase2").mkdir(exist_ok=True)
-    server = ThreadingHTTPServer(("127.0.0.1", 0), partial(QuietHandler, directory=str(ROOT / "static")))
+    server = PreviewServer(("127.0.0.1", 0), partial(QuietHandler, directory=str(ROOT / "static")))
     threading.Thread(target=server.serve_forever, daemon=True).start()
     try:
         version = run(f"http://127.0.0.1:{server.server_port}", args.capture)

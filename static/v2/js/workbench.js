@@ -1,34 +1,10 @@
-import { getPreferences, setPreferences, resetPreferences } from './preferences.js';
+import { initAppearance } from './appearance.js';
+import { initIcons } from './icons.js';
 import { initUI, selectTab, toast } from './ui.js';
 
+initIcons();
 initUI();
-
-const themeToggle = document.getElementById('theme-toggle');
-function syncPreferences() {
-  const preferences = getPreferences();
-  document.querySelectorAll('input[name="theme"]').forEach(input => { input.checked = input.value === preferences.theme; });
-  document.getElementById('reduce-motion').checked = preferences.reduceMotion;
-  const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
-  themeToggle.setAttribute('aria-label', `Switch to ${next} theme`);
-}
-document.addEventListener('preferenceschange', syncPreferences);
-syncPreferences();
-
-themeToggle.addEventListener('click', () => {
-  const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
-  if (!setPreferences({ theme: next })) toast('Theme changed for this visit. Browser storage is unavailable.');
-});
-document.querySelectorAll('input[name="theme"]').forEach(input => input.addEventListener('change', () => {
-  if (!setPreferences({ theme: input.value })) toast('Theme changed for this visit. Browser storage is unavailable.');
-}));
-document.getElementById('reduce-motion').addEventListener('change', event => {
-  if (!setPreferences({ reduceMotion: event.target.checked })) toast('Motion preference changed for this visit. Browser storage is unavailable.');
-});
-document.getElementById('reset-preferences').addEventListener('click', () => {
-  const cleared = resetPreferences();
-  toast(cleared ? 'Preview preferences reset. Your existing chats were not touched.'
-    : 'Preferences reset for this visit. Browser storage could not be cleared.');
-});
+initAppearance();
 
 const search = document.getElementById('collection-search');
 search.addEventListener('input', () => {

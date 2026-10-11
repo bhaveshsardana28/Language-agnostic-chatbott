@@ -234,8 +234,10 @@ or zero-violation claim is made.
 
 ## 4. Complete feature inventory and parity checklist
 
-Every checkbox is intentionally open: it is a **new-UI acceptance gate**, not
-a statement that the old UI passed. Preserve implemented behavior and intended
+At the Phase 0 audit every checkbox was intentionally open: each is a **new-UI
+acceptance gate**, not a statement that the old UI passed. Phase 3 now closes
+F01–F06 for the shell with the evidence in [PHASE_3_SHELL.md](PHASE_3_SHELL.md)
+and `shell-checks.json`. The original findings remain in the table. Preserve implemented behavior and intended
 behavior covered by existing tests, even where the present split broke it.
 Each row must eventually receive a test/screenshot/manual-evidence reference
 before Phase 11 sign-off. Shared startup blocker B1 applies to chat-dependent
@@ -245,12 +247,12 @@ rows. Paths below are relative to `static/js/` unless stated otherwise.
 
 | Gate | Existing behavior and evidence | Current finding | Redesign phase |
 |---|---|---|---|
-| [ ] F01 | Responsive sidebar + main + fixed-bottom composer; `templates/index.html`, `static/css/layout.css` | LIVE geometry at four required widths; visual identity is still old shell | 3 |
-| [ ] F02 | Desktop sidebar collapse, persisted `sideCollapsed`; `sidebar.js:131–159` | CODE; mobile scrim layering broken | 3 |
-| [ ] F03 | Mobile drawer, backdrop close, Escape, focus to New chat/composer; `sidebar.js:125–157` | CODE/BROKEN backdrop; no focus trap/inert background | 3, 10 |
-| [ ] F04 | Backend status, offline banner and Retry health check; `main.js:15–27,63–72` | LIVE health; status is connectivity, not working chat/provider | 3, 4 |
-| [ ] F05 | Multilingual greeting cycle (Hello, नमस्ते, ਸਤ ਸ੍ਰੀ ਅਕਾਲ, Hola, Bonjour, Hallo, Ciao); `chat.js:91–101` | CODE, initialization blocked | 3 |
-| [ ] F06 | Six prompts: general, coding, Hindi, translation, documents, current info; `chat.js:34–41,77–88` | CODE, zero cards mounted live | 3 |
+| [x] F01 | Responsive sidebar + main + fixed-bottom composer; `templates/index.html`, `static/css/layout.css` | Original: LIVE old-shell geometry. Phase 3: V2 geometry + screenshots at 360/768/1024/1440; composer stays docked while main scrolls | 3 |
+| [x] F02 | Desktop sidebar collapse, persisted `sideCollapsed`; `sidebar.js:131–159` | Original: CODE. Phase 3: 272px sidebar/76px rail, collapse survives reload and theme changes | 3 |
+| [x] F03 | Mobile drawer, backdrop close, Escape, focus to New chat/composer; `sidebar.js:125–157` | Original: broken scrim/no trap. Phase 3: native modal, trap, backdrop/Escape, opener return, New chat→composer, resize cleanup; broader a11y audit remains Phase 10 | 3, 10 |
+| [x] F04 | Backend status, offline banner and Retry health check; `main.js:15–27,63–72` | Phase 3: live health + failure/timeout/offline/retry/stale-response fixtures; reports API reachability separately from provider configuration | 3, 4 |
+| [x] F05 | Multilingual greeting cycle (Hello, नमस्ते, ਸਤ ਸ੍ਰੀ ਅਕਾਲ, Hola, Bonjour, Hallo, Ciao); `chat.js:91–101` | Original: blocked. Phase 3: seven states in order, script labels, explicit pause, reduced motion/visibility handling | 3 |
+| [x] F06 | Six prompts: general, coding, Hindi, translation, documents, current info; `chat.js:34–41,77–88` | Original: zero cards. Phase 3: six selectable prompts populate/focus editable draft; actual sending remains Phase 4 | 3 |
 | [ ] F07 | New chat, restore current conversation, heading auto-title; `chat.js:104–125,287–299` | BROKEN startup; local IDs also break server memory (B3) | 3, 4, 6 |
 | [ ] F08 | Textarea auto-grow to 200 px, `dir=auto`, Enter send / Shift+Enter newline, Enter-send preference; `chat.js:366–375,462–465` | CODE, send handlers never bind | 4 |
 | [ ] F09 | Empty-input ignore, 4,000-character guard, count above 3,200, warning above 3,600, disable over limit | CODE; no explicit empty-input status; backend max can differ by env | 4 |

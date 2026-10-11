@@ -101,6 +101,11 @@
   --canvas-width: 820px;
   --page-width: 1440px;
   --sidebar-study: 200px;
+  --sidebar-size: 272px;
+  --shell-reading-size: 1040px;
+  --shell-draft-max: 200px;
+  --text-shell-hero: clamp(2rem, 4.5vw, 4rem);
+  --greeting-interval: 4800ms;
   --textarea-max: 176px;
   --textarea-min: 64px;
   --skeleton-height: 12px;

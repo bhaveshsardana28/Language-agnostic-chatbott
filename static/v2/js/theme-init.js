@@ -9,4 +9,5 @@
     ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
   document.documentElement.dataset.motion = preferences.reduceMotion === true ||
     matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduced' : 'full';
+  document.documentElement.dataset.sidebar = preferences.sideCollapsed === true ? 'collapsed' : 'expanded';
 })();

@@ -20,6 +20,21 @@ The CSS and component workbench are the Phase 2 source of truth:
 The legacy route, backend and legacy static files remain unchanged after the
 pre-existing application snapshot commit `a0a7185`.
 
+### Phase 3 adoption
+
+The approved system now also powers `static/v2/index.html`, the application
+shell. [PHASE_3_SHELL.md](PHASE_3_SHELL.md) documents its behavior and verification.
+`shell.css` adds viewport/sidebar/composer layout while reusing the existing
+component and editorial layout rules. `icons.js` mounts the **same inline
+sprite** on both pages; `appearance.js` shares theme/motion control wiring.
+Three matching sidebar/pause/play icons extend the original family.
+
+`gaia.redesign.v2` now also contains the boolean `sideCollapsed`. The pre-paint
+script resolves this alongside theme/motion, and changing appearance preserves
+the collapse choice. Reset preview preferences resets all three preferences.
+The Phase 2 report/screenshots below remain that phase's checkpoint; its full
+battery was rerun after this shared-module extraction (35 groups passed).
+
 ## Product direction
 
 Common Ground is an editorial, language-first conversation surface:

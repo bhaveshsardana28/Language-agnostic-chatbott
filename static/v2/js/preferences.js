@@ -8,8 +8,9 @@ function load() {
     return {
       theme: ['light', 'dark', 'system'].includes(saved.theme) ? saved.theme : 'system',
       reduceMotion: saved.reduceMotion === true,
+      sideCollapsed: saved.sideCollapsed === true,
     };
-  } catch { return { theme: 'system', reduceMotion: false }; }
+  } catch { return { theme: 'system', reduceMotion: false, sideCollapsed: false }; }
 }
 
 let preferences = load();
@@ -20,6 +21,7 @@ function apply() {
   document.documentElement.dataset.theme = preferences.theme === 'system'
     ? (colorQuery.matches ? 'dark' : 'light') : preferences.theme;
   document.documentElement.dataset.motion = reducedMotion() ? 'reduced' : 'full';
+  document.documentElement.dataset.sidebar = preferences.sideCollapsed ? 'collapsed' : 'expanded';
   if (reducedMotion()) document.getAnimations().forEach(animation => animation.cancel());
   document.dispatchEvent(new CustomEvent('preferenceschange', { detail: getPreferences() }));
 }
@@ -28,6 +30,7 @@ export function setPreferences(patch) {
   preferences = {
     theme: ['light', 'dark', 'system'].includes(patch.theme) ? patch.theme : preferences.theme,
     reduceMotion: typeof patch.reduceMotion === 'boolean' ? patch.reduceMotion : preferences.reduceMotion,
+    sideCollapsed: typeof patch.sideCollapsed === 'boolean' ? patch.sideCollapsed : preferences.sideCollapsed,
   };
   let saved = true;
   try { localStorage.setItem(KEY, JSON.stringify(preferences)); } catch { saved = false; }
@@ -36,7 +39,7 @@ export function setPreferences(patch) {
 }
 
 export function resetPreferences() {
-  preferences = { theme: 'system', reduceMotion: false };
+  preferences = { theme: 'system', reduceMotion: false, sideCollapsed: false };
   let cleared = true;
   try { localStorage.removeItem(KEY); } catch { cleared = false; }
   apply();
