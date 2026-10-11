@@ -1,0 +1,29 @@
+/* Motion communicates state. Only transform and opacity are animated. */
+@keyframes shimmer {
+  from { transform: translateX(-100%); opacity: 0; }
+  50% { opacity: var(--motion-dim); }
+  to { transform: translateX(100%); opacity: 0; }
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(var(--motion-breathe-scale)); opacity: var(--motion-dim); }
+}
+.prompt-button .icon { transition: transform var(--motion-ui) var(--ease-enter); }
+.voice-orb[data-state='thinking'] .voice-orb__rings { animation-duration: var(--motion-shimmer); }
+.voice-orb[data-state='speaking'] .voice-orb__rings { animation-duration: var(--motion-shimmer); }
+.voice-orb[data-state='listening'] .voice-orb__rings { animation-duration: var(--motion-ambient); }
+:root[data-motion='reduced'] *, :root[data-motion='reduced'] *::before,
+:root[data-motion='reduced'] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+:root[data-motion='reduced'] .voice-orb { display: none; }
+:root[data-motion='reduced'] .voice-reduced-icon { display: block; }
+:root[data-visibility='hidden'] *, :root[data-visibility='hidden'] *::before,
+:root[data-visibility='hidden'] *::after { animation-play-state: paused !important; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .voice-orb { display: none; }
+  .voice-reduced-icon { display: block; }
+}

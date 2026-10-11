@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-motion="full">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>Common Ground — GAIA design system</title>
+  <link rel="icon" href="./assets/brand/favicon.svg" type="image/svg+xml">
+  <script src="./js/theme-init.js"></script>
+  <link rel="stylesheet" href="./css/tokens.css">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/motion.css">
+  <script type="module" src="./js/workbench.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to design preview</a>
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" hidden>
+    <symbol id="i-gaia" viewBox="0 0 32 32"><path d="M22 6h-7a7 7 0 1 0 7 7V6m0 7v11c0 5-10 6-14 2M15 6h11"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4zM8 9h8m-8 3h5"/></symbol>
+    <symbol id="i-voice" viewBox="0 0 24 24"><path d="M4 9v6m4-10v14m4-12v10m4-13v16m4-11v6"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 6h5m4 0h7M4 12h11m4 0h1M4 18h3m4 0h9"/><circle cx="11" cy="6" r="2"/><circle cx="17" cy="12" r="2"/><circle cx="9" cy="18" r="2"/></symbol>
+    <symbol id="i-theme" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v16m0-16a8 8 0 0 1 0 16"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></symbol>
+    <symbol id="i-switch" viewBox="0 0 24 24"><path d="M4 8h15m-4-4 4 4-4 4M20 16H5m4-4-4 4 4 4"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4H4v12h4"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 9a8 8 0 1 0 0 6M20 3v6h-6"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H5v18h14V8zM14 3v5h5M9 13h6m-6 4h6"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 20V4M5 11l7-7 7 7"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="m11 5-5 4H3v6h3l5 4zM16 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol>
+    <symbol id="empty-chat" viewBox="0 0 168 168"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M24 29h91v69H60l-22 19V98H24z"/><path d="M69 69h73v58h-17v15l-20-15H69z"/><path d="M42 49h38m-38 14h55m-12 23h37m-37 14h26"/><circle cx="119" cy="28" r="9"/><path d="M119 24v8m-4-4h8"/></g></symbol>
+    <symbol id="empty-docs" viewBox="0 0 168 168"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M42 19h57l26 27v101H42zM99 19v27h26M29 41H19v102h10M60 70h47M60 87h47M60 104h31"/><circle cx="115" cy="124" r="21"/><path d="M105 124h20m-10-10v20"/></g></symbol>
+  </svg>
+
+  <div class="review-bar">
+    <strong>Common Ground / Phase 02</strong>
+    <span>Design system applied to a conversation</span>
+    <a href="#welcome" data-view="welcome">Welcome study ↗</a>
+  </div>
+  <div class="workbench">
+    <header class="product-head">
+      <button class="icon-button icon-button--quiet" data-open="library-drawer" aria-label="Open sample collection"><svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg></button>
+      <a class="brand" href="#welcome" data-view="welcome" aria-label="GAIA welcome preview"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-gaia"/></svg></span><span>gaia</span></a>
+      <span class="brand-descriptor">A conversation without a fixed language.</span>
+      <div class="head-actions">
+        <span class="presence"><svg class="icon" aria-hidden="true"><use href="#i-switch"/></svg><span class="presence-text">Deutsch · </span><span>sample</span></span>
+        <button class="icon-button icon-button--quiet" id="theme-toggle" aria-label="Switch to dark theme"><svg class="icon" aria-hidden="true"><use href="#i-theme"/></svg></button>
+        <button class="icon-button icon-button--quiet" data-open="settings-dialog" aria-label="Open appearance settings"><svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg></button>
+      </div>
+    </header>
+    <div class="body-grid">
+      <aside class="rail" aria-label="Design preview tools">
+        <button class="icon-button" data-view="welcome" aria-label="Preview welcome screen"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button>
+        <button class="icon-button" data-open="library-drawer" aria-label="Preview conversation drawer"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg></button>
+        <button class="icon-button" data-open="voice-dialog" aria-label="Preview voice mode, microphone off"><svg class="icon" aria-hidden="true"><use href="#i-voice"/></svg></button>
+        <span class="rail-label">WORDS, IN GOOD COMPANY</span>
+      </aside>
+      <main class="canvas" id="main-content" tabindex="-1">
+        <div class="canvas-nav">
+          <div class="tabs" role="tablist" aria-label="Design system screens" data-tabs>
+            <button class="tab" id="tab-conversation" role="tab" aria-controls="panel-conversation" aria-selected="true" tabindex="0">Conversation</button>
+            <button class="tab" id="tab-welcome" role="tab" aria-controls="panel-welcome" aria-selected="false" tabindex="-1">Welcome</button>
+            <button class="tab" id="tab-scripts" role="tab" aria-controls="panel-scripts" aria-selected="false" tabindex="-1">Script lab</button>
+          </div>
+          <span class="context-note">Illustrative content · no API calls</span>
+        </div>
+
+        <section class="panel" id="panel-conversation" role="tabpanel" aria-labelledby="tab-conversation" tabindex="0">
+          <div class="conversation">
+            <div class="conversation-title">
+              <div><p class="eyebrow">A small question about language</p><h1>A thought can travel.</h1></div>
+              <div class="menu-anchor">
+                <button class="icon-button icon-button--quiet" id="conversation-menu-button" aria-haspopup="menu" aria-expanded="false" aria-controls="conversation-menu" aria-label="Sample conversation actions"><svg class="icon" aria-hidden="true"><use href="#i-more"/></svg></button>
+                <div class="menu" id="conversation-menu" role="menu" aria-labelledby="conversation-menu-button" hidden>
+                  <button role="menuitem" tabindex="-1" data-copy="reply-en"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copy sample reply</button>
+                  <button role="menuitem" tabindex="-1" data-thinking><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>Preview thinking state</button>
+                  <button role="menuitem" tabindex="-1" data-view="scripts"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg>Check script typography</button>
+                </div>
+              </div>
+            </div>
+            <article class="message message--user" aria-label="Sample user message">
+              <div class="message-meta"><span>You</span><span class="avatar" aria-hidden="true">BS</span></div>
+              <p class="user-bubble" dir="auto">What’s a good way to start learning a new language?</p>
+            </article>
+            <article class="message" aria-label="Sample assistant reply in English">
+              <div class="assistant-head"><span class="avatar avatar--assistant" aria-hidden="true"><svg class="icon"><use href="#i-gaia"/></svg></span><strong>GAIA</strong><span class="chip">English · Latin</span></div>
+              <div class="assistant-content">
+                <div class="prose" id="reply-en" dir="auto" lang="en"><p>Start with a little of it, every day. Choose a few useful phrases, listen to how they sound, and use them in a real conversation.</p><blockquote>Small conversations make a good beginning.</blockquote></div>
+                <div class="message-actions">
+                  <span class="tooltip"><button class="icon-button icon-button--quiet" data-copy="reply-en" aria-label="Copy English sample reply" aria-describedby="tooltip-copy-en" data-tooltip="tooltip-copy-en"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg></button><span role="tooltip" id="tooltip-copy-en" hidden>Copy reply as text</span></span>
+                  <button class="icon-button icon-button--quiet" data-thinking aria-label="Preview the thinking state"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg></button>
+                  <button class="icon-button icon-button--quiet" data-open="voice-dialog" aria-label="Preview voice treatment, no audio playback"><svg class="icon" aria-hidden="true"><use href="#i-sound"/></svg></button>
+                  <time datetime="2026-10-10T10:42:00" title="Illustrative timestamp">10:42 · sample</time>
+                </div>
+              </div>
+            </article>
+            <article class="message message--user" aria-label="Sample user message in German"><p class="user-bubble" dir="auto" lang="de">Und wie bleibe ich motiviert?</p></article>
+            <div class="language-switch"><span>Language switched: <strong>English</strong><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg><strong>Deutsch</strong></span></div>
+            <article class="message" aria-label="Sample assistant reply in German" id="preview-reply" aria-busy="false">
+              <div class="assistant-head"><span class="avatar avatar--assistant" aria-hidden="true"><svg class="icon"><use href="#i-gaia"/></svg></span><strong>GAIA</strong><span class="chip">Deutsch · German</span><span class="chip chip--quiet">Sample metadata</span></div>
+              <div class="assistant-content">
+                <div id="thinking-preview" hidden><p class="status-line" role="status">Thinking state preview — no request is running</p><div class="skeleton-stack" aria-hidden="true"><div class="skeleton skeleton--long"></div><div class="skeleton skeleton--medium"></div><div class="skeleton skeleton--short"></div></div></div>
+                <div class="prose" id="reply-de" dir="auto" lang="de"><p>Mach die Sprache zu einem kleinen Teil deines Alltags. Höre ein Lied, lies einen kurzen Text oder sprich ein paar Minuten mit jemandem.</p><p><strong>Such dir etwas, das dir wirklich Spaß macht.</strong> So wird aus einer Aufgabe eine Gewohnheit.</p></div>
+                <div class="message-actions"><span class="tooltip"><button class="icon-button icon-button--quiet" data-copy="reply-de" aria-label="Copy German sample reply" aria-describedby="tooltip-copy-de" data-tooltip="tooltip-copy-de"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg></button><span role="tooltip" id="tooltip-copy-de" hidden>Copy reply as text</span></span><button class="icon-button icon-button--quiet" data-open="voice-dialog" aria-label="Preview voice treatment for this sample"><svg class="icon" aria-hidden="true"><use href="#i-sound"/></svg></button><time datetime="2026-10-10T10:43:00" title="Illustrative timestamp">10:43 · sample</time></div>
+              </div>
+            </article>
+          </div>
+          <form class="composer" id="preview-composer">
+            <label for="preview-message">Try the composer component</label>
+            <textarea class="textarea" id="preview-message" rows="2" dir="auto" placeholder="Follow your next thought…" aria-describedby="composer-explanation composer-error"></textarea>
+            <p class="field-error" id="composer-error" hidden></p>
+            <div class="composer-tools"><button class="icon-button icon-button--quiet" type="button" data-open="library-drawer" data-library-tab="documents" aria-label="Preview the documents empty state"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button><button class="icon-button icon-button--quiet" type="button" data-open="voice-dialog" aria-label="Open voice preview, microphone off"><svg class="icon" aria-hidden="true"><use href="#i-voice"/></svg></button><span class="small muted">Your words, your pace.</span><button class="button button--primary" type="submit">Preview <svg class="icon" aria-hidden="true"><use href="#i-send"/></svg></button></div>
+          </form>
+          <p class="composer-note" id="composer-explanation"><span>Component preview. Nothing is sent or saved as a conversation.</span><span>Enter to preview · Shift+Enter for a new line</span></p>
+        </section>
+
+        <section class="panel" id="panel-welcome" role="tabpanel" aria-labelledby="tab-welcome" tabindex="0" hidden>
+          <div class="welcome-study"><p class="eyebrow">A little curiosity goes a long way</p><h1>A world of words.<br>One <em>conversation.</em></h1><p>Start with a question. Follow a thought. Change languages along the way.</p><div class="greetings" aria-label="Illustrative multilingual greetings"><span>Hello.</span><span lang="hi">नमस्ते.</span><span lang="fr">Bonjour.</span><span lang="pa">ਸਤ ਸ੍ਰੀ ਅਕਾਲ.</span></div><div class="prompt-list"><button class="prompt-button" data-view="conversation"><span><small>Understand something</small>How do we learn a language?</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button><button class="prompt-button" data-view="conversation"><span><small>Think in Hindi</small><span lang="hi">मुझे कुछ नया सिखाओ।</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button><button class="prompt-button" data-view="conversation"><span><small>Find the right words</small><span lang="es">Ayúdame a escribir un correo.</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button><button class="prompt-button" data-open="library-drawer" data-library-tab="documents"><span><small>Bring a document</small>Make a long read feel shorter.</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button></div><div class="welcome-actions"><button class="button button--primary" data-view="conversation">Explore the conversation <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button><button class="button" data-open="voice-dialog">Preview voice mode</button></div><p class="field-note">Welcome-screen study. Suggested prompts open the illustrative conversation.</p></div>
+        </section>
+
+        <section class="panel" id="panel-scripts" role="tabpanel" aria-labelledby="tab-scripts" tabindex="0" hidden>
+          <div class="specimens"><h1>Every script deserves room.</h1><p>DM Sans for the interface. Georgia for editorial moments. Locally hosted Noto fallbacks for Devanagari and Gurmukhi. These specimens test rendering, not language detection, voice support or answer quality.</p><div class="token-swatches" aria-label="Current theme palette"><span class="token-swatch token-swatch--paper">Paper</span><span class="token-swatch token-swatch--ink">Ink</span><span class="token-swatch token-swatch--accent">Vermilion</span><span class="token-swatch token-swatch--sage">Sage</span></div><div class="specimen-grid">
+            <article class="specimen"><h2>English · Latin</h2><p lang="en" dir="auto">A good question is a place to begin.</p></article>
+            <article class="specimen"><h2>हिन्दी · Devanagari</h2><p lang="hi" dir="auto">अपनी भाषा में सवाल पूछिए। क्षितिज पर नई रोशनी है।</p></article>
+            <article class="specimen"><h2>ਪੰਜਾਬੀ · Gurmukhi</h2><p lang="pa" dir="auto">ਆਪਣੀ ਭਾਸ਼ਾ ਵਿੱਚ ਸਵਾਲ ਪੁੱਛੋ। ਨਵੀਆਂ ਗੱਲਾਂ ਸਿੱਖੋ।</p></article>
+            <article class="specimen"><h2>Deutsch · Latin</h2><p lang="de" dir="auto">Jede Frage ist ein neuer Anfang. Größe, Nähe, Überzeugung.</p></article>
+            <article class="specimen"><h2>Español · Latin</h2><p lang="es" dir="auto">¿Qué te gustaría aprender hoy?</p></article>
+            <article class="specimen"><h2>Français · Latin</h2><p lang="fr" dir="auto">Une idée peut en faire naître une autre.</p></article>
+            <article class="specimen"><h2>Italiano · Latin</h2><p lang="it" dir="auto">Ogni domanda è un nuovo inizio.</p></article>
+            <article class="specimen"><h2>Arabic · rendering specimen only</h2><p lang="ar" dir="auto">كل سؤال هو بداية جديدة. أهلاً وسهلاً.</p></article>
+            <article class="specimen"><h2>Chinese · rendering specimen only</h2><p lang="zh" dir="auto">每一个问题，都是新的开始。</p></article>
+            <article class="specimen"><h2>Japanese · rendering specimen only</h2><p lang="ja" dir="auto">一つの質問から、新しい会話が始まります。</p></article>
+            <article class="specimen"><h2>Korean · rendering specimen only</h2><p lang="ko" dir="auto">모든 질문은 새로운 시작입니다.</p></article>
+            <article class="specimen"><h2>Cyrillic · rendering specimen only</h2><p lang="ru" dir="auto">Каждый вопрос — новое начало.</p></article>
+          </div><p class="field-note">Text uses dir="auto". System-font coverage is device-dependent; the screenshot review is not a native-speaker language evaluation.</p></div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <footer class="review-footer"><span>Common Ground in light and dark. Signal lives only inside Voice Mode.</span><span>Phase 2 · no live chat or voice capability is implied</span></footer>
+  <div class="toast-region" id="toast-region" role="status" aria-live="polite" aria-atomic="false"></div>
+
+  <dialog class="dialog" id="settings-dialog" aria-labelledby="settings-title">
+    <header class="dialog-head"><h2 id="settings-title">Make yourself at home.</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close appearance settings"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+    <div class="dialog-body">
+      <p class="small muted">A considered palette, in the light that suits you.</p>
+      <fieldset class="choice-group"><legend>Theme</legend><div class="choices"><label class="choice"><input type="radio" name="theme" value="light">Light</label><label class="choice"><input type="radio" name="theme" value="dark">Dark</label><label class="choice"><input type="radio" name="theme" value="system">System</label></div></fieldset>
+      <div class="check"><input id="reduce-motion" type="checkbox" aria-describedby="motion-note"><label for="reduce-motion">Reduce motion<br><span class="field-note" id="motion-note">Keep every state clear, without non-essential animation. Your device preference is also respected.</span></label></div>
+      <div class="field"><span class="small">Preview shortcuts</span><dl class="keyboard-list"><dt><kbd>Escape</kbd></dt><dd>Close the top overlay or menu</dd><dt><kbd>← / →</kbd></dt><dd>Move between focused tabs</dd><dt><kbd>↑ / ↓</kbd></dt><dd>Move through an open menu</dd><dt><kbd>Enter</kbd></dt><dd>Preview composer feedback</dd></dl></div>
+      <p class="field-note">Only theme and motion preferences are stored in the separate redesign key. Existing chat history is untouched.</p>
+      <button class="button button--danger" id="reset-preferences">Reset preview preferences</button>
+    </div>
+    <footer class="dialog-foot"><button class="button button--primary" data-close>Done</button></footer>
+  </dialog>
+
+  <dialog class="dialog drawer" id="library-drawer" aria-labelledby="library-title">
+    <header class="dialog-head"><h2 id="library-title">Your collection</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close collection"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+    <div class="tabs" role="tablist" aria-label="Sample collection" data-tabs><button class="tab" id="tab-history" role="tab" aria-controls="panel-history" aria-selected="true" tabindex="0">Conversations</button><button class="tab" id="tab-documents" role="tab" aria-controls="panel-documents" aria-selected="false" tabindex="-1">Documents</button></div>
+    <section class="dialog-body" id="panel-history" role="tabpanel" aria-labelledby="tab-history"><div class="field"><label for="collection-search">Search the sample collection</label><input class="input" id="collection-search" type="search" autocomplete="off" placeholder="Find a thought…"></div><button class="button collection-row" id="sample-conversation" data-view="conversation" data-close><strong>A small question about language</strong><span class="field-note">Illustrative conversation · English → Deutsch</span></button><div class="empty-state" id="empty-search" hidden><svg class="empty-art" aria-hidden="true"><use href="#empty-chat"/></svg><h3>No matching thoughts yet.</h3><p>Try “language” to find the sample conversation.</p></div><p class="field-note" id="search-status" role="status">One sample conversation. Your real history is not loaded.</p></section>
+    <section class="dialog-body" id="panel-documents" role="tabpanel" aria-labelledby="tab-documents" hidden><div class="empty-state"><svg class="empty-art" aria-hidden="true"><use href="#empty-docs"/></svg><h3>A little context goes a long way.</h3><p>This is the empty-document component. Uploads will be connected in the documents phase.</p><button class="button" id="upload-preview">Preview upload feedback</button></div></section>
+  </dialog>
+
+  <dialog class="dialog voice-mode" id="voice-dialog" aria-labelledby="voice-title" aria-describedby="voice-privacy">
+    <header class="voice-head"><span class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-gaia"/></svg></span>gaia</span><span class="voice-preview-label">VOICE STUDY · MIC OFF</span><button class="icon-button icon-button--quiet" data-close aria-label="End voice preview"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+    <div class="voice-content"><p class="eyebrow">A contained change of atmosphere</p><h2 id="voice-title">Give your thoughts a little room.</h2><p class="muted small">Common Ground’s voice, with Signal’s immersive dark canvas.</p>
+      <div class="voice-orb" id="voice-orb" data-state="idle" aria-hidden="true"><svg viewBox="0 0 240 240"><g class="voice-orb__rings" fill="none" stroke="currentColor"><circle cx="120" cy="120" r="110" stroke-dasharray="1 8"/><circle cx="120" cy="120" r="93"/><ellipse cx="120" cy="120" rx="66" ry="93"/><ellipse cx="120" cy="120" rx="93" ry="45" transform="rotate(-32 120 120)"/><ellipse cx="120" cy="120" rx="93" ry="45" transform="rotate(32 120 120)"/></g></svg><span class="voice-orb__glyph">g</span></div>
+      <svg class="icon voice-reduced-icon" aria-hidden="true"><use href="#i-voice"/></svg>
+      <p class="voice-state-label" id="voice-state-label" role="status">Idle · design preview</p>
+      <p class="voice-copy" id="voice-copy">A quiet place for your next thought.</p>
+      <div class="field"><label for="voice-state">Illustrated state</label><select class="select" id="voice-state"><option value="idle">Idle</option><option value="listening">Listening — illustration only</option><option value="thinking">Thinking — illustration only</option><option value="speaking">Speaking — illustration only</option></select></div>
+      <p class="voice-footnote" id="voice-privacy">This is a visual component preview. No microphone, waveform data, speech recognition or audio playback is used. Real voice behavior is built and tested in later phases.</p>
+      <button class="button button--primary" data-close>End preview <svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+  </dialog>
+</body>
+</html>

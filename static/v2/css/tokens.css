@@ -1,0 +1,184 @@
+/* Common Ground. Values live here; components consume semantic tokens.
+   Signal is scoped to .voice-mode only. No inversion/filter-based theme. */
+:root {
+  color-scheme: light;
+  --color-page: #f4f2ed;
+  --color-surface: #fcfbf8;
+  --color-raised: #ffffff;
+  --color-soft: #e9ece2;
+  --color-ink: #292e2a;
+  --color-muted: #5c645a;
+  --color-accent: #aa3925;
+  --color-action: #b7412b;
+  --color-on-action: #ffffff;
+  --color-border: #d4d8cd;
+  --color-control-border: #788071;
+  --color-focus: #8b3525;
+  --color-user: #e6e9dc;
+  --color-chip: #ecefe3;
+  --color-chip-ink: #465440;
+  --color-danger: #9c3028;
+  --color-success: #356345;
+  --color-warning: #765218;
+  --color-disabled: #e4e5dc;
+  --color-disabled-ink: #586052;
+  --color-code: #eeefe7;
+  --color-selection: #ead6c9;
+  --color-scrim: rgb(14 19 15 / 66%);
+  --shadow-paper: 0 3px 0 #e5e8dd;
+  --shadow-float: 0 12px 36px rgb(41 46 42 / 12%);
+  --shadow-dialog: 0 24px 80px rgb(14 19 15 / 24%);
+
+  --font-ui: 'DM Sans', 'Noto Sans Devanagari', 'Noto Sans Gurmukhi',
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  --font-editorial: Georgia, 'Times New Roman', 'Noto Sans Devanagari',
+    'Noto Sans Gurmukhi', serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --font-rtl: 'Geeza Pro', 'Noto Sans Arabic', 'FreeSerif', 'Segoe UI', Arial, sans-serif;
+  --font-cjk: 'PingFang SC', 'Hiragino Sans', 'Yu Gothic', 'Malgun Gothic',
+    'Noto Sans CJK SC', 'WenQuanYi Zen Hei', sans-serif;
+  --font-cyrillic: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  --text-xs: .75rem;
+  --text-sm: .875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 3rem;
+  --text-hero: clamp(2.75rem, 5vw, 4.5rem);
+  --line-tight: 1.12;
+  --line-ui: 1.5;
+  --line-reading: 1.75;
+  --line-script: 1.9;
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-strong: 600;
+  --tracking-display: -.045em;
+  --tracking-label: .1em;
+
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-9: 36px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --radius-small: 4px;
+  --radius-medium: 8px;
+  --radius-dialog: 12px;
+  --radius-round: 999px;
+  --stroke: 1px;
+  --stroke-strong: 2px;
+  --focus-width: 3px;
+  --focus-offset: 3px;
+  --icon-stroke: 1.5;
+  --icon-size: 20px;
+  --icon-small: 16px;
+  --control-size: 44px;
+  --avatar-size: 36px;
+  --brand-size: 32px;
+  --rail-size: 76px;
+  --header-size: 80px;
+  --drawer-size: 360px;
+  --dialog-size: 520px;
+  --toast-size: 400px;
+  --menu-size: 232px;
+  --tooltip-size: 240px;
+  --illustration-size: 168px;
+  --orb-size: 240px;
+  --orb-small: 192px;
+  --reading-width: 70ch;
+  --canvas-width: 820px;
+  --page-width: 1440px;
+  --sidebar-study: 200px;
+  --textarea-max: 176px;
+  --textarea-min: 64px;
+  --skeleton-height: 12px;
+  --skeleton-long: 92%;
+  --skeleton-medium: 76%;
+  --skeleton-short: 48%;
+
+  --z-content: 0;
+  --z-sticky: 10;
+  --z-menu: 20;
+  --z-tooltip: 30;
+  --z-toast: 40;
+  /* Native dialog top layer sits above this document ladder. */
+  --motion-fast: 150ms;
+  --motion-ui: 220ms;
+  --motion-slow: 300ms;
+  --motion-panel: 420ms;
+  --motion-ambient: 3200ms;
+  --motion-shimmer: 1400ms;
+  --ease-enter: cubic-bezier(.2, .7, .3, 1);
+  --ease-exit: cubic-bezier(.4, 0, 1, 1);
+  --ease-linear: linear;
+  --spring-mass: 1;
+  --spring-stiffness: 260;
+  --spring-damping: 28;
+  --motion-rise: 8px;
+  --motion-press: .97;
+  --motion-breathe-scale: 1.04;
+  --motion-dim: .5;
+  --dialog-start-scale: .97;
+  --tooltip-delay: 300ms;
+  --toast-duration: 5000ms;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-page: #171c18;
+  --color-surface: #202720;
+  --color-raised: #2a3129;
+  --color-soft: #2b342b;
+  --color-ink: #eeeade;
+  --color-muted: #b7beac;
+  --color-accent: #efa18b;
+  --color-action: #d68c76;
+  --color-on-action: #1d211b;
+  --color-border: #40493b;
+  --color-control-border: #87907c;
+  --color-focus: #f2bda1;
+  --color-user: #354031;
+  --color-chip: #313d2c;
+  --color-chip-ink: #cfdbb9;
+  --color-danger: #f2a18f;
+  --color-success: #b4d3a8;
+  --color-warning: #e3be7a;
+  --color-disabled: #30382d;
+  --color-disabled-ink: #b5bca9;
+  --color-code: #2a3327;
+  --color-selection: #654739;
+  --shadow-paper: 0 3px 0 #11170f;
+  --shadow-float: 0 12px 36px rgb(0 0 0 / 24%);
+  --shadow-dialog: 0 24px 80px rgb(0 0 0 / 40%);
+}
+
+.voice-mode {
+  color-scheme: dark;
+  --color-page: #111510;
+  --color-surface: #111510;
+  --color-raised: #20261b;
+  --color-soft: #20261b;
+  --color-ink: #f0f2e8;
+  --color-muted: #a1a997;
+  --color-accent: #dafa68;
+  --color-action: #dafa68;
+  --color-on-action: #111510;
+  --color-border: #333c2d;
+  --color-control-border: #768268;
+  --color-focus: #dafa68;
+  --color-chip: #20261b;
+  --color-chip-ink: #dafa68;
+  --color-selection: #344220;
+}

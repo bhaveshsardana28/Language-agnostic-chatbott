@@ -1,0 +1,799 @@
+{
+  "phase": 2,
+  "scope": "offline component preview, not live app parity",
+  "environment": {
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "python": "3.12.7",
+    "chromium": "153.0.8010.12"
+  },
+  "passed_groups": [
+    "light: 29 computed contrast pairs meet their thresholds",
+    "light/360px: three screens fit, controls labelled/44px, four voice states, Signal scoped",
+    "light/768px: three screens fit, controls labelled/44px, four voice states, Signal scoped",
+    "light/1024px: three screens fit, controls labelled/44px, four voice states, Signal scoped",
+    "four local font faces loaded; actual Indic/Latin custom glyph fonts and Arabic RTL verified",
+    "voice-with-light-app: 7 computed contrast pairs meet their thresholds",
+    "light/1440px: three screens fit, controls labelled/44px, four voice states, Signal scoped",
+    "light: tabs support arrows/Home/End, focus and panel selection",
+    "light: menu keyboard navigation, Escape return and action focus",
+    "light: hover/focus tooltip, Escape dismissal and exact text clipboard copy",
+    "light: composer errors/newlines/draft retention and explicit disabled/loading states",
+    "light: rendered primary hover + focus contrast 5.520:1 and 3px focus ring",
+    "light: named native modal traps keyboard focus, makes background inert, restores opener",
+    "light: searchable drawer, documents empty state, in-dialog toast and backdrop close",
+    "light: persistent theme/motion, legacy storage isolation, reduced-motion icon/state",
+    "light: scoped reset, live OS preferences and toast expiry with motion disabled",
+    "light: zero console/page/asset failures; only local static GETs; no mic or speech calls",
+    "dark: 29 computed contrast pairs meet their thresholds",
+    "dark/360px: three screens fit, controls labelled/44px, four voice states, Signal scoped",
+    "dark/768px: three screens fit, controls labelled/44px, four voice states, Signal scoped",
+    "dark/1024px: three screens fit, controls labelled/44px, four voice states, Signal scoped",
+    "voice-with-dark-app: 7 computed contrast pairs meet their thresholds",
+    "dark/1440px: three screens fit, controls labelled/44px, four voice states, Signal scoped",
+    "dark: tabs support arrows/Home/End, focus and panel selection",
+    "dark: menu keyboard navigation, Escape return and action focus",
+    "dark: hover/focus tooltip, Escape dismissal and exact text clipboard copy",
+    "dark: composer errors/newlines/draft retention and explicit disabled/loading states",
+    "dark: rendered primary hover + focus contrast 6.123:1 and 3px focus ring",
+    "dark: named native modal traps keyboard focus, makes background inert, restores opener",
+    "dark: searchable drawer, documents empty state, in-dialog toast and backdrop close",
+    "dark: persistent theme/motion, legacy storage isolation, reduced-motion icon/state",
+    "dark: scoped reset, live OS preferences and toast expiry with motion disabled",
+    "dark: zero console/page/asset failures; only local static GETs; no mic or speech calls",
+    "malformed preferences: system-safe first paint and usable theme switch",
+    "blocked preferences: system-safe first paint and usable theme switch"
+  ],
+  "contrast": {
+    "light": [
+      {
+        "foreground": "ink",
+        "background": "page",
+        "fg": "#292e2a",
+        "bg": "#f4f2ed",
+        "ratio": 12.361,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "ink",
+        "background": "surface",
+        "fg": "#292e2a",
+        "bg": "#fcfbf8",
+        "ratio": 13.364,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "ink",
+        "background": "raised",
+        "fg": "#292e2a",
+        "bg": "#ffffff",
+        "ratio": 13.829,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "ink",
+        "background": "soft",
+        "fg": "#292e2a",
+        "bg": "#e9ece2",
+        "ratio": 11.565,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "ink",
+        "background": "user",
+        "fg": "#292e2a",
+        "bg": "#e6e9dc",
+        "ratio": 11.23,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "ink",
+        "background": "code",
+        "fg": "#292e2a",
+        "bg": "#eeefe7",
+        "ratio": 11.943,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "ink",
+        "background": "selection",
+        "fg": "#292e2a",
+        "bg": "#ead6c9",
+        "ratio": 9.852,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "muted",
+        "background": "page",
+        "fg": "#5c645a",
+        "bg": "#f4f2ed",
+        "ratio": 5.479,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "muted",
+        "background": "surface",
+        "fg": "#5c645a",
+        "bg": "#fcfbf8",
+        "ratio": 5.924,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "muted",
+        "background": "raised",
+        "fg": "#5c645a",
+        "bg": "#ffffff",
+        "ratio": 6.13,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "muted",
+        "background": "soft",
+        "fg": "#5c645a",
+        "bg": "#e9ece2",
+        "ratio": 5.126,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "accent",
+        "background": "page",
+        "fg": "#aa3925",
+        "bg": "#f4f2ed",
+        "ratio": 5.652,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "accent",
+        "background": "surface",
+        "fg": "#aa3925",
+        "bg": "#fcfbf8",
+        "ratio": 6.11,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "accent",
+        "background": "raised",
+        "fg": "#aa3925",
+        "bg": "#ffffff",
+        "ratio": 6.323,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "accent",
+        "background": "soft",
+        "fg": "#aa3925",
+        "bg": "#e9ece2",
+        "ratio": 5.288,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "danger",
+        "background": "surface",
+        "fg": "#9c3028",
+        "bg": "#fcfbf8",
+        "ratio": 7.078,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "success",
+        "background": "surface",
+        "fg": "#356345",
+        "bg": "#fcfbf8",
+        "ratio": 6.715,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "warning",
+        "background": "surface",
+        "fg": "#765218",
+        "bg": "#fcfbf8",
+        "ratio": 6.786,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "chip-ink",
+        "background": "chip",
+        "fg": "#465440",
+        "bg": "#ecefe3",
+        "ratio": 6.925,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "on-action",
+        "background": "action",
+        "fg": "#ffffff",
+        "bg": "#b7412b",
+        "ratio": 5.52,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "disabled-ink",
+        "background": "disabled",
+        "fg": "#586052",
+        "bg": "#e4e5dc",
+        "ratio": 5.153,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "focus",
+        "background": "page",
+        "fg": "#8b3525",
+        "bg": "#f4f2ed",
+        "ratio": 7.127,
+        "minimum": 3
+      },
+      {
+        "foreground": "focus",
+        "background": "surface",
+        "fg": "#8b3525",
+        "bg": "#fcfbf8",
+        "ratio": 7.705,
+        "minimum": 3
+      },
+      {
+        "foreground": "focus",
+        "background": "raised",
+        "fg": "#8b3525",
+        "bg": "#ffffff",
+        "ratio": 7.973,
+        "minimum": 3
+      },
+      {
+        "foreground": "focus",
+        "background": "soft",
+        "fg": "#8b3525",
+        "bg": "#e9ece2",
+        "ratio": 6.668,
+        "minimum": 3
+      },
+      {
+        "foreground": "control-border",
+        "background": "page",
+        "fg": "#788071",
+        "bg": "#f4f2ed",
+        "ratio": 3.663,
+        "minimum": 3
+      },
+      {
+        "foreground": "control-border",
+        "background": "surface",
+        "fg": "#788071",
+        "bg": "#fcfbf8",
+        "ratio": 3.96,
+        "minimum": 3
+      },
+      {
+        "foreground": "control-border",
+        "background": "raised",
+        "fg": "#788071",
+        "bg": "#ffffff",
+        "ratio": 4.098,
+        "minimum": 3
+      },
+      {
+        "foreground": "control-border",
+        "background": "soft",
+        "fg": "#788071",
+        "bg": "#e9ece2",
+        "ratio": 3.427,
+        "minimum": 3
+      }
+    ],
+    "voice-with-light-app": [
+      {
+        "foreground": "ink",
+        "background": "surface",
+        "fg": "#f0f2e8",
+        "bg": "#111510",
+        "ratio": 16.311,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "muted",
+        "background": "surface",
+        "fg": "#a1a997",
+        "bg": "#111510",
+        "ratio": 7.586,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "accent",
+        "background": "surface",
+        "fg": "#dafa68",
+        "bg": "#111510",
+        "ratio": 15.682,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "on-action",
+        "background": "action",
+        "fg": "#111510",
+        "bg": "#dafa68",
+        "ratio": 15.682,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "ink",
+        "background": "selection",
+        "fg": "#f0f2e8",
+        "bg": "#344220",
+        "ratio": 9.542,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "focus",
+        "background": "surface",
+        "fg": "#dafa68",
+        "bg": "#111510",
+        "ratio": 15.682,
+        "minimum": 3
+      },
+      {
+        "foreground": "control-border",
+        "background": "surface",
+        "fg": "#768268",
+        "bg": "#111510",
+        "ratio": 4.535,
+        "minimum": 3
+      }
+    ],
+    "dark": [
+      {
+        "foreground": "ink",
+        "background": "page",
+        "fg": "#eeeade",
+        "bg": "#171c18",
+        "ratio": 14.361,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "ink",
+        "background": "surface",
+        "fg": "#eeeade",
+        "bg": "#202720",
+        "ratio": 12.721,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "ink",
+        "background": "raised",
+        "fg": "#eeeade",
+        "bg": "#2a3129",
+        "ratio": 11.122,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "ink",
+        "background": "soft",
+        "fg": "#eeeade",
+        "bg": "#2b342b",
+        "ratio": 10.719,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "ink",
+        "background": "user",
+        "fg": "#eeeade",
+        "bg": "#354031",
+        "ratio": 9.051,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "ink",
+        "background": "code",
+        "fg": "#eeeade",
+        "bg": "#2a3327",
+        "ratio": 10.903,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "ink",
+        "background": "selection",
+        "fg": "#eeeade",
+        "bg": "#654739",
+        "ratio": 6.946,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "muted",
+        "background": "page",
+        "fg": "#b7beac",
+        "bg": "#171c18",
+        "ratio": 9.027,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "muted",
+        "background": "surface",
+        "fg": "#b7beac",
+        "bg": "#202720",
+        "ratio": 7.996,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "muted",
+        "background": "raised",
+        "fg": "#b7beac",
+        "bg": "#2a3129",
+        "ratio": 6.991,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "muted",
+        "background": "soft",
+        "fg": "#b7beac",
+        "bg": "#2b342b",
+        "ratio": 6.738,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "accent",
+        "background": "page",
+        "fg": "#efa18b",
+        "bg": "#171c18",
+        "ratio": 8.341,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "accent",
+        "background": "surface",
+        "fg": "#efa18b",
+        "bg": "#202720",
+        "ratio": 7.389,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "accent",
+        "background": "raised",
+        "fg": "#efa18b",
+        "bg": "#2a3129",
+        "ratio": 6.46,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "accent",
+        "background": "soft",
+        "fg": "#efa18b",
+        "bg": "#2b342b",
+        "ratio": 6.226,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "danger",
+        "background": "surface",
+        "fg": "#f2a18f",
+        "bg": "#202720",
+        "ratio": 7.483,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "success",
+        "background": "surface",
+        "fg": "#b4d3a8",
+        "bg": "#202720",
+        "ratio": 9.344,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "warning",
+        "background": "surface",
+        "fg": "#e3be7a",
+        "bg": "#202720",
+        "ratio": 8.68,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "chip-ink",
+        "background": "chip",
+        "fg": "#cfdbb9",
+        "bg": "#313d2c",
+        "ratio": 7.897,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "on-action",
+        "background": "action",
+        "fg": "#1d211b",
+        "bg": "#d68c76",
+        "ratio": 6.123,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "disabled-ink",
+        "background": "disabled",
+        "fg": "#b5bca9",
+        "bg": "#30382d",
+        "ratio": 6.206,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "focus",
+        "background": "page",
+        "fg": "#f2bda1",
+        "bg": "#171c18",
+        "ratio": 10.339,
+        "minimum": 3
+      },
+      {
+        "foreground": "focus",
+        "background": "surface",
+        "fg": "#f2bda1",
+        "bg": "#202720",
+        "ratio": 9.158,
+        "minimum": 3
+      },
+      {
+        "foreground": "focus",
+        "background": "raised",
+        "fg": "#f2bda1",
+        "bg": "#2a3129",
+        "ratio": 8.007,
+        "minimum": 3
+      },
+      {
+        "foreground": "focus",
+        "background": "soft",
+        "fg": "#f2bda1",
+        "bg": "#2b342b",
+        "ratio": 7.717,
+        "minimum": 3
+      },
+      {
+        "foreground": "control-border",
+        "background": "page",
+        "fg": "#87907c",
+        "bg": "#171c18",
+        "ratio": 5.191,
+        "minimum": 3
+      },
+      {
+        "foreground": "control-border",
+        "background": "surface",
+        "fg": "#87907c",
+        "bg": "#202720",
+        "ratio": 4.598,
+        "minimum": 3
+      },
+      {
+        "foreground": "control-border",
+        "background": "raised",
+        "fg": "#87907c",
+        "bg": "#2a3129",
+        "ratio": 4.02,
+        "minimum": 3
+      },
+      {
+        "foreground": "control-border",
+        "background": "soft",
+        "fg": "#87907c",
+        "bg": "#2b342b",
+        "ratio": 3.874,
+        "minimum": 3
+      }
+    ],
+    "voice-with-dark-app": [
+      {
+        "foreground": "ink",
+        "background": "surface",
+        "fg": "#f0f2e8",
+        "bg": "#111510",
+        "ratio": 16.311,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "muted",
+        "background": "surface",
+        "fg": "#a1a997",
+        "bg": "#111510",
+        "ratio": 7.586,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "accent",
+        "background": "surface",
+        "fg": "#dafa68",
+        "bg": "#111510",
+        "ratio": 15.682,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "on-action",
+        "background": "action",
+        "fg": "#111510",
+        "bg": "#dafa68",
+        "ratio": 15.682,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "ink",
+        "background": "selection",
+        "fg": "#f0f2e8",
+        "bg": "#344220",
+        "ratio": 9.542,
+        "minimum": 4.5
+      },
+      {
+        "foreground": "focus",
+        "background": "surface",
+        "fg": "#dafa68",
+        "bg": "#111510",
+        "ratio": 15.682,
+        "minimum": 3
+      },
+      {
+        "foreground": "control-border",
+        "background": "surface",
+        "fg": "#768268",
+        "bg": "#111510",
+        "ratio": 4.535,
+        "minimum": 3
+      }
+    ]
+  },
+  "rendered_contrast": {
+    "light": {
+      "state": "primary button, hover + keyboard focus",
+      "fg": "#ffffff",
+      "bg": "#b7412b",
+      "ratio": 5.52,
+      "minimum": 4.5
+    },
+    "dark": {
+      "state": "primary button, hover + keyboard focus",
+      "fg": "#1d211b",
+      "bg": "#d68c76",
+      "ratio": 6.123,
+      "minimum": 4.5
+    }
+  },
+  "rendered_fonts": {
+    "en": [
+      {
+        "familyName": "DM Sans 9pt",
+        "postScriptName": "DMSans9pt-Regular",
+        "isCustomFont": true,
+        "glyphCount": 36
+      }
+    ],
+    "hi": [
+      {
+        "familyName": "DM Sans 9pt",
+        "postScriptName": "DMSans9pt-Regular",
+        "isCustomFont": true,
+        "glyphCount": 9
+      },
+      {
+        "familyName": "Noto Sans Devanagari",
+        "postScriptName": "NotoSansDevanagari-Regular",
+        "isCustomFont": true,
+        "glyphCount": 38
+      }
+    ],
+    "pa": [
+      {
+        "familyName": "Noto Sans Gurmukhi",
+        "postScriptName": "NotoSansGurmukhi-Regular",
+        "isCustomFont": true,
+        "glyphCount": 36
+      },
+      {
+        "familyName": "DM Sans 9pt",
+        "postScriptName": "DMSans9pt-Regular",
+        "isCustomFont": true,
+        "glyphCount": 7
+      },
+      {
+        "familyName": "Noto Sans Devanagari",
+        "postScriptName": "NotoSansDevanagari-Regular",
+        "isCustomFont": true,
+        "glyphCount": 2
+      }
+    ],
+    "de": [
+      {
+        "familyName": "DM Sans 9pt",
+        "postScriptName": "DMSans9pt-Regular",
+        "isCustomFont": true,
+        "glyphCount": 57
+      }
+    ],
+    "es": [
+      {
+        "familyName": "DM Sans 9pt",
+        "postScriptName": "DMSans9pt-Regular",
+        "isCustomFont": true,
+        "glyphCount": 30
+      }
+    ],
+    "fr": [
+      {
+        "familyName": "DM Sans 9pt",
+        "postScriptName": "DMSans9pt-Regular",
+        "isCustomFont": true,
+        "glyphCount": 40
+      }
+    ],
+    "it": [
+      {
+        "familyName": "DM Sans 9pt",
+        "postScriptName": "DMSans9pt-Regular",
+        "isCustomFont": true,
+        "glyphCount": 31
+      }
+    ],
+    "ar": [
+      {
+        "familyName": "Geeza Pro",
+        "postScriptName": "GeezaPro",
+        "isCustomFont": false,
+        "glyphCount": 35
+      }
+    ],
+    "zh": [
+      {
+        "familyName": "蘋方-簡",
+        "postScriptName": "PingFangSC-Regular",
+        "isCustomFont": false,
+        "glyphCount": 13
+      }
+    ],
+    "ja": [
+      {
+        "familyName": "Hiragino Sans",
+        "postScriptName": "HiraginoSans-W3",
+        "isCustomFont": false,
+        "glyphCount": 11
+      },
+      {
+        "familyName": "蘋方-簡",
+        "postScriptName": "PingFangSC-Regular",
+        "isCustomFont": false,
+        "glyphCount": 9
+      }
+    ],
+    "ko": [
+      {
+        "familyName": "蘋方-簡",
+        "postScriptName": "PingFangSC-Regular",
+        "isCustomFont": false,
+        "glyphCount": 4
+      },
+      {
+        "familyName": "Apple SD Gothic Neo",
+        "postScriptName": "AppleSDGothicNeo-Regular",
+        "isCustomFont": false,
+        "glyphCount": 13
+      }
+    ],
+    "ru": [
+      {
+        "familyName": ".SF NS",
+        "postScriptName": ".SFNS-Regular",
+        "isCustomFont": false,
+        "glyphCount": 29
+      }
+    ]
+  },
+  "screenshots": [
+    "docs/screenshots/phase2/light-360-conversation.png",
+    "docs/screenshots/phase2/light-360-welcome.png",
+    "docs/screenshots/phase2/light-360-scripts.png",
+    "docs/screenshots/phase2/light-360-voice.png",
+    "docs/screenshots/phase2/light-1440-conversation.png",
+    "docs/screenshots/phase2/light-1440-welcome.png",
+    "docs/screenshots/phase2/light-1440-scripts.png",
+    "docs/screenshots/phase2/light-1440-voice.png",
+    "docs/screenshots/phase2/light-1440-settings.png",
+    "docs/screenshots/phase2/light-1440-drawer.png",
+    "docs/screenshots/phase2/voice-reduced-motion.png",
+    "docs/screenshots/phase2/dark-360-conversation.png",
+    "docs/screenshots/phase2/dark-360-welcome.png",
+    "docs/screenshots/phase2/dark-360-scripts.png",
+    "docs/screenshots/phase2/dark-360-voice.png",
+    "docs/screenshots/phase2/dark-1440-conversation.png",
+    "docs/screenshots/phase2/dark-1440-welcome.png",
+    "docs/screenshots/phase2/dark-1440-scripts.png",
+    "docs/screenshots/phase2/dark-1440-voice.png",
+    "docs/screenshots/phase2/dark-1440-settings.png",
+    "docs/screenshots/phase2/dark-1440-drawer.png"
+  ]
+}
