@@ -280,7 +280,7 @@ async def chat(request: Request):
                     hits = rag.query(cid, text,
                                      top_k=rag.OVERVIEW_TOP_K if overview else rag.TOP_K,
                                      overview=overview)
-                    if not hits["hits"] or (not overview and not rag.grounded(hits["hits"], hits["degraded"])):
+                    if not hits["hits"] or (not overview and not rag.grounded(hits["hits"], hits["degraded"], text)):
                         reply = _not_found_in_docs(route.response_lang)
                         yield frame({"type": "delta", "text": reply})
                         memory.append(cid, "user", text)

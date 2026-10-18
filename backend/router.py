@@ -89,6 +89,25 @@ def _translation_parts(text: str) -> tuple[Optional[str], Optional[str]]:
 _RECENCY_RE = re.compile(
     r"\b(latest|today'?s?|current|news|price of|who won|right now|2026)\b", re.IGNORECASE
 )
+_DOCUMENT_RE = re.compile(
+    r"\b(?:document|file|uploaded|upload|pdf|docx|markdown|attachment|"
+    r"summari[sz]e|summary|main points|key points|what is in|what's in|"
+    r"according to|from the|in the|page\s+\d+|"
+    r"documento|archivo|resumen|página|document|fichier|résumé|page|"
+    r"dokument|datei|zusammenfassung|seite|documento|file|riassunto|pagina|"
+    r"दस्तावेज़|दस्तावेज|फ़ाइल|फाइल|अपलोड|सारांश|मुख्य\s+बिंदु|पृष्ठ|"
+    r"ਦਸਤਾਵੇਜ਼|ਫਾਈਲ|ਸੰਖੇਪ|ਪੰਨਾ)\b",
+    re.IGNORECASE,
+)
+_DOCUMENT_OVERVIEW_RE = re.compile(
+    r"\b(?:what(?:'s| is) in|summari[sz]e|summary|main points|key points|"
+    r"overview|give me the gist|tell me about (?:this|the) (?:document|file)|"
+    r"what(?:'s| is) (?:this|the) (?:document|file) about|"
+    r"what does (?:this|the) (?:document|file) contain|"
+    r"give me (?:some )?(?:information|info) about (?:this|the) (?:document|file)|"
+    r"resumen|résumé|zusammenfassung|riassunto|सारांश|ਸੰਖੇਪ)\b",
+    re.IGNORECASE,
+)
 
 
 @dataclass
@@ -111,6 +130,13 @@ def decide(text: str, lang_meta: dict, has_docs: bool = False) -> Route:
 
     response_lang = _lang_instruction(text) or user_lang
 
+    # An explicit document request must win over incidental campus/recency words
+    # (for example, "what does the uploaded document say about the 2026 exam?").
+    # Otherwise a user can upload a document and have the same question routed to
+    # the campus or web tool before retrieval gets a chance to run.
+    if has_docs and _DOCUMENT_RE.search(text):
+        return Route("document", response_lang, "explicit uploaded-document request")
+
     if _RECENCY_RE.search(text):
         return Route("web", response_lang, "recency/freshness keywords")
 
@@ -123,6 +149,11 @@ def decide(text: str, lang_meta: dict, has_docs: bool = False) -> Route:
         return Route("document", response_lang, "session has uploaded documents")
 
     return Route("general", response_lang, "no special trigger")
+
+
+def is_document_overview(text: str) -> bool:
+    """Whether retrieval should sample the document broadly, not gate one hit."""
+    return bool(_DOCUMENT_OVERVIEW_RE.search(text))
 
 
 def _campus_probe(text: str, user_lang: str) -> tuple[str, float]:

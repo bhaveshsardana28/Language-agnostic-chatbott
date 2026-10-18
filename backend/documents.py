@@ -697,6 +697,16 @@ def score_chunks(query: str, chunks: List[str], top_k: int = 5) -> List[Tuple[fl
     return scored[:top_k]
 
 
+def keyword_overlap(query: str, text: str) -> tuple[int, int]:
+    """Return (matching meaningful terms, meaningful query terms).
+
+    This is used only as a conservative grounding rescue when a semantic
+    embedding is relevant but falls just below the calibrated cosine gate.
+    """
+    query_tokens = _tokens(query)
+    return len(query_tokens & _tokens(text)), len(query_tokens)
+
+
 def build_context(query: str, chunks: List[str], top_k: int = 5) -> Tuple[str, List[int]]:
     top = score_chunks(query, chunks, top_k=top_k)
     return "\n\n".join(f"[{rank}] {chunk}" for rank, (_, _, chunk) in enumerate(top, 1)), [index for _, index, _ in top]

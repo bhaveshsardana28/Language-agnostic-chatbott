@@ -299,9 +299,23 @@ def query(session_id: str, query_text: str, top_k: int = TOP_K, overview: bool =
     return {"hits": hits, "degraded": True}
 
 
-def grounded(hits: list[dict], degraded: bool = False) -> bool:
+def grounded(hits: list[dict], degraded: bool = False, query_text: str = "") -> bool:
     threshold = KEYWORD_GROUND_THRESHOLD if degraded else GROUND_THRESHOLD
-    return bool(hits) and hits[0].get("score", 0.0) >= threshold
+    if not hits:
+        return False
+    top = hits[0]
+    if top.get("score", 0.0) >= threshold:
+        return True
+    if degraded or not query_text:
+        return False
+
+    # Short factual questions often use wording that is not close enough to
+    # the document sentence for a 0.45 cosine gate, e.g. "total number of
+    # employees" versus "has 42 employees".  Permit a narrow rescue only when
+    # the hit is still semantically related and shares a meaningful query term;
+    # an absent question such as "CEO of Zephyr-999" has no such overlap.
+    matches, query_terms = documents.keyword_overlap(query_text, top.get("text", ""))
+    return top.get("score", 0.0) >= 0.30 and matches >= 1 and query_terms >= 1
 
 
 def list_documents(session_id: str, owner_id: str | None = None) -> list[dict]:
