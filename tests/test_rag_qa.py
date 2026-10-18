@@ -153,6 +153,12 @@ def test_grounding_rescues_natural_fact_wording_without_accepting_absent_query()
     assert not rag.grounded(hit, query_text="Who is the CEO of Zephyr-999?")
     assert router.is_document_overview("What is this document about?")
     assert router.is_document_overview("Give me information about this file")
+    assert router.is_document_overview("Tell me about the uploaded document")
+    assert router.is_document_overview("Explain this document")
+    assert router.is_document_overview("Extract all the text from this image")
+    assert router.is_document_overview("What is the content of this document?")
+    assert router.is_document_overview("What is written in this document?")
+    assert router.is_document_followup("What does it say?")
 
 
 def test_pdf_page_metadata_and_docx_table_extraction():

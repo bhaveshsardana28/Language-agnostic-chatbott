@@ -102,9 +102,16 @@ _DOCUMENT_RE = re.compile(
 _DOCUMENT_OVERVIEW_RE = re.compile(
     r"\b(?:what(?:'s| is) in|summari[sz]e|summary|main points|key points|"
     r"overview|give me the gist|tell me about (?:this|the) (?:document|file)|"
-    r"what(?:'s| is) (?:this|the) (?:document|file) about|"
-    r"what does (?:this|the) (?:document|file) contain|"
-    r"give me (?:some )?(?:information|info) about (?:this|the) (?:document|file)|"
+    r"tell me about (?:(?:this|the|that|my|your|an|a)\s+)?(?:uploaded|attached|scanned)?\s*(?:document|file|pdf|attachment|image)|"
+    r"give me (?:some )?(?:information|info|details) about (?:(?:this|the|that|my|your|an|a)\s+)?(?:uploaded|attached|scanned)?\s*(?:document|file|pdf|attachment|image)|"
+    r"explain (?:(?:this|the|that|my|your|an|a)\s+)?(?:uploaded|attached|scanned)?\s*(?:document|file|pdf|attachment|image)|"
+    r"read (?:(?:this|the|that|my|your|an|a)\s+)?(?:uploaded|attached|scanned)?\s*(?:document|file|pdf|attachment|image)|"
+    r"extract (?:all )?(?:the )?(?:text|content) (?:from|of) (?:(?:this|the|that|my|your|an|a)\s+)?(?:uploaded|attached|scanned)?\s*(?:document|file|pdf|attachment|image)|"
+    r"what(?:'s| is) (?:(?:this|the|that|my|your|an|a)\s+)?(?:uploaded|attached|scanned)?\s*(?:document|file|pdf|attachment|image) about|"
+    r"what(?:'s| is) (?:the )?(?:content|text|information) (?:of|in|from) (?:(?:this|the|that|my|your|an|a)\s+)?(?:uploaded|attached|scanned)?\s*(?:document|file|pdf|attachment|image)|"
+    r"what is written (?:in|on) (?:(?:this|the|that|my|your|an|a)\s+)?(?:uploaded|attached|scanned)?\s*(?:document|file|pdf|attachment|image)|"
+    r"what(?:'s| is) (?:(?:this|the|that|my|your|an|a)\s+)?(?:uploaded|attached|scanned)?\s*(?:document|file|pdf|attachment|image)|"
+    r"what does (?:(?:this|the|that|my|your|an|a)\s+)?(?:uploaded|attached|scanned)?\s*(?:document|file|pdf|attachment|image) contain|"
     r"resumen|résumé|zusammenfassung|riassunto|सारांश|ਸੰਖੇਪ)\b",
     re.IGNORECASE,
 )
@@ -154,6 +161,15 @@ def decide(text: str, lang_meta: dict, has_docs: bool = False) -> Route:
 def is_document_overview(text: str) -> bool:
     """Whether retrieval should sample the document broadly, not gate one hit."""
     return bool(_DOCUMENT_OVERVIEW_RE.search(text))
+
+
+def is_document_followup(text: str) -> bool:
+    """Whether a short, context-dependent question asks for a broad read."""
+    return bool(re.search(
+        r"^\s*(?:what does it say|what is it about|tell me more|read it|"
+        r"summari[sz]e it|explain it|what are the main points|give me the details)\s*[?.!]*\s*$",
+        text or "", re.IGNORECASE,
+    ))
 
 
 def _campus_probe(text: str, user_lang: str) -> tuple[str, float]:

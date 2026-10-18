@@ -276,7 +276,7 @@ async def chat(request: Request):
                 user_msg = text
 
                 if route.route == "document":
-                    overview = router.is_document_overview(text)
+                    overview = router.is_document_overview(text) or router.is_document_followup(text)
                     hits = rag.query(cid, text,
                                      top_k=rag.OVERVIEW_TOP_K if overview else rag.TOP_K,
                                      overview=overview)
