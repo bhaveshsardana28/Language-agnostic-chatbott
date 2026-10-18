@@ -1,0 +1,16 @@
+.git
+.gitignore
+.env
+.python-version
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+data/*.db
+data/*.db-*
+data/uploads/
+logs/
+models/
+cache/
+docs/screenshots/

@@ -4,8 +4,12 @@
 
 ```bash
 cd ~/language_agnostic_chatbot
-make test                    # FYP core (10) + v2 API (11) + detection (26) — offline, mocked
-make test-browser             # real-browser UI suite (61 checks) — server must be on :8000
+make test                    # core + V2/RAG + persistence + OCR — offline, mocked where needed
+make test-browser            # default V2 route + keyless campus smoke
+make test-v2-voice           # V2 SpeechRecognition state machine — fake engine only
+python -m pytest -q          # full pytest suite when pytest is installed
+python scripts/eval_rag_multilingual.py --json  # 10-case retrieval benchmark
+python scripts/eval_ocr.py --json               # CER/WER synthetic OCR fixtures
 ```
 
 ## What each suite actually proves
@@ -14,8 +18,13 @@ make test-browser             # real-browser UI suite (61 checks) — server mus
 |---|---|---|
 | `tests/test_core.py` (10) | FYP pivot pipeline, classifier gate, Flask contract | — |
 | `tests/test_v2.py` (11) | FastAPI routes, router decisions, SSE frames, RAG plumbing (fake embeddings), session isolation, web fallback, docs endpoint | live LLM behavior |
+| `tests/test_rag_qa.py` | document overview/precision/refusal, prompt grounding, pages/tables, atomic ingestion | live provider generation |
+| `tests/test_persistence.py` | SQLite restart recovery, serialized embeddings, workspace ownership boundary | multi-node database behavior |
+| `tests/test_ocr.py` | signatures, page-aware native/mixed extraction, duplicate/report authorization, local image/PDF OCR, rotated and low-contrast synthetic fixtures | handwriting and uninstalled language packs |
 | `tests/test_code_switching.py` (26) | mixed-script/Hinglish detection incl. all spec cases | languages beyond the 7 tested |
-| `tests/test_browser.py` (61) | layout/scroll architecture, streaming state machine, anti-force-scroll, XSS escape regression, history/search/export, themes, debug panel, voice state machines (mocked engines), language chips/dividers, mobile drawer, overflow at 375/430/1280 | real mic/speakers, real Safari/iOS |
+| `tests/test_browser.py` | default V2 route and keyless campus reply | real mic/speakers, real Safari/iOS |
+| `scripts/verify_shell.py` | V2 responsive shell, prompts, themes, drawer, health and page-load privacy boundary | real speech recognition |
+| `scripts/verify_voice_input.py` | V2 locale setting, requesting/listening, interim/final transcript, keyboard/Escape, errors and no-audio boundary using a fake engine | real mic, locale quality, Safari/iOS |
 
 ## Known untested-by-automation (manual checklist before demo)
 
@@ -23,6 +32,9 @@ make test-browser             # real-browser UI suite (61 checks) — server mus
 2. Voice — fill docs/VOICE_TEST_MATRIX.md (engines are mocked in CI).
 3. Live Groq rate-limit UX (the message exists; force it by spamming).
 4. Theme paint-flash timing (logic verified; sub-100 ms timing is visual).
+5. Handwriting, complex tables, photographs with severe perspective distortion,
+   and languages whose Tesseract packs are not installed. The synthetic quality
+   run reports CER/WER rather than claiming a universal accuracy percentage.
 
 ## Phase-11 audit results (axe-core 4.10.2, real runs — 30 Sep 2026)
 

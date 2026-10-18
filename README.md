@@ -37,12 +37,19 @@ test set (30 queries × 6 languages) is never used in training.
 ## Quick start
 
 ```bash
-python3 -m venv venv                 # if python3 is missing: /opt/anaconda3/bin/python3 -m venv venv
-./venv/bin/pip install -r requirements.txt
-./venv/bin/python app.py             # FYP pivot system -> http://localhost:5000
+python3 -m venv venv                 # Python 3.12.7 is pinned in .python-version
+./venv/bin/pip install -r requirements.lock
+./venv/bin/python app.py             # GAIA V2 -> http://localhost:8000
 ```
 
-## GAIA v2 — the general multilingual layer (FastAPI, port 8000)
+The default localhost page is the new GAIA V2 frontend. The original Flask
+assistant is legacy-only and is available explicitly with:
+
+```bash
+make run-legacy                       # old UI -> http://localhost:5000
+```
+
+## GAIA V2 — the general multilingual layer (FastAPI, port 8000)
 
 The v2 layer turns the FYP baseline into a general-purpose assistant while
 preserving it as one route (`campus_kb`). Nothing in the graded pipeline
@@ -50,32 +57,66 @@ was replaced — it became a component.
 
 ```bash
 cp .env.example .env                 # add LLM_API_KEY (free: console.groq.com)
-make run-v2                          # -> http://localhost:8000
+make run                              # -> http://localhost:8000
 ```
+
+`http://localhost:8000/` now opens the redesigned Common Ground frontend. The
+explicit `/legacy` route is retained only for regression comparison.
 
 | Route | What handles it | Needs LLM key? |
 |---|---|---|
 | `general` | any question, any language (Groq: `qwen/qwen3.8-27b`, env-swappable) | yes |
 | `campus_kb` | FYP pivot pipeline (16 intents, TF-IDF+LogReg, measured) | no |
 | `translate` | "translate X into Y" — free MT with cache+fallback | no |
-| `document` | per-chat uploaded PDF/DOCX/TXT; cross-language retrieval via `paraphrase-multilingual-MiniLM-L12-v2`; grounding gate 0.45; honest "not found" | yes |
+| `document` | per-chat uploaded PDF/DOCX/TXT/Markdown/images; native-text + local page-level OCR; cross-language retrieval via `paraphrase-multilingual-MiniLM-L12-v2`; honest "not found" | yes |
 | `web` | recency questions via keyless DuckDuckGo, sources shown | yes |
 
 Per-message language detection, language-switch instructions ("answer in
 Hindi"), bounded conversation memory, SSE streaming, dark/light/system themes,
 welcome screen with suggestions, markdown + code blocks with copy buttons,
 per-conversation sidebar (search/rename/delete/export, grouped by date),
-message actions (copy/regenerate/edit/Listen), document chips, sources,
+message actions (copy/regenerate/edit), document chips, sources,
 professional debug panel, settings, offline banner, mobile drawer,
-**voice input** (browser speech recognition, BCP-47 language selection) and
-**voice output** (language-matched synthesis, honest no-voice fallback) —
-device-level voice testing pending, see docs/VOICE_TEST_MATRIX.md.
-Tested with real-browser Playwright suite: `make test-browser` (61 checks)
-+ code-switching detection suite (26 checks). Demo: docs/DEMO_SCRIPT.md.
+**voice input** (browser SpeechRecognition, BCP-47 language selection, editable
+no-auto-send transcript). Voice output/listen is not yet connected. Real-device
+voice testing is pending; see docs/VOICE_TEST_MATRIX.md.
+Tested with real-browser Playwright smoke plus mocked V2 voice checks:
+`make test-browser` and `make test-v2-voice`.
+Plus the code-switching detection suite. Demo: docs/DEMO_SCRIPT.md.
 APIs: `/api/v1/{chat,conversations,documents,languages,intents,health}` —
-see docs/API.md. Tests: `make test` (11 v2 + 10 FYP + 26 code-switching + 19 browser).
+see docs/API.md. Real-device voice results remain untested.
 
-Run the offline test suite: `./venv/bin/python tests/test_core.py` (or `make test`).
+Run the offline test suite: `make test`. It covers the core app, V2 RAG,
+SQLite restart/ownership boundaries, OCR parser behavior, synthetic image/PDF
+fixtures when the local OCR capability is installed, and code switching.
+
+### OCR and document intelligence
+
+The V2 upload path validates file signatures, stores the original upload under a
+generated hash, extracts native text first, and OCRs only pages that need it.
+The local OCR stack is PyMuPDF + Pillow + pytesseract + Tesseract; it does not
+send private documents to a third-party OCR API. Supported inputs are text and
+mixed/scanned PDFs, DOCX (including embedded images when OCR is available), TXT,
+Markdown/CSV/JSON/code text, PNG/JPEG/TIFF/BMP/WebP, and HEIC/HEIF only when the
+installed Pillow build can decode them. See `docs/OCR.md` for configuration,
+language packs, structured reports, and measured fixture results.
+
+For a reproducible local setup:
+
+```bash
+cp .env.example .env
+make install
+make test
+./venv/bin/python scripts/eval_ocr.py --json
+make run                         # http://localhost:8000
+```
+
+For a Linux container with Tesseract language packs:
+
+```bash
+docker build -t language-agnostic-chatbot .
+docker run --rm -p 8000:8000 --env-file .env -v "$PWD/data:/app/data" language-agnostic-chatbot
+```
 
 ## Project structure
 

@@ -18,3 +18,7 @@ pypdf==6.19.0          # document ingestion
 python-docx==1.2.0     # document ingestion
 sentence-transformers==6.1.0  # multilingual embeddings (paraphrase-multilingual-MiniLM-L12-v2)
 torch==2.14.1          # CPU inference for embeddings
+PyMuPDF==1.26.7        # bounded PDF rendering for page-level OCR
+Pillow==11.3.0         # image decoding and OCR preprocessing
+pytesseract==0.3.13    # local Tesseract wrapper; documents stay on this host
+pytest==8.4.2          # offline regression suite

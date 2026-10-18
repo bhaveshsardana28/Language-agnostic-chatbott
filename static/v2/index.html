@@ -12,12 +12,13 @@
   <link rel="stylesheet" href="./css/components.css">
   <link rel="stylesheet" href="./css/layout.css">
   <link rel="stylesheet" href="./css/shell.css">
+  <link rel="stylesheet" href="./css/chat.css">
   <link rel="stylesheet" href="./css/motion.css">
   <script type="module" src="./js/main.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to conversation</a>
-  <noscript><p class="shell-noscript">Enable JavaScript for the interactive shell. <a href="/">Open the existing assistant</a>.</p></noscript>
+  <noscript><p class="shell-noscript">Enable JavaScript for the interactive shell.</p></noscript>
   <div class="app-shell">
     <div id="sidebar-dock">
       <aside id="app-sidebar" class="app-sidebar" aria-label="Workspace navigation">
@@ -26,9 +27,13 @@
           <button class="button button--primary sidebar-action" id="new-chat" data-new-chat aria-label="New chat" title="New chat"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span class="sidebar-label">New chat</span></button>
           <button class="button button--quiet sidebar-action" data-shell-open="documents-dialog" aria-label="Documents" title="Documents"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg><span class="sidebar-label">Documents</span></button>
         </nav>
-        <section class="sidebar-history sidebar-label" aria-labelledby="history-title">
+        <section class="sidebar-history sidebar-label" aria-labelledby="history-title" aria-live="polite">
           <h2 id="history-title" class="eyebrow">Your conversations</h2>
-          <div class="sidebar-empty"><svg class="empty-art" aria-hidden="true"><use href="#empty-chat"/></svg><p>A place for the thoughts<br>you come back to.</p><p class="field-note">History connects in Phase 6.<br>Your existing chats are in the original app.</p></div>
+          <label class="history-search-label" for="history-search">Search conversations</label>
+          <input class="input history-search" id="history-search" type="search" placeholder="Find a thought…" autocomplete="off">
+          <div class="sidebar-empty" id="history-empty"><svg class="empty-art" aria-hidden="true"><use href="#empty-chat"/></svg><p>A place for the thoughts<br>you come back to.</p><p class="field-note">Your conversations stay in this browser.</p></div>
+          <p class="history-no-results field-note" id="history-no-results" hidden>No conversations match that search.</p>
+          <div class="history-list" id="history-list" role="list" aria-label="Saved conversations"></div>
         </section>
         <div class="sidebar-foot">
           <button class="button button--quiet sidebar-action" data-shell-open="settings-dialog" aria-label="Appearance settings" title="Appearance settings"><svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg><span class="sidebar-label">Make yourself at home</span></button>
@@ -54,6 +59,7 @@
         <span class="field-note" id="service-detail">Checking API reachability only.</span>
         <button class="button button--quiet" id="health-retry" disabled>Check service</button>
       </div>
+      <div class="mock-banner" id="mock-banner" role="status" hidden></div>
       <div class="shell-offline" id="offline-banner" role="status" hidden><strong id="offline-title">Service unavailable</strong><span id="offline-detail">Your draft stays here. Use Retry connection to check again.</span></div>
 
       <main id="main-content" class="shell-main" tabindex="-1" aria-label="Conversation workspace">
@@ -76,15 +82,19 @@
             <button class="prompt-button" data-prompt="Find recent news about renewable energy and include sources."><span><small>Look beyond the page</small>Catch up on something current.</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
           </div></div>
         </section>
+        <section class="conversation-view" id="conversation-view" aria-labelledby="conversation-view-title" hidden>
+          <div class="conversation-view-head"><div><p class="eyebrow">A living conversation</p><h1 id="conversation-view-title">A thought can travel.</h1></div><span class="chip" id="conversation-mode">Server conversation</span></div>
+          <div class="message-log" id="message-log" role="log" aria-live="polite" aria-relevant="additions text"></div>
+        </section>
       </main>
 
       <footer class="shell-compose-region" id="compose-region">
         <form class="composer shell-composer" id="composer-form">
           <label for="message-input">Your next thought</label>
-          <textarea class="textarea" id="message-input" dir="auto" rows="1" placeholder="Ask in your own words…" aria-describedby="shell-scope draft-note"></textarea>
-          <div class="composer-tools"><button class="icon-button icon-button--quiet" type="button" data-shell-open="documents-dialog" aria-label="Attach a document" title="Attach a document"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button><button class="icon-button icon-button--quiet" type="button" data-shell-open="voice-info-dialog" aria-label="Voice input availability" title="Voice input availability"><svg class="icon" aria-hidden="true"><use href="#i-voice"/></svg></button><span class="field-note" id="draft-note">Draft stays in this tab.</span><button class="button button--primary" type="submit" disabled aria-describedby="shell-scope">Send <svg class="icon" aria-hidden="true"><use href="#i-send"/></svg></button></div>
+          <textarea class="textarea" id="message-input" dir="auto" rows="1" placeholder="Ask in your own words…" aria-describedby="shell-scope draft-note message-count"></textarea>
+          <div class="composer-tools"><button class="icon-button icon-button--quiet" type="button" data-shell-open="documents-dialog" aria-label="Attach a document" title="Attach a document"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button><button class="icon-button icon-button--quiet voice-input-button" id="voice-input-button" type="button" aria-label="Start voice input" title="Start voice input"><svg class="icon" aria-hidden="true"><use href="#i-voice"/></svg></button><span class="field-note voice-input-status" id="voice-input-status" role="status" aria-live="polite">Voice input ready when supported.</span><span class="field-note" id="draft-note">Draft stays in this tab.</span><span class="field-note" id="message-count" role="status">0 / 4,000</span><button class="button button--primary" id="send-button" type="submit" disabled aria-describedby="shell-scope message-count">Send <svg class="icon" aria-hidden="true"><use href="#i-send"/></svg></button></div>
         </form>
-        <div class="shell-compose-note"><span id="shell-scope">Phase 3 shell · sending connects in Phase 4.</span><a id="legacy-link" href="/">Open existing assistant ↗</a></div>
+          <div class="shell-compose-note"><span id="shell-scope">Phase 6 chat · conversations stay in this browser.</span></div>
       </footer>
     </div>
   </div>
@@ -98,19 +108,38 @@
     <header class="dialog-head"><h2 id="settings-title">Make yourself at home.</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close appearance settings"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
     <div class="dialog-body"><p class="small muted">A considered palette, in the light that suits you.</p>
       <fieldset class="choice-group"><legend>Theme</legend><div class="choices"><label class="choice"><input type="radio" name="theme" value="light">Light</label><label class="choice"><input type="radio" name="theme" value="dark">Dark</label><label class="choice"><input type="radio" name="theme" value="system">System</label></div></fieldset>
-      <div class="check"><input id="reduce-motion" type="checkbox" aria-describedby="motion-note"><label for="reduce-motion">Reduce motion<br><span class="field-note" id="motion-note">Your device preference is also respected. Greeting rotation pauses while reduced motion is on.</span></label></div>
-      <p class="field-note">Theme, motion and desktop sidebar preferences are saved in the redesign space. Drafts are not saved. Resetting these preferences does not erase existing conversations.</p>
+       <div class="check"><input id="reduce-motion" type="checkbox" aria-describedby="motion-note"><label for="reduce-motion">Reduce motion<br><span class="field-note" id="motion-note">Your device preference is also respected. Greeting rotation pauses while reduced motion is on.</span></label></div>
+       <div class="check"><input id="show-insights" type="checkbox" aria-describedby="insights-note"><label for="show-insights">Show reply insights<br><span class="field-note" id="insights-note">Reveal detected language, response route and timing for each assistant reply. Off by default.</span></label></div>
+       <div class="field"><label for="speech-language">Speech input language</label><select class="select" id="speech-language"><option value="auto">Auto · use the latest detected language</option><option value="en-IN">English · India</option><option value="hi-IN">Hindi · India</option><option value="pa-IN">Punjabi · India</option><option value="es-ES">Spanish · Spain</option><option value="fr-FR">French · France</option><option value="de-DE">German · Germany</option><option value="it-IT">Italian · Italy</option></select><span class="field-note">Voice input puts an editable transcript in the composer. It never sends automatically.</span></div>
+       <p class="field-note">Theme, motion and desktop sidebar preferences are saved in the redesign space. Drafts are not saved. Resetting these preferences does not erase existing conversations.</p>
       <button class="button button--danger" id="reset-preferences">Reset preview preferences</button>
     </div><footer class="dialog-foot"><button class="button button--primary" data-close>Done</button></footer>
   </dialog>
   <dialog class="dialog" id="documents-dialog" aria-labelledby="documents-title">
     <header class="dialog-head"><h2 id="documents-title">Bring a little context.</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close documents"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
-    <div class="dialog-body empty-state"><svg class="empty-art" aria-hidden="true"><use href="#empty-docs"/></svg><h3>A place for your next read.</h3><p>Document upload and per-conversation files connect in Phase 6. This shell has not loaded or uploaded any documents.</p></div>
+    <div class="dialog-body document-panel">
+       <div class="document-toolbar"><div><p class="field-note" id="document-status" role="status">Choose a file to add context to this conversation.</p><p class="field-note" id="document-count">0 ready · 0 documents</p></div><button class="button button--primary" id="document-choose" type="button">Choose file</button><input id="document-file" type="file" accept=".pdf,.docx,.txt,.md,.csv,.json,.py,.js,.png,.jpg,.jpeg,.tif,.tiff,.bmp,.webp,.heic,.heif" hidden></div>
+       <div class="document-empty" id="document-empty"><svg class="empty-art" aria-hidden="true"><use href="#empty-docs"/></svg><h3>A place for your next read.</h3><p>Upload a PDF, DOCX, TXT, Markdown, CSV, JSON, code, or image file. Scanned pages are read locally when OCR is available.</p></div>
+       <ul class="document-list" id="document-list" aria-label="Conversation documents"></ul>
+       <pre class="document-preview" id="document-preview" aria-label="Extracted text preview" hidden></pre>
+      <button class="button button--danger document-clear" id="document-clear" type="button" disabled>Clear all documents</button>
+    </div>
     <footer class="dialog-foot"><button class="button button--primary" data-close>Back to my draft</button></footer>
+  </dialog>
+  <dialog class="dialog" id="rename-dialog" aria-labelledby="rename-title">
+    <header class="dialog-head"><h2 id="rename-title">Name this conversation.</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close rename conversation"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+    <form class="dialog-body" id="rename-form">
+      <div class="field"><label for="rename-input">Conversation title</label><input class="input" id="rename-input" maxlength="80" required aria-describedby="rename-note rename-error"><span class="field-note" id="rename-note">Up to 80 characters. Leading and trailing spaces are removed.</span><span class="field-error" id="rename-error" role="alert" hidden></span></div>
+      <footer class="dialog-foot"><button class="button" type="button" data-close>Cancel</button><button class="button button--primary" type="submit">Save title</button></footer>
+    </form>
+  </dialog>
+  <dialog class="dialog" id="delete-dialog" aria-labelledby="delete-title">
+    <header class="dialog-head"><h2 id="delete-title">Delete this conversation?</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close delete conversation"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+    <form class="dialog-body" id="delete-form"><p id="delete-copy">This removes the saved conversation from this browser.</p><footer class="dialog-foot"><button class="button" type="button" data-close>Keep conversation</button><button class="button button--danger" type="submit">Delete conversation</button></footer></form>
   </dialog>
   <dialog class="dialog" id="voice-info-dialog" aria-labelledby="voice-info-title">
     <header class="dialog-head"><h2 id="voice-info-title">Your words, your pace.</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close voice information"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
-    <div class="dialog-body"><p>Voice input connects in Phase 7. Your microphone is off; this shell does not request access.</p><p class="field-note">The design system includes a separate visual Voice Mode study.</p><a class="button" href="./components.html">Explore the component studies <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+     <div class="dialog-body"><p>Voice input uses your browser's speech recognition and places an editable transcript in your draft. It does not record or store raw audio.</p><p class="field-note">Use Settings to choose Auto or a specific speech language. Real-device microphone behavior still depends on browser and OS support.</p><a class="button" href="./components.html">Explore the component studies <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
     <footer class="dialog-foot"><button class="button button--primary" data-close>Back to my draft</button></footer>
   </dialog>
 </body>
