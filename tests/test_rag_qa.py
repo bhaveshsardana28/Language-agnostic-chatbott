@@ -151,6 +151,9 @@ def test_grounding_rescues_natural_fact_wording_without_accepting_absent_query()
     hit = [{"score": 0.395, "text": "Project Aurora has 42 employees."}]
     assert rag.grounded(hit, query_text="What is the total number of employees?")
     assert not rag.grounded(hit, query_text="Who is the CEO of Zephyr-999?")
+    created_hit = [{"score": 0.146, "text": "The project was created in 2024 by the research operations team."}]
+    assert rag.grounded(created_hit, query_text="What year was it created?")
+    assert not rag.grounded(created_hit, query_text="Does it mention a budget?")
     assert router.is_document_overview("What is this document about?")
     assert router.is_document_overview("Give me information about this file")
     assert router.is_document_overview("Tell me about the uploaded document")
@@ -159,6 +162,9 @@ def test_grounding_rescues_natural_fact_wording_without_accepting_absent_query()
     assert router.is_document_overview("What is the content of this document?")
     assert router.is_document_overview("What is written in this document?")
     assert router.is_document_followup("What does it say?")
+    assert router.is_document_overview("What are the important details?")
+    assert router.is_document_overview("Please list the facts in the document.")
+    assert router.is_document_overview("What information does the file contain?")
 
 
 def test_pdf_page_metadata_and_docx_table_extraction():

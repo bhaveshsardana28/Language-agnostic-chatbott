@@ -115,6 +115,13 @@ _DOCUMENT_OVERVIEW_RE = re.compile(
     r"resumen|résumé|zusammenfassung|riassunto|सारांश|ਸੰਖੇਪ)\b",
     re.IGNORECASE,
 )
+_GENERIC_DOCUMENT_OVERVIEW_RE = re.compile(
+    r"\b(?:important|key|main|essential|relevant)\s+(?:details|facts|points|information|info)|"
+    r"\b(?:list|show|give|provide|share)\s+(?:me\s+)?(?:the\s+)?(?:facts|details|points|information|info|content)|"
+    r"\bwhat\s+(?:information|info|content|details|facts|points)\b|"
+    r"\b(?:tell|explain|describe)\s+me\s+(?:about|what)\b",
+    re.IGNORECASE,
+)
 
 
 @dataclass
@@ -160,7 +167,7 @@ def decide(text: str, lang_meta: dict, has_docs: bool = False) -> Route:
 
 def is_document_overview(text: str) -> bool:
     """Whether retrieval should sample the document broadly, not gate one hit."""
-    return bool(_DOCUMENT_OVERVIEW_RE.search(text))
+    return bool(_DOCUMENT_OVERVIEW_RE.search(text) or _GENERIC_DOCUMENT_OVERVIEW_RE.search(text))
 
 
 def is_document_followup(text: str) -> bool:

@@ -36,7 +36,10 @@ _ROTATE_RE = re.compile(r"Rotate:\s*(\d+)", re.IGNORECASE)
 _STOPWORDS = {
     "a", "an", "and", "are", "as", "at", "be", "by", "for", "from", "how", "i",
     "in", "is", "it", "me", "of", "on", "or", "the", "this", "to", "was", "what",
-    "when", "where", "which", "who", "with", "you", "your",
+    "when", "where", "which", "who", "with", "you", "your", "about", "does", "do",
+    "document", "documents", "file", "files", "information", "info", "details", "detail",
+    "facts", "fact", "content", "text", "important", "key", "main", "points", "point",
+    "say", "says", "mention", "mentions", "tell", "list", "show", "give", "provide",
 }
 
 PDF_SUFFIXES = frozenset({".pdf"})
@@ -705,6 +708,11 @@ def keyword_overlap(query: str, text: str) -> tuple[int, int]:
     """
     query_tokens = _tokens(query)
     return len(query_tokens & _tokens(text)), len(query_tokens)
+
+
+def matching_keywords(query: str, text: str) -> set[str]:
+    """Return meaningful query terms that occur verbatim in a candidate chunk."""
+    return _tokens(query) & _tokens(text)
 
 
 def build_context(query: str, chunks: List[str], top_k: int = 5) -> Tuple[str, List[int]]:
