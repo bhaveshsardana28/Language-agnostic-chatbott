@@ -31,6 +31,8 @@ export function initDocuments(chat) {
   const empty = document.getElementById('document-empty');
   const count = document.getElementById('document-count');
   const preview = document.getElementById('document-preview');
+  const previewCard = document.getElementById('document-preview-card');
+  const dropzone = document.getElementById('document-dropzone');
   let records = [];
   let active = null;
   let sequence = 0;
@@ -49,6 +51,10 @@ export function initDocuments(chat) {
     records.forEach(record => {
       const row = document.createElement('li');
       row.className = 'document-row';
+      const mark = document.createElement('span');
+      mark.className = 'document-file-mark';
+      mark.textContent = extensionOf(record.document).replace('.', '').toUpperCase().slice(0, 4) || 'FILE';
+      mark.setAttribute('aria-hidden', 'true');
       const name = document.createElement('strong');
       name.textContent = record.document;
       const detail = document.createElement('span');
@@ -59,7 +65,7 @@ export function initDocuments(chat) {
       const chip = document.createElement('span');
       chip.className = `chip document-status document-status--${record.status}`;
       chip.textContent = record.status === 'processing' ? 'Processing' : record.status === 'failed' ? 'Failed' : 'Ready';
-      row.append(name, detail, chip);
+      row.append(mark, name, detail, chip);
       if (record.status === 'failed' && record.file) {
         const retry = document.createElement('button');
         retry.className = 'button button--quiet document-preview-button';
@@ -83,6 +89,7 @@ export function initDocuments(chat) {
     if (!record.document_id) return;
     const previewOwner = ++previewSequence;
     const serverId = chat.getServerConversationId();
+    previewCard.hidden = false;
     preview.hidden = false;
     preview.textContent = 'Loading extracted text…';
     try {
@@ -98,6 +105,7 @@ export function initDocuments(chat) {
     records = [];
     previewSequence += 1;
     setStatus(text);
+    previewCard.hidden = true;
     preview.hidden = true;
     preview.textContent = '';
     render();
@@ -161,7 +169,7 @@ export function initDocuments(chat) {
         const report = await uploadDocument(file, serverId);
         if (active?.owner !== owner) return;
         Object.assign(record, report);
-        record.status = report.status === 'completed' ? 'ready' : (report.status || 'failed');
+        record.status = report.status === 'completed' || !report.status ? 'ready' : report.status;
         try {
           await refresh();
         } catch {
@@ -217,11 +225,30 @@ export function initDocuments(chat) {
   choose.addEventListener('click', () => input.click());
   input.addEventListener('change', () => upload(input.files?.[0]));
   clear.addEventListener('click', clearAll);
+  dropzone.addEventListener('click', event => {
+    if (!event.target.closest('button')) input.click();
+  });
+  dropzone.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); input.click(); }
+  });
+  dropzone.addEventListener('dragover', event => {
+    event.preventDefault();
+    dropzone.dataset.dragging = 'true';
+  });
+  dropzone.addEventListener('dragleave', event => {
+    if (!dropzone.contains(event.relatedTarget)) delete dropzone.dataset.dragging;
+  });
+  dropzone.addEventListener('drop', event => {
+    event.preventDefault();
+    delete dropzone.dataset.dragging;
+    upload(event.dataTransfer?.files?.[0]);
+  });
   document.addEventListener('click', event => {
     if (event.target.closest('[data-shell-open="documents-dialog"]')) setTimeout(refresh, 0);
   });
   document.addEventListener('v2conversationchange', () => {
     previewSequence += 1;
+    previewCard.hidden = true;
     preview.hidden = true;
     if (active) { active = null; sequence += 1; }
     if (dialog.open) refresh();

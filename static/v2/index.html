@@ -115,16 +115,48 @@
       <button class="button button--danger" id="reset-preferences">Reset preview preferences</button>
     </div><footer class="dialog-foot"><button class="button button--primary" data-close>Done</button></footer>
   </dialog>
-  <dialog class="dialog" id="documents-dialog" aria-labelledby="documents-title">
-    <header class="dialog-head"><h2 id="documents-title">Bring a little context.</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close documents"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+  <dialog class="dialog document-workspace-dialog" id="documents-dialog" aria-labelledby="documents-title">
+    <header class="dialog-head document-workspace-head">
+      <div class="document-heading">
+        <span class="document-heading-kicker">Conversation library</span>
+        <h2 id="documents-title">Your source room.</h2>
+        <p>Keep the pages that make this conversation more useful.</p>
+      </div>
+      <div class="document-head-mark" aria-hidden="true"><svg class="icon"><use href="#i-file"/></svg><span>LOCAL<br>OCR</span></div>
+      <button class="icon-button icon-button--quiet" data-close aria-label="Close documents"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </header>
     <div class="dialog-body document-panel">
-       <div class="document-toolbar"><div><p class="field-note" id="document-status" role="status">Choose a file to add context to this conversation.</p><p class="field-note" id="document-count">0 ready · 0 documents</p></div><button class="button button--primary" id="document-choose" type="button">Choose file</button><input id="document-file" type="file" accept=".pdf,.docx,.txt,.md,.csv,.json,.py,.js,.png,.jpg,.jpeg,.tif,.tiff,.bmp,.webp,.heic,.heif" hidden></div>
-       <div class="document-empty" id="document-empty"><svg class="empty-art" aria-hidden="true"><use href="#empty-docs"/></svg><h3>A place for your next read.</h3><p>Upload a PDF, DOCX, TXT, Markdown, CSV, JSON, code, or image file. Scanned pages are read locally when OCR is available.</p></div>
-       <ul class="document-list" id="document-list" aria-label="Conversation documents"></ul>
-       <pre class="document-preview" id="document-preview" aria-label="Extracted text preview" hidden></pre>
-      <button class="button button--danger document-clear" id="document-clear" type="button" disabled>Clear all documents</button>
+      <section class="document-upload-surface" id="document-dropzone" role="button" tabindex="0" aria-describedby="document-drop-note">
+        <div class="document-upload-mark" aria-hidden="true"><svg class="icon"><use href="#i-plus"/></svg></div>
+        <div class="document-upload-copy">
+          <p class="document-eyebrow">Add context</p>
+          <h3>Drop a file into the conversation.</h3>
+          <p id="document-drop-note">PDF, DOCX, text and common image files. Scanned pages are read locally when OCR is available.</p>
+        </div>
+        <button class="button button--primary" id="document-choose" type="button">Choose file</button>
+        <input id="document-file" type="file" accept=".pdf,.docx,.txt,.md,.csv,.json,.py,.js,.png,.jpg,.jpeg,.tif,.tiff,.bmp,.webp,.heic,.heif" hidden>
+      </section>
+
+      <div class="document-toolbar">
+        <div class="document-status-group">
+          <span class="document-live-dot" aria-hidden="true"></span>
+          <div><p class="field-note" id="document-status" role="status">Choose a file to add context to this conversation.</p><p class="field-note" id="document-count">0 ready · 0 documents</p></div>
+        </div>
+        <span class="document-privacy-note"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg> Private to this chat</span>
+      </div>
+
+      <section class="document-library" aria-labelledby="document-library-title">
+        <header class="document-library-head"><div><p class="document-eyebrow">Source library</p><h3 id="document-library-title">Files in this conversation</h3></div><button class="button button--danger document-clear" id="document-clear" type="button" disabled>Clear all</button></header>
+        <div class="document-empty" id="document-empty"><svg class="empty-art" aria-hidden="true"><use href="#empty-docs"/></svg><h3>Your library is waiting.</h3><p>Uploaded files will appear here with their processing state, page count, and extracted text preview.</p></div>
+        <ul class="document-list" id="document-list" aria-label="Conversation documents"></ul>
+      </section>
+
+      <section class="document-preview-card" id="document-preview-card" aria-labelledby="document-preview-title" hidden>
+        <header><div><p class="document-eyebrow">Readable layer</p><h3 id="document-preview-title">Extracted text</h3></div><span class="chip chip--quiet">Preview</span></header>
+        <pre class="document-preview" id="document-preview" aria-label="Extracted text preview"></pre>
+      </section>
     </div>
-    <footer class="dialog-foot"><button class="button button--primary" data-close>Back to my draft</button></footer>
+    <footer class="dialog-foot"><span class="document-footer-note">Ready files can be questioned from the composer.</span><button class="button button--primary" data-close>Back to my draft</button></footer>
   </dialog>
   <dialog class="dialog" id="rename-dialog" aria-labelledby="rename-title">
     <header class="dialog-head"><h2 id="rename-title">Name this conversation.</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close rename conversation"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
