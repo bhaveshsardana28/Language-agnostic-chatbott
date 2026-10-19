@@ -261,6 +261,24 @@
   .shell-starters .prompt-button { min-block-size: 92px; }
 }
 
+/* Compact density: more of the conversation stays in view without changing
+   browser zoom or making controls too small to use. */
+.app-sidebar { padding-block: var(--space-5); }
+.shell-header { min-block-size: 64px; padding-block: var(--space-3); }
+.shell-service { min-block-size: 32px; }
+.shell-main { padding-block: clamp(var(--space-4), 3vw, var(--space-7)); }
+.welcome-copy { padding: clamp(var(--space-5), 3.5vw, var(--space-9)); border-radius: 24px; }
+.welcome-copy h1 { font-size: clamp(2.25rem, 4vw, 4rem); }
+.language-notebook { padding: var(--space-6); }
+.language-notebook > span { font-size: var(--text-2xl); }
+.shell-starters .prompt-list { gap: var(--space-3); }
+.shell-starters .prompt-button { min-block-size: 96px; padding: var(--space-3); }
+.shell-compose-region { padding-block: var(--space-2); }
+.shell-composer { padding: var(--space-3); border-radius: 18px; }
+.shell-composer .textarea { min-block-size: 48px; }
+.document-workspace-head { padding-block: var(--space-5); }
+.document-panel { gap: var(--space-4); }
+
 /* Whole-shell redesign: a quieter, card-based workspace that keeps the
    existing Common Ground vocabulary while making the conversation the focus. */
 .shell-page { background: var(--color-page); }
