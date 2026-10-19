@@ -203,6 +203,64 @@
   .document-upload-surface .button { grid-column: 1; }
 }
 
+/* Aurora visual system — the full product surface is intentionally calm,
+   high-contrast and spacious, with indigo as the primary interaction signal. */
+.shell-page body { background: var(--color-page); }
+.app-shell { background: linear-gradient(135deg, var(--color-page), color-mix(in srgb, var(--color-soft) 52%, var(--color-page))); }
+#sidebar-dock { background: color-mix(in srgb, var(--color-page) 88%, var(--color-soft)); }
+.app-sidebar { padding: var(--space-7) var(--space-6); }
+.sidebar-brand { padding-block-end: var(--space-7); }
+.sidebar-brand .brand { font-family: var(--font-ui); font-size: var(--text-2xl); font-weight: var(--weight-strong); letter-spacing: -.06em; }
+.sidebar-brand .brand-mark { inline-size: 36px; block-size: 36px; border-radius: 12px; background: linear-gradient(145deg, var(--color-action), var(--color-accent)); box-shadow: 0 10px 24px color-mix(in srgb, var(--color-action) 30%, transparent); }
+.sidebar-brand > .small { padding-inline-start: 48px; color: var(--color-muted); letter-spacing: .02em; }
+.sidebar-nav .sidebar-action { border: var(--stroke) solid transparent; border-radius: 12px; }
+.sidebar-nav .sidebar-action:first-child { background: linear-gradient(135deg, var(--color-action), var(--color-accent)); border-color: transparent; box-shadow: 0 12px 26px color-mix(in srgb, var(--color-action) 28%, transparent); }
+.sidebar-nav .sidebar-action:nth-child(2) { background: color-mix(in srgb, var(--color-surface) 72%, transparent); border-color: var(--color-border); }
+.sidebar-nav .sidebar-action:nth-child(2):hover { border-color: var(--color-accent); }
+.sidebar-history { border-block-start-color: color-mix(in srgb, var(--color-border) 70%, transparent); }
+.sidebar-history .eyebrow { color: var(--color-muted); font-size: 10px; letter-spacing: .16em; }
+.history-search { min-block-size: 42px; border-color: var(--color-border); box-shadow: inset 0 1px 0 rgb(255 255 255 / 40%); }
+.history-row { border: var(--stroke) solid transparent; }
+.history-row:hover { border-color: var(--color-border); background: color-mix(in srgb, var(--color-soft) 60%, transparent); }
+.history-row[aria-current='true'] { border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border)); background: color-mix(in srgb, var(--color-chip) 70%, transparent); box-shadow: none; }
+.sidebar-foot { border-block-start-color: color-mix(in srgb, var(--color-border) 70%, transparent); }
+.shell-workspace { background: var(--color-surface); }
+.shell-header { min-block-size: 74px; background: color-mix(in srgb, var(--color-surface) 84%, transparent); backdrop-filter: blur(18px); }
+.shell-header .icon-button { border-radius: 12px; }
+.shell-header-actions { gap: var(--space-2); }
+.shell-language { color: var(--color-accent); border-color: color-mix(in srgb, var(--color-accent) 28%, var(--color-border)); background: color-mix(in srgb, var(--color-chip) 58%, transparent); }
+.shell-service { min-block-size: 38px; background: color-mix(in srgb, var(--color-page) 52%, transparent); }
+.shell-main { position: relative; isolation: isolate; background: var(--color-surface); }
+.shell-main::before { content: ''; position: absolute; z-index: -1; inset: 0; pointer-events: none; background: radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--color-accent) 13%, transparent), transparent 30%), radial-gradient(circle at 90% 80%, color-mix(in srgb, #16b8a0 9%, transparent), transparent 26%); }
+.shell-welcome { max-inline-size: 1180px; row-gap: var(--space-10); }
+.welcome-copy { position: relative; overflow: hidden; border: var(--stroke) solid color-mix(in srgb, var(--color-accent) 22%, var(--color-border)); border-radius: 30px; background: linear-gradient(145deg, color-mix(in srgb, var(--color-surface) 92%, var(--color-accent)), var(--color-surface) 55%, color-mix(in srgb, var(--color-soft) 52%, var(--color-surface))); box-shadow: 0 24px 60px color-mix(in srgb, var(--color-accent) 12%, transparent); }
+.welcome-copy::after { content: ''; position: absolute; inset-inline-end: -100px; inset-block-start: -120px; inline-size: 280px; block-size: 280px; border-radius: var(--radius-round); background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 66%); pointer-events: none; }
+.greeting-line { position: relative; z-index: 1; }
+.greeting-line::before { background: var(--color-success); box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-success) 16%, transparent); }
+.welcome-copy h1 { position: relative; z-index: 1; max-inline-size: 11ch; font-family: var(--font-ui); font-weight: var(--weight-strong); letter-spacing: -.075em; line-height: .98; }
+.welcome-copy h1 em { font-style: normal; background: linear-gradient(100deg, var(--color-action), var(--color-accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.welcome-intro { position: relative; z-index: 1; max-inline-size: 42ch; }
+.language-notebook { border: var(--stroke) solid color-mix(in srgb, var(--color-accent) 20%, var(--color-border)); border-inline-start: var(--stroke) solid color-mix(in srgb, var(--color-accent) 20%, var(--color-border)); border-radius: 26px; background: linear-gradient(160deg, color-mix(in srgb, var(--color-chip) 72%, var(--color-surface)), var(--color-soft)); box-shadow: 0 20px 44px color-mix(in srgb, var(--color-accent) 10%, transparent); }
+.language-notebook > span { font-family: var(--font-ui); font-weight: var(--weight-medium); }
+.shell-starters { position: relative; }
+.shell-starters > .field-note { color: var(--color-accent); letter-spacing: .04em; }
+.shell-starters .prompt-list { gap: var(--space-4); }
+.shell-starters .prompt-button { min-block-size: 120px; border: var(--stroke) solid var(--color-border); border-radius: 18px; background: color-mix(in srgb, var(--color-surface) 92%, transparent); box-shadow: 0 10px 24px color-mix(in srgb, var(--color-ink) 5%, transparent); }
+.shell-starters .prompt-button:hover { border-color: var(--color-accent); background: color-mix(in srgb, var(--color-chip) 70%, var(--color-surface)); box-shadow: 0 14px 30px color-mix(in srgb, var(--color-accent) 13%, transparent); }
+.shell-starters .prompt-button small { color: var(--color-accent); letter-spacing: .08em; text-transform: uppercase; }
+.shell-compose-region { background: color-mix(in srgb, var(--color-page) 65%, transparent); backdrop-filter: blur(18px); }
+.shell-composer { border: var(--stroke) solid color-mix(in srgb, var(--color-accent) 34%, var(--color-control-border)); border-radius: 22px; background: color-mix(in srgb, var(--color-surface) 92%, transparent); box-shadow: 0 18px 42px color-mix(in srgb, var(--color-accent) 12%, transparent); }
+.shell-composer:focus-within { border-color: var(--color-accent); box-shadow: 0 20px 50px color-mix(in srgb, var(--color-accent) 20%, transparent); }
+.shell-composer .textarea { font-size: var(--text-base); }
+.shell-compose-note { color: var(--color-muted); }
+
+@media (width < 48rem) {
+  .app-sidebar { padding: var(--space-5) var(--space-4); }
+  .welcome-copy { border-radius: 22px; }
+  .language-notebook { border-radius: 20px; }
+  .shell-starters .prompt-button { min-block-size: 92px; }
+}
+
 /* Whole-shell redesign: a quieter, card-based workspace that keeps the
    existing Common Ground vocabulary while making the conversation the focus. */
 .shell-page { background: var(--color-page); }
