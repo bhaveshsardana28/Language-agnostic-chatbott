@@ -363,3 +363,18 @@
   .shell-compose-region { padding-inline: var(--space-4); }
   .shell-composer { border-radius: 16px; }
 }
+
+/* Final normal density override. This intentionally comes after the theme
+   layers so the compact setting is visible rather than presentation-sized. */
+.shell-main { padding-block: clamp(var(--space-4), 2vw, var(--space-6)); }
+.shell-welcome { row-gap: var(--space-6); }
+.welcome-copy { padding: clamp(var(--space-5), 2.5vw, var(--space-7)); border-radius: 20px; }
+.welcome-copy h1 { max-inline-size: 12ch; margin-block: var(--space-4); font-size: clamp(2rem, 3.2vw, 3.25rem); line-height: 1.02; }
+.welcome-intro { font-size: var(--text-sm); }
+.language-notebook { padding: var(--space-5); border-radius: 20px; }
+.language-notebook > span { font-size: var(--text-xl); }
+.shell-starters .prompt-list { gap: var(--space-2); }
+.shell-starters .prompt-button { min-block-size: 84px; padding: var(--space-3); }
+.shell-compose-region { padding-block: var(--space-2); }
+.shell-composer { padding: var(--space-3); border-radius: 16px; }
+.shell-composer .textarea { min-block-size: 44px; }
