@@ -202,3 +202,73 @@
   .document-upload-copy { grid-column: 1; }
   .document-upload-surface .button { grid-column: 1; }
 }
+
+/* Whole-shell redesign: a quieter, card-based workspace that keeps the
+   existing Common Ground vocabulary while making the conversation the focus. */
+.shell-page { background: var(--color-page); }
+.app-shell { background: var(--color-page); }
+#sidebar-dock { background: linear-gradient(180deg, var(--color-page), var(--color-soft)); border-inline-end: 0; }
+.app-sidebar { padding: var(--space-6) var(--space-5); gap: var(--space-5); }
+.sidebar-brand { padding: var(--space-2) var(--space-2) var(--space-5); }
+.sidebar-brand .brand { font-size: var(--text-3xl); }
+.brand-mark { border-radius: var(--radius-medium); box-shadow: 0 8px 20px color-mix(in srgb, var(--color-action) 25%, transparent); }
+.sidebar-nav { gap: var(--space-3); }
+.sidebar-nav .sidebar-action { min-block-size: 48px; padding-inline: var(--space-4); border-radius: var(--radius-medium); }
+.sidebar-nav .sidebar-action:first-child { box-shadow: 0 8px 18px color-mix(in srgb, var(--color-action) 22%, transparent); }
+.sidebar-history { padding-block-start: var(--space-4); border-block-start: var(--stroke) solid var(--color-border); }
+.history-search { border-radius: var(--radius-round); background: color-mix(in srgb, var(--color-surface) 74%, transparent); }
+.history-row { border-radius: var(--radius-medium); padding-inline: var(--space-3); }
+.history-row[aria-current='true'] { box-shadow: inset 3px 0 0 var(--color-accent); }
+.sidebar-foot { padding-block-start: var(--space-4); border-block-start: var(--stroke) solid var(--color-border); }
+.sidebar-foot .sidebar-action { border-radius: var(--radius-medium); }
+.shell-workspace { background: var(--color-surface); }
+.shell-header { min-block-size: 76px; padding-inline: clamp(var(--space-5), 4vw, var(--space-10)); background: color-mix(in srgb, var(--color-surface) 92%, var(--color-soft)); border-block-end-color: color-mix(in srgb, var(--color-border) 70%, transparent); }
+.shell-heading strong { font-size: var(--text-base); }
+.shell-heading .field-note::before { content: '•'; margin-inline-end: var(--space-2); color: var(--color-success); }
+.shell-header-actions { gap: var(--space-3); }
+.shell-language { padding: var(--space-2) var(--space-3); border: var(--stroke) solid var(--color-border); border-radius: var(--radius-round); background: var(--color-page); }
+.shell-service { min-block-size: 36px; padding-inline: clamp(var(--space-5), 4vw, var(--space-10)); background: color-mix(in srgb, var(--color-page) 55%, transparent); }
+.shell-main { padding: clamp(var(--space-5), 4vw, var(--space-10)); background: radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--color-soft) 70%, transparent), transparent 34%), var(--color-surface); }
+.shell-welcome { max-inline-size: 1120px; row-gap: var(--space-8); }
+.welcome-copy { padding: clamp(var(--space-6), 5vw, var(--space-12)); border: var(--stroke) solid var(--color-border); border-radius: 28px; background: linear-gradient(135deg, color-mix(in srgb, var(--color-surface) 94%, var(--color-soft)), var(--color-page)); box-shadow: var(--shadow-float); }
+.greeting-line { margin-block-end: var(--space-5); }
+.greeting-line::before { content: ''; inline-size: 10px; block-size: 10px; border-radius: var(--radius-round); background: var(--color-action); box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-action) 14%, transparent); }
+.greeting-line .icon-button { margin-inline-start: auto; }
+.welcome-copy h1 { max-inline-size: 10ch; margin-block: var(--space-5); font-size: clamp(2.6rem, 5vw, 5rem); }
+.welcome-intro { max-inline-size: 44ch; }
+.language-notebook { align-self: stretch; justify-content: center; border: var(--stroke) solid var(--color-border); border-inline-start: var(--stroke) solid var(--color-border); border-radius: 24px; padding: var(--space-8); background: var(--color-soft); box-shadow: var(--shadow-paper); }
+.language-notebook > span { font-size: var(--text-3xl); }
+.shell-starters { margin-block-start: 0; }
+.shell-starters > .field-note { color: var(--color-accent); font-weight: var(--weight-strong); letter-spacing: .04em; }
+.shell-starters .prompt-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); margin-block-start: var(--space-4); border: 0; }
+.shell-starters .prompt-button { min-block-size: 112px; padding: var(--space-4); border: var(--stroke) solid var(--color-border); border-radius: var(--radius-medium); background: var(--color-surface); box-shadow: var(--shadow-paper); transition: transform var(--motion-fast) var(--ease-enter), border-color var(--motion-fast) var(--ease-enter), background var(--motion-fast) var(--ease-enter); }
+.shell-starters .prompt-button:hover { border-color: var(--color-accent); background: var(--color-soft); transform: translateY(-2px); }
+.shell-starters .prompt-button span { display: grid; gap: var(--space-2); }
+.shell-starters .prompt-button small { color: var(--color-accent); font-weight: var(--weight-strong); letter-spacing: .04em; }
+.shell-compose-region { padding-inline: clamp(var(--space-5), 4vw, var(--space-10)); background: color-mix(in srgb, var(--color-page) 75%, transparent); border-block-start-color: var(--color-border); }
+.shell-composer { max-inline-size: 1120px; padding: var(--space-4); border: var(--stroke-strong) solid var(--color-control-border); border-radius: 20px; background: var(--color-surface); box-shadow: 0 14px 34px color-mix(in srgb, var(--color-ink) 10%, transparent); }
+.shell-composer:focus-within { border-color: var(--color-accent); box-shadow: 0 16px 38px color-mix(in srgb, var(--color-action) 15%, transparent); }
+.shell-composer .textarea { min-block-size: 58px; padding-inline: var(--space-3); }
+.composer-tools { gap: var(--space-3); }
+.composer-tools .icon-button { border-radius: var(--radius-medium); }
+.shell-compose-note { max-inline-size: 1120px; }
+
+@media (width < 80rem) {
+  .shell-starters .prompt-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (width < 64rem) {
+  .shell-main { padding-inline: var(--space-5); }
+  .welcome-copy { padding: var(--space-8); }
+}
+@media (width < 48rem) {
+  .shell-header { min-block-size: 64px; padding-inline: var(--space-3); }
+  .shell-service { padding-inline: var(--space-4); }
+  .shell-main { padding: var(--space-4); }
+  .shell-welcome { padding-block: var(--space-2); }
+  .welcome-copy { padding: var(--space-6); border-radius: 20px; }
+  .welcome-copy h1 { max-inline-size: none; font-size: clamp(2.25rem, 12vw, 3.5rem); }
+  .shell-starters .prompt-list { grid-template-columns: 1fr; }
+  .shell-starters .prompt-button { min-block-size: 84px; }
+  .shell-compose-region { padding-inline: var(--space-4); }
+  .shell-composer { border-radius: 16px; }
+}
