@@ -1,6 +1,11 @@
 import { getPreferences, setPreferences } from './preferences.js';
 import { openOverlay, closeOverlay, toast } from './ui.js';
 
+export async function closeNavigation() {
+  const drawer = document.getElementById('navigation-drawer');
+  if (drawer?.open) await closeOverlay(drawer);
+}
+
 export function initShell() {
   const desktop = matchMedia('(min-width: 64rem)');
   const toggle = document.getElementById('sidebar-toggle');
@@ -45,9 +50,6 @@ export function initShell() {
     }
   });
 
-  async function closeNavigation() {
-    if (drawer.open) await closeOverlay(drawer);
-  }
   document.querySelectorAll('[data-shell-open]').forEach(button => {
     button.addEventListener('click', async () => {
       const wasMobileNav = drawer.contains(button);

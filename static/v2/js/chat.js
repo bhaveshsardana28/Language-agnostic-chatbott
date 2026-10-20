@@ -2,6 +2,7 @@ import { API_BASE } from '../config.js';
 import { createConversation, deleteConversation as deleteServerConversation } from './api.js';
 import { mockStream } from './mock.js';
 import { renderMarkdown, plainText } from './markdown.js';
+import { closeNavigation } from './shell.js';
 import { toast, openOverlay, closeOverlay } from './ui.js';
 import { loadHistory, newConversation, saveHistory, serializeMessage, titleFromMessage } from './history.js';
 
@@ -95,6 +96,9 @@ export function initChat() {
   const deleteDialog = document.getElementById('delete-dialog');
   const deleteForm = document.getElementById('delete-form');
   const deleteCopy = document.getElementById('delete-copy');
+  const navigationDrawer = document.getElementById('navigation-drawer');
+  const sidebarToggle = document.getElementById('sidebar-toggle');
+  const desktop = matchMedia('(min-width: 64rem)');
   let conversationId = null;
   let active = null;
   let assistant = null;
@@ -636,13 +640,13 @@ export function initChat() {
     setSendButton('Send'); updateInput();
     document.dispatchEvent(new CustomEvent('v2conversationchange', { detail: { serverId: null } }));
   }
-  async function confirmDelete(record) {
+  async function confirmDelete(record, opener = document.activeElement) {
     if (!record) return;
     pendingRecord = record;
     deleteCopy.textContent = record.serverId
       ? 'This removes the saved conversation here and asks the server to delete its conversation data.'
       : 'This removes the saved conversation from this browser.';
-    openOverlay('delete-dialog');
+    openOverlay('delete-dialog', opener);
   }
   async function removeConversation() {
     const record = pendingRecord;
@@ -749,18 +753,22 @@ export function initChat() {
   });
   send.addEventListener('click', () => { if (active) active.controller.abort(); else sendMessage(); });
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && active) { event.preventDefault(); active.controller.abort(); } });
-  document.addEventListener('click', event => {
+  document.addEventListener('click', async event => {
     const action = event.target.closest('[data-history-action]');
     if (action) {
       const record = recordFor(action.dataset.recordId);
       if (!record) return;
-      if (action.dataset.historyAction === 'rename') openRename(record, action);
+      const fromMobileNavigation = !desktop.matches && navigationDrawer.contains(action);
+      if (fromMobileNavigation) await closeNavigation();
+      const opener = fromMobileNavigation ? sidebarToggle : action;
+      if (action.dataset.historyAction === 'rename') openRename(record, opener);
       if (action.dataset.historyAction === 'export') exportConversation(record);
-      if (action.dataset.historyAction === 'delete') confirmDelete(record);
+      if (action.dataset.historyAction === 'delete') confirmDelete(record, opener);
       return;
     }
     const saved = event.target.closest('[data-history-id]');
     if (saved) {
+      if (!desktop.matches && navigationDrawer.contains(saved)) await closeNavigation();
       restoreConversation(saved.dataset.historyId);
       return;
     }
