@@ -42,12 +42,16 @@ python3 -m venv venv                 # Python 3.12.7 is pinned in .python-versio
 ./venv/bin/python app.py             # GAIA V2 -> http://localhost:8000
 ```
 
-The default localhost page is the new GAIA V2 frontend. The original Flask
-assistant is legacy-only and is available explicitly with:
+The default localhost page is the GAIA V2 frontend. The Flask pivot-pipeline
+assistant now has a separate, three-file multilingual frontend, available with:
 
 ```bash
-make run-legacy                       # old UI -> http://localhost:5000
+make run-legacy                       # three-file Flask UI -> http://localhost:5000
 ```
+
+For the no-build HTML/CSS/JavaScript frontend, use **port 5000**, not port 8000.
+Setup, API compatibility, memory-only history, and browser checks are documented
+in [docs/FLASK_FRONTEND.md](docs/FLASK_FRONTEND.md). No backend changes are needed.
 
 ## GAIA V2 — the general multilingual layer (FastAPI, port 8000)
 
