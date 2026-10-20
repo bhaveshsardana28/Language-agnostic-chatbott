@@ -1,33 +1,36 @@
-/* Common Ground. Values live here; components consume semantic tokens.
-   Signal is scoped to .voice-mode only. No inversion/filter-based theme. */
+/* GAIA workspace tokens. A quiet paper surface keeps the conversation in focus;
+   cobalt is reserved for actions, focus, and source references. */
 :root {
   color-scheme: light;
-  --color-page: #eef1f8;
-  --color-surface: #f9fbff;
+  --color-page: #f3f5f7;
+  --color-surface: #fbfcfd;
   --color-raised: #ffffff;
-  --color-soft: #e8edfa;
-  --color-ink: #121827;
-  --color-muted: #586274;
-  --color-accent: #5b5ce2;
-  --color-action: #5148d8;
+  --color-soft: #edf1f5;
+  --color-ink: #17212b;
+  --color-muted: #607080;
+  --color-accent: #496bc8;
+  --color-action: #2f5fc4;
+  --color-brand: #3157c9;
+  --color-brand-deep: #17327f;
   --color-on-action: #ffffff;
-  --color-border: #d9e0ec;
-  --color-control-border: #8d98ad;
-  --color-focus: #4e46c8;
-  --color-user: #e9e8ff;
-  --color-chip: #e6edff;
-  --color-chip-ink: #3d4f7a;
-  --color-danger: #c33b5d;
-  --color-success: #118a78;
-  --color-warning: #9a6512;
-  --color-disabled: #e4e8f1;
-  --color-disabled-ink: #68748a;
-  --color-code: #eef2fb;
-  --color-selection: #dcd9ff;
-  --color-scrim: rgb(4 10 27 / 66%);
-  --shadow-paper: 0 4px 0 #e0e5f1;
-  --shadow-float: 0 18px 48px rgb(42 55 112 / 14%);
-  --shadow-dialog: 0 28px 90px rgb(9 15 36 / 28%);
+  --color-border: #d7dee7;
+  --color-control-border: #5f6d7d;
+  --color-focus: #1f4ba7;
+  --color-user: #edf2ff;
+  --color-chip: #e8efff;
+  --color-chip-ink: #294f9f;
+  --color-danger: #b42318;
+  --color-success: #027a48;
+  --color-warning: #b54708;
+  --color-disabled: #eef1f4;
+  --color-disabled-ink: #607080;
+  --color-code: #f2f5f8;
+  --color-selection: #dbeafe;
+  --color-scrim: rgb(15 23 42 / 52%);
+  --shadow-paper: 0 1px 2px rgb(16 24 40 / 6%), 0 8px 20px rgb(16 24 40 / 4%);
+  --shadow-float: 0 18px 42px rgb(16 24 40 / 12%);
+  --shadow-hero: 0 24px 70px rgb(37 69 145 / 12%);
+  --shadow-dialog: 0 24px 64px rgb(16 24 40 / 24%);
 
   --font-ui: 'DM Sans', 'Noto Sans Devanagari', 'Noto Sans Gurmukhi',
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
@@ -46,16 +49,16 @@
   --text-2xl: 1.5rem;
   --text-3xl: 2rem;
   --text-4xl: 3rem;
-  --text-hero: clamp(2.75rem, 5vw, 4.5rem);
-  --line-tight: 1.12;
+  --text-hero: clamp(2.5rem, 5vw, 4.25rem);
+  --line-tight: 1.2;
   --line-ui: 1.5;
   --line-reading: 1.75;
   --line-script: 1.9;
   --weight-normal: 400;
   --weight-medium: 500;
   --weight-strong: 600;
-  --tracking-display: -.045em;
-  --tracking-label: .1em;
+  --tracking-display: -.035em;
+  --tracking-label: .06em;
 
   --space-0: 0;
   --space-1: 4px;
@@ -73,9 +76,9 @@
   --space-16: 64px;
   --space-20: 80px;
   --space-24: 96px;
-  --radius-small: 7px;
-  --radius-medium: 14px;
-  --radius-dialog: 22px;
+  --radius-small: 8px;
+  --radius-medium: 12px;
+  --radius-dialog: 16px;
   --radius-round: 999px;
   --stroke: 1px;
   --stroke-strong: 2px;
@@ -85,10 +88,10 @@
   --icon-size: 20px;
   --icon-small: 16px;
   --control-size: 44px;
-  --avatar-size: 36px;
+  --avatar-size: 32px;
   --brand-size: 32px;
   --rail-size: 76px;
-  --header-size: 80px;
+  --header-size: 68px;
   --drawer-size: 360px;
   --dialog-size: 520px;
   --toast-size: 400px;
@@ -101,10 +104,11 @@
   --canvas-width: 820px;
   --page-width: 1440px;
   --sidebar-study: 200px;
-  --sidebar-size: 272px;
-  --shell-reading-size: 1040px;
+  --sidebar-size: 248px;
+  --shell-reading-size: 1160px;
   --shell-draft-max: 200px;
-  --text-shell-hero: clamp(2rem, 4.5vw, 4rem);
+  --text-shell-hero: clamp(2rem, 3.2vw, 3rem);
+  --text-shell-display: clamp(2.35rem, 4.4vw, 4rem);
   --greeting-interval: 4800ms;
   --textarea-max: 176px;
   --textarea-min: 64px;
@@ -142,31 +146,34 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --color-page: #080d1b;
-  --color-surface: #10182b;
-  --color-raised: #162039;
-  --color-soft: #1a2742;
-  --color-ink: #eef3ff;
-  --color-muted: #9aa8c2;
-  --color-accent: #8e8aff;
-  --color-action: #7068f2;
+  --color-page: #0f131a;
+  --color-surface: #151b24;
+  --color-raised: #1c2530;
+  --color-soft: #202a35;
+  --color-ink: #f4f7fb;
+  --color-muted: #a4afbe;
+  --color-accent: #8da9ff;
+  --color-action: #4f76d2;
+  --color-brand: #6f91ff;
+  --color-brand-deep: #9ab2ff;
   --color-on-action: #ffffff;
-  --color-border: #2b3955;
-  --color-control-border: #70809b;
-  --color-focus: #a49eff;
-  --color-user: #20284c;
-  --color-chip: #243355;
-  --color-chip-ink: #c4d1f5;
-  --color-danger: #f188a4;
-  --color-success: #63d7bd;
-  --color-warning: #e8bf75;
-  --color-disabled: #1c2942;
-  --color-disabled-ink: #9aa8c2;
-  --color-code: #131d32;
-  --color-selection: #3b3470;
-  --shadow-paper: 0 4px 0 #070b16;
-  --shadow-float: 0 18px 48px rgb(0 0 0 / 30%);
-  --shadow-dialog: 0 28px 90px rgb(0 0 0 / 50%);
+  --color-border: #2d3946;
+  --color-control-border: #7f8ea4;
+  --color-focus: #b0c6ff;
+  --color-user: #243657;
+  --color-chip: #263b5f;
+  --color-chip-ink: #d0dcff;
+  --color-danger: #f18b82;
+  --color-success: #63d6a0;
+  --color-warning: #f2b86b;
+  --color-disabled: #27313d;
+  --color-disabled-ink: #a4afbe;
+  --color-code: #111821;
+  --color-selection: #2c4a7e;
+  --shadow-paper: 0 1px 2px rgb(0 0 0 / 24%), 0 8px 20px rgb(0 0 0 / 12%);
+  --shadow-float: 0 18px 42px rgb(0 0 0 / 32%);
+  --shadow-hero: 0 24px 70px rgb(0 0 0 / 34%);
+  --shadow-dialog: 0 24px 64px rgb(0 0 0 / 52%);
 }
 
 .voice-mode {

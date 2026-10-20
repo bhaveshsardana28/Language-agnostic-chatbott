@@ -4,16 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
-  <title>GAIA — A conversation without a fixed language</title>
+  <meta name="description" content="GAIA is a private multilingual intelligence workspace for conversation, documents, and source-aware answers.">
+  <meta name="theme-color" content="#f3f5f7">
+  <title>GAIA — Multilingual intelligence workspace</title>
   <link rel="icon" href="./assets/brand/favicon.svg" type="image/svg+xml">
   <script src="./js/theme-init.js"></script>
-  <link rel="stylesheet" href="./css/tokens.css?v=aurora-normal-20261019">
-  <link rel="stylesheet" href="./css/base.css?v=aurora-normal-20261019">
-  <link rel="stylesheet" href="./css/components.css?v=aurora-normal-20261019">
-  <link rel="stylesheet" href="./css/layout.css?v=aurora-normal-20261019">
-  <link rel="stylesheet" href="./css/shell.css?v=aurora-normal-20261019">
-  <link rel="stylesheet" href="./css/chat.css?v=aurora-normal-20261019">
-  <link rel="stylesheet" href="./css/motion.css?v=aurora-normal-20261019">
+  <link rel="stylesheet" href="./css/tokens.css?v=gaia-premium-20261020">
+  <link rel="stylesheet" href="./css/base.css?v=gaia-premium-20261020">
+  <link rel="stylesheet" href="./css/components.css?v=gaia-premium-20261020">
+  <link rel="stylesheet" href="./css/layout.css?v=gaia-premium-20261020">
+  <link rel="stylesheet" href="./css/shell.css?v=gaia-premium-20261020">
+  <link rel="stylesheet" href="./css/chat.css?v=gaia-premium-20261020">
+  <link rel="stylesheet" href="./css/motion.css?v=gaia-premium-20261020">
   <script type="module" src="./js/main.js"></script>
 </head>
 <body>
@@ -22,23 +24,23 @@
   <div class="app-shell">
     <div id="sidebar-dock">
       <aside id="app-sidebar" class="app-sidebar" aria-label="Workspace navigation">
-        <div class="sidebar-brand"><span class="brand" aria-label="GAIA"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-gaia"/></svg></span><span class="sidebar-label">gaia</span></span><span class="sidebar-label small muted">Multilingual workspace</span></div>
+         <div class="sidebar-brand"><span class="brand" aria-label="GAIA"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-gaia"/></svg></span><span class="sidebar-label">GAIA</span></span><span class="sidebar-label small muted">Document intelligence workspace</span></div>
         <nav class="sidebar-nav" aria-label="Workspace">
           <button class="button button--primary sidebar-action" id="new-chat" data-new-chat aria-label="New chat" title="New chat"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span class="sidebar-label">New chat</span></button>
           <button class="button button--quiet sidebar-action" data-shell-open="documents-dialog" aria-label="Documents" title="Documents"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg><span class="sidebar-label">Documents</span></button>
         </nav>
         <section class="sidebar-history sidebar-label" aria-labelledby="history-title" aria-live="polite">
-          <h2 id="history-title" class="eyebrow">Your conversations</h2>
+           <h2 id="history-title" class="eyebrow">Recent conversations</h2>
           <label class="history-search-label" for="history-search">Search conversations</label>
           <input class="input history-search" id="history-search" type="search" placeholder="Find a thought…" autocomplete="off">
-          <div class="sidebar-empty" id="history-empty"><svg class="empty-art" aria-hidden="true"><use href="#empty-chat"/></svg><p>A place for the thoughts<br>you come back to.</p><p class="field-note">Your conversations stay in this browser.</p></div>
+           <div class="sidebar-empty" id="history-empty"><svg class="empty-art" aria-hidden="true"><use href="#empty-chat"/></svg><p>Your saved conversations<br>will appear here.</p><p class="field-note">Stored locally in this browser.</p></div>
           <p class="history-no-results field-note" id="history-no-results" hidden>No conversations match that search.</p>
           <div class="history-list" id="history-list" role="list" aria-label="Saved conversations"></div>
         </section>
         <div class="sidebar-foot">
-          <button class="button button--quiet sidebar-action" data-shell-open="settings-dialog" aria-label="Appearance settings" title="Appearance settings"><svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg><span class="sidebar-label">Make yourself at home</span></button>
+           <button class="button button--quiet sidebar-action" data-shell-open="settings-dialog" aria-label="Appearance settings" title="Workspace settings"><svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg><span class="sidebar-label">Workspace settings</span></button>
           <a class="button button--quiet sidebar-action" href="./components.html" aria-label="Design system studies" title="Design system studies"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg><span class="sidebar-label">Design system studies</span></a>
-          <p class="field-note sidebar-label">WORDS, IN GOOD COMPANY</p>
+           <p class="field-note sidebar-label">PRIVATE WORKSPACE</p>
         </div>
       </aside>
     </div>
@@ -46,7 +48,7 @@
     <div class="shell-workspace">
       <header class="shell-header">
         <button class="icon-button icon-button--quiet" id="sidebar-toggle" aria-label="Collapse sidebar" aria-controls="app-sidebar" aria-expanded="true"><svg class="icon" aria-hidden="true"><use href="#i-sidebar"/></svg></button>
-        <div class="shell-heading"><strong id="conversation-heading">New conversation</strong><span class="field-note">Your ideas, in any language.</span></div>
+         <div class="shell-heading"><strong id="conversation-heading">New conversation</strong><span class="field-note">Ask questions across your files and languages.</span></div>
         <div class="shell-header-actions">
           <span class="shell-language" title="Language is detected per message once chat is connected"><svg class="icon" aria-hidden="true"><use href="#i-switch"/></svg><span>Auto<span class="shell-language-detail"> · per message</span></span></span>
           <button class="icon-button icon-button--quiet" data-shell-open="documents-dialog" aria-label="Open documents" title="Open documents"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg></button>
@@ -65,36 +67,36 @@
       <main id="main-content" class="shell-main" tabindex="-1" aria-label="Conversation workspace">
         <section class="shell-welcome" id="welcome" aria-labelledby="welcome-title">
           <div class="welcome-copy">
-            <div class="greeting-line"><span class="sr-only">Welcome. A conversation can begin in your language.</span><span id="greeting" aria-hidden="true" lang="en">Hello.</span><span id="greeting-script" aria-hidden="true">Latin</span><button class="icon-button icon-button--quiet" id="greeting-pause" aria-label="Pause greeting rotation" aria-pressed="false" title="Pause greeting rotation"><svg class="icon" aria-hidden="true"><use href="#i-pause"/></svg></button></div>
-            <p class="eyebrow">A little curiosity goes a long way</p>
-            <h1 id="welcome-title">A world of words.<br>One <em>conversation.</em></h1>
-            <p class="welcome-intro">Start with a question. Follow a thought.<br class="wide-break"> Change languages without changing the conversation.</p>
+             <div class="greeting-line"><span class="sr-only">Workspace ready. Start a conversation or add a source.</span><span id="greeting" aria-hidden="true" lang="en">Workspace ready</span><span id="greeting-script" aria-hidden="true">Auto-detect</span><button class="icon-button icon-button--quiet" id="greeting-pause" aria-label="Pause greeting rotation" aria-pressed="false" title="Pause workspace status rotation"><svg class="icon" aria-hidden="true"><use href="#i-pause"/></svg></button></div>
+             <p class="eyebrow">GAIA</p>
+             <h1 id="welcome-title">How can I help you today?</h1>
+             <p class="welcome-intro">Ask a question, upload a document, or start with one of the suggestions below.</p>
           </div>
-          <aside class="language-notebook" aria-label="A study in scripts">
-            <p class="eyebrow">Many ways to begin</p><span lang="hi">बातचीत</span><span lang="pa">ਗੱਲਬਾਤ</span><span lang="de">Gespräch</span><p class="field-note">Different scripts.<br>A shared space.</p>
+           <aside class="language-notebook" aria-label="Document library overview">
+             <p class="eyebrow">Document library</p><span>Upload and inspect sources</span><span>OCR and page-aware extraction</span><span>Source-aware answers</span><button class="button" type="button" data-shell-open="documents-dialog">Open document library <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button><p class="field-note">Files stay attached to the conversation they support.</p>
           </aside>
-          <div class="shell-starters"><p class="field-note">A starting point, in your own words · select a prompt to edit</p><div class="prompt-list" id="starter-prompts">
-            <button class="prompt-button" data-prompt="Explain a complex idea in simple terms."><span><small>Understand something</small>Make a big idea feel simple.</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-            <button class="prompt-button" data-prompt="Help me write a Python function and explain how it works."><span><small>Build something</small>Work through a little Python.</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-            <button class="prompt-button" data-prompt="मुझे कुछ नया सिखाओ।"><span><small>Think in Hindi</small><span lang="hi">मुझे कुछ नया सिखाओ।</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-            <button class="prompt-button" data-prompt="Translate ‘A good question is a place to begin’ into German."><span><small>Find the right words</small>Take a sentence into German.</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-            <button class="prompt-button" data-prompt="Summarize the key points of the document I attach."><span><small>Read with context</small>Make a long document shorter.</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-            <button class="prompt-button" data-prompt="Find recent news about renewable energy and include sources."><span><small>Look beyond the page</small>Catch up on something current.</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+           <div class="shell-starters"><p class="field-note">Try one of these</p><div class="prompt-list" id="starter-prompts">
+             <button class="prompt-button" data-prompt="Summarize the key points of the document I attach."><span><small>Summarize a document</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+             <button class="prompt-button" data-prompt="Explain a complex idea in simple terms."><span><small>Explain something</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+             <button class="prompt-button" data-prompt="Help me write a Python function and explain how it works."><span><small>Help me write code</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+             <button class="prompt-button" data-prompt="Translate the attached document into Hindi and preserve the structure."><span><small>Translate text</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+             <button class="prompt-button" data-prompt="Find the key risks, decisions, and action items in the document I attach."><span><small>Find key decisions</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+             <button class="prompt-button" data-prompt="Compare the attached documents and show the important differences."><span><small>Compare documents</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
           </div></div>
         </section>
         <section class="conversation-view" id="conversation-view" aria-labelledby="conversation-view-title" hidden>
-          <div class="conversation-view-head"><div><p class="eyebrow">A living conversation</p><h1 id="conversation-view-title">A thought can travel.</h1></div><span class="chip" id="conversation-mode">Server conversation</span></div>
+           <div class="conversation-view-head"><div><p class="eyebrow">Conversation workspace</p><h1 id="conversation-view-title">Working session</h1></div><span class="chip" id="conversation-mode">Server conversation</span></div>
           <div class="message-log" id="message-log" role="log" aria-live="polite" aria-relevant="additions text"></div>
         </section>
       </main>
 
       <footer class="shell-compose-region" id="compose-region">
         <form class="composer shell-composer" id="composer-form">
-          <label for="message-input">Your next thought</label>
-          <textarea class="textarea" id="message-input" dir="auto" rows="1" placeholder="Ask in your own words…" aria-describedby="shell-scope draft-note message-count"></textarea>
+           <label for="message-input">Message</label>
+           <textarea class="textarea" id="message-input" dir="auto" rows="1" placeholder="Ask a question or describe a task…" aria-describedby="shell-scope draft-note message-count"></textarea>
           <div class="composer-tools"><button class="icon-button icon-button--quiet" type="button" data-shell-open="documents-dialog" aria-label="Attach a document" title="Attach a document"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button><button class="icon-button icon-button--quiet voice-input-button" id="voice-input-button" type="button" aria-label="Start voice input" title="Start voice input"><svg class="icon" aria-hidden="true"><use href="#i-voice"/></svg></button><span class="field-note voice-input-status" id="voice-input-status" role="status" aria-live="polite">Voice input ready when supported.</span><span class="field-note" id="draft-note">Draft stays in this tab.</span><span class="field-note" id="message-count" role="status">0 / 4,000</span><button class="button button--primary" id="send-button" type="submit" disabled aria-describedby="shell-scope message-count">Send <svg class="icon" aria-hidden="true"><use href="#i-send"/></svg></button></div>
         </form>
-          <div class="shell-compose-note"><span id="shell-scope">Phase 6 chat · conversations stay in this browser.</span></div>
+           <div class="shell-compose-note"><span id="shell-scope">Your conversation and attached sources stay in this browser.</span></div>
       </footer>
     </div>
   </div>
@@ -105,7 +107,7 @@
     <div id="mobile-sidebar-slot"></div>
   </dialog>
   <dialog class="dialog" id="settings-dialog" aria-labelledby="settings-title">
-    <header class="dialog-head"><h2 id="settings-title">Make yourself at home.</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close appearance settings"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+     <header class="dialog-head"><h2 id="settings-title">Workspace settings</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close workspace settings"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
     <div class="dialog-body"><p class="small muted">A considered palette, in the light that suits you.</p>
       <fieldset class="choice-group"><legend>Theme</legend><div class="choices"><label class="choice"><input type="radio" name="theme" value="light">Light</label><label class="choice"><input type="radio" name="theme" value="dark">Dark</label><label class="choice"><input type="radio" name="theme" value="system">System</label></div></fieldset>
        <div class="check"><input id="reduce-motion" type="checkbox" aria-describedby="motion-note"><label for="reduce-motion">Reduce motion<br><span class="field-note" id="motion-note">Your device preference is also respected. Greeting rotation pauses while reduced motion is on.</span></label></div>
@@ -118,9 +120,9 @@
   <dialog class="dialog document-workspace-dialog" id="documents-dialog" aria-labelledby="documents-title">
     <header class="dialog-head document-workspace-head">
       <div class="document-heading">
-        <span class="document-heading-kicker">Conversation library</span>
-        <h2 id="documents-title">Your source room.</h2>
-        <p>Keep the pages that make this conversation more useful.</p>
+         <span class="document-heading-kicker">Conversation sources</span>
+         <h2 id="documents-title">Document library</h2>
+         <p>Upload, review, and manage the files used in this conversation.</p>
       </div>
       <div class="document-head-mark" aria-hidden="true"><svg class="icon"><use href="#i-file"/></svg><span>LOCAL<br>OCR</span></div>
       <button class="icon-button icon-button--quiet" data-close aria-label="Close documents"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
@@ -129,9 +131,9 @@
       <section class="document-upload-surface" id="document-dropzone" role="button" tabindex="0" aria-describedby="document-drop-note">
         <div class="document-upload-mark" aria-hidden="true"><svg class="icon"><use href="#i-plus"/></svg></div>
         <div class="document-upload-copy">
-          <p class="document-eyebrow">Add context</p>
-          <h3>Drop a file into the conversation.</h3>
-          <p id="document-drop-note">PDF, DOCX, text and common image files. Scanned pages are read locally when OCR is available.</p>
+           <p class="document-eyebrow">Add source</p>
+           <h3>Upload a document for this conversation.</h3>
+           <p id="document-drop-note">PDF, DOCX, text, and common image files. Scanned pages are read locally when OCR is available.</p>
         </div>
         <button class="button button--primary" id="document-choose" type="button">Choose file</button>
         <input id="document-file" type="file" accept=".pdf,.docx,.txt,.md,.csv,.json,.py,.js,.png,.jpg,.jpeg,.tif,.tiff,.bmp,.webp,.heic,.heif" hidden>
@@ -147,7 +149,7 @@
 
       <section class="document-library" aria-labelledby="document-library-title">
         <header class="document-library-head"><div><p class="document-eyebrow">Source library</p><h3 id="document-library-title">Files in this conversation</h3></div><button class="button button--danger document-clear" id="document-clear" type="button" disabled>Clear all</button></header>
-        <div class="document-empty" id="document-empty"><svg class="empty-art" aria-hidden="true"><use href="#empty-docs"/></svg><h3>Your library is waiting.</h3><p>Uploaded files will appear here with their processing state, page count, and extracted text preview.</p></div>
+         <div class="document-empty" id="document-empty"><svg class="empty-art" aria-hidden="true"><use href="#empty-docs"/></svg><h3>No sources added yet</h3><p>Uploaded files will appear here with their processing state, page count, and extracted text preview.</p></div>
         <ul class="document-list" id="document-list" aria-label="Conversation documents"></ul>
       </section>
 
@@ -156,7 +158,7 @@
         <pre class="document-preview" id="document-preview" aria-label="Extracted text preview"></pre>
       </section>
     </div>
-    <footer class="dialog-foot"><span class="document-footer-note">Ready files can be questioned from the composer.</span><button class="button button--primary" data-close>Back to my draft</button></footer>
+     <footer class="dialog-foot"><span class="document-footer-note">Ready files can be referenced from the message composer.</span><button class="button button--primary" data-close>Back to my draft</button></footer>
   </dialog>
   <dialog class="dialog" id="rename-dialog" aria-labelledby="rename-title">
     <header class="dialog-head"><h2 id="rename-title">Name this conversation.</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close rename conversation"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>

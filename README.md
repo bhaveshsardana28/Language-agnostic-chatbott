@@ -42,6 +42,11 @@ python3 -m venv venv                 # Python 3.12.7 is pinned in .python-versio
 ./venv/bin/python app.py             # GAIA V2 -> http://localhost:8000
 ```
 
+The repository is reproducible from a clean checkout: `.python-version` pins
+Python 3.12.7, `requirements.lock` pins the install surface, and `make install`
+generates the ignored campus intent model only when it is missing. No API key is
+needed for the offline test suite or the campus knowledge-base route.
+
 The default localhost page is the GAIA V2 frontend. The Flask pivot-pipeline
 assistant now has a separate, three-file multilingual frontend, available with:
 
@@ -113,6 +118,23 @@ make install
 make test
 ./venv/bin/python scripts/eval_ocr.py --json
 make run                         # http://localhost:8000
+```
+
+The release checks are intentionally small and repeatable:
+
+```bash
+make lint
+make test                         # offline regression suite
+```
+
+For a container deployment, the Docker build trains the small campus model inside
+the image, installs the local OCR system packages, and exposes a health check:
+
+```bash
+docker build -t language-agnostic-chatbot .
+docker run --rm --name gaia -p 8000:8000 --env-file .env \
+  -v "$PWD/data:/app/data" language-agnostic-chatbot
+curl -fsS http://127.0.0.1:8000/api/v1/health
 ```
 
 For a Linux container with Tesseract language packs:

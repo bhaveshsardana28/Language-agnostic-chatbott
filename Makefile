@@ -1,9 +1,10 @@
-.PHONY: help install run run-v2 run-legacy test test-v2-voice lint clean
+.PHONY: help install bootstrap-model run run-v2 run-legacy test test-v2-voice lint clean
 
 help:
 	@echo "Language-Agnostic Chatbot (pivot translation + single English intent model)"
 	@echo ""
 	@echo "  make install   create venv and install dependencies"
+	@echo "  make bootstrap-model  build the local campus intent model if missing"
 	@echo "  make run       start the new GAIA V2 app on http://localhost:8000"
 	@echo "  make run-legacy start the original Flask app on http://localhost:5000"
 	@echo "  make test      run core tests (offline)"
@@ -12,6 +13,10 @@ help:
 install:
 	python3 -m venv venv
 	./venv/bin/pip install -r requirements.lock
+	@$(MAKE) bootstrap-model
+
+bootstrap-model:
+	@if [ -f models/intent_classifier.joblib ]; then echo "intent model already present"; else ./venv/bin/python scripts/train.py >/dev/null; echo "intent model generated"; fi
 
 run:
 	./venv/bin/python app.py

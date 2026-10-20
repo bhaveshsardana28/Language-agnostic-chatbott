@@ -207,8 +207,8 @@
 .empty-state p { max-inline-size: var(--reading-width); color: var(--color-muted); font-size: var(--text-sm); }
 .empty-art { inline-size: var(--illustration-size); block-size: var(--illustration-size); color: var(--color-accent); }
 .collection-row { inline-size: 100%; display: flex; text-align: start; flex-direction: column; gap: var(--space-1); align-items: flex-start; padding: var(--space-4); }
-.toast-region { position: fixed; z-index: var(--z-toast); inset-block-end: calc(var(--space-6) + env(safe-area-inset-bottom)); inset-inline-end: var(--space-6); inline-size: min(var(--toast-size), calc(100% - var(--space-12))); pointer-events: none; }
-.toast { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4); margin-block-start: var(--space-2); background: var(--color-raised); color: var(--color-ink); border: var(--stroke) solid var(--color-control-border); border-radius: var(--radius-medium); box-shadow: var(--shadow-float); font-size: var(--text-sm); pointer-events: auto; }
+.toast-region { position: fixed; z-index: var(--z-toast); inset-block-start: var(--space-5); inset-inline-end: var(--space-6); inline-size: min(var(--toast-size), calc(100% - var(--space-12))); pointer-events: none; }
+.toast { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4); margin-block-end: var(--space-2); background: color-mix(in srgb, var(--color-raised) 94%, var(--color-brand)); color: var(--color-ink); border: var(--stroke) solid color-mix(in srgb, var(--color-brand) 28%, var(--color-control-border)); border-radius: 14px; box-shadow: var(--shadow-float); font-size: var(--text-sm); pointer-events: auto; }
 .toast p { flex: 1; }
 .toast-inline { padding-inline: var(--space-6); padding-block-end: var(--space-4); }
 .skeleton { position: relative; overflow: hidden; block-size: var(--skeleton-height); background: var(--color-soft); border-radius: var(--radius-small); }
