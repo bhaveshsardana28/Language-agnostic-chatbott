@@ -1,198 +1,102 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="system">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<script>
-/* theme-flash prevention: resolve stored theme BEFORE first paint */
-try {
-  const t = JSON.parse(localStorage.getItem('gaia.store.v1') || '{}').theme;
-  if (t === 'light' || (t === 'system' && matchMedia('(prefers-color-scheme: light)').matches))
-    document.documentElement.dataset.theme = 'light';
-} catch (e) {}
-</script>
-<title>Global Multilingual AI Assistant</title>
-
-<!-- CSS Modules -->
-<link rel="stylesheet" href="/static/css/tokens.css">
-<link rel="stylesheet" href="/static/css/components.css">
-<link rel="stylesheet" href="/static/css/layout.css">
-<link rel="stylesheet" href="/static/css/motion.css">
-
-<style>
-/* Inline critical styles for immediate render (prevents FOUC) */
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
-body{font-family:var(--font-ui);background:var(--bg);color:var(--text);overflow:hidden;transition:background var(--t-med) var(--ease-out),color var(--t-med) var(--ease-out)}
-button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-:focus-visible{outline:none;box-shadow:var(--focus-ring);border-radius:var(--r-sm)}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
-body.reduce-motion *,body.reduce-motion *::before,body.reduce-motion *::after{animation:none!important;transition:none!important}
-
-/* App shell - critical for layout */
-.app{display:grid;grid-template-columns:280px 1fr;height:100vh;height:100dvh}
-.main{display:flex;flex-direction:column;min-width:0;min-height:0;position:relative}
-@media(max-width:900px){.app{grid-template-columns:1fr}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="GAIA — a multilingual campus assistant. Six languages, one conversation.">
+  <title>GAIA — Global Multilingual AI Assistant</title>
+  <link rel="stylesheet" href="/static/css/style.css?v=flask-1">
+  <script src="/static/js/app.js?v=flask-1" defer></script>
 </head>
 <body>
-
-<div class="app">
-
-  <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar" aria-label="Conversations">
-    <div class="sidebar__brand">
-      <div class="sidebar__logo" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
-          <circle cx="12" cy="12" r="9"/><path d="M3.5 12h17M12 3.3c2.6 2.4 4 5.4 4 8.7s-1.4 6.3-4 8.7c-2.6-2.4-4-5.4-4-8.7s1.4-6.3 4-8.7z"/>
-        </svg>
+  <a class="skip-link" href="#message-input">Skip to message input</a>
+  <div class="page-shell">
+    <aside class="intro-panel" aria-label="About GAIA">
+      <p class="eyebrow">LANGUAGE IS A BRIDGE.</p>
+      <div class="intro-copy">
+        <h2>Many languages.<br>One conversation.</h2>
+        <p>A familiar place to ask, explore, and find your way around campus. In words that feel like you.</p>
       </div>
-      <div>
-        <h1 class="sidebar__title">Global Multilingual AI Assistant</h1>
-        <p class="sidebar__subtitle">AI that speaks your language.</p>
-      </div>
-    </div>
+      <ul class="language-list" aria-label="Six supported languages">
+        <li><span class="native-name" lang="en">English</span><span>English</span></li>
+        <li><span class="native-name" lang="hi">हिन्दी</span><span>Hindi</span></li>
+        <li><span class="native-name" lang="pa">ਪੰਜਾਬੀ</span><span>Punjabi</span></li>
+        <li><span class="native-name" lang="es">Español</span><span>Spanish</span></li>
+        <li><span class="native-name" lang="fr">Français</span><span>French</span></li>
+        <li><span class="native-name" lang="de">Deutsch</span><span>German</span></li>
+      </ul>
+      <p class="pipeline-note">Your language → English pivot → intent → your reply.<br>One model. A little less distance.</p>
+    </aside>
 
-    <div class="sidebar__actions">
-      <button id="new-chat" class="btn btn--primary btn--sm" style="width:100%;justify-content:center">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-        New chat
-      </button>
-      <div class="sidebar__search">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="search" placeholder="Search chats" aria-label="Search conversations" autocomplete="off">
-      </div>
-    </div>
-
-    <nav id="conv-list" class="sidebar__list" aria-label="Chat history" tabindex="0"></nav>
-
-    <div class="sidebar__footer">
-      <button id="settings-btn" class="sidebar__settings-btn" aria-label="Settings">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></svg>
-        Settings
-      </button>
-      <button id="del-all-side" class="sidebar__delete-all" type="button">Delete all data</button>
-      <p class="sidebar__note">Your chat history is stored locally on this device.</p>
-    </div>
-  </aside>
-
-  <div id="scrim" class="scrim" hidden></div>
-
-  <!-- Main -->
-  <main class="main">
-    <header class="topbar">
-      <button id="menu-btn" class="icon-btn" aria-label="Open conversations menu">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-      </button>
-      <span class="topbar__title" id="chat-title">New conversation</span>
-      <span class="topbar__status"><span class="topbar__dot" id="topbar-dot"></span><span id="topbar-status">Online</span></span>
-      <div class="topbar__controls">
-        <button id="voice-mode-btn" class="icon-btn" aria-label="Voice mode" title="Voice mode (full-screen)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 4v3M12 17v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2.5 12h3M18.5 12h3M4.9 19.1l2.1-2.1M17 6.9l2.1-2.1"/></svg>
-        </button>
-        <button id="docs-btn" class="icon-btn" aria-label="Add document (PDF, DOCX, TXT)" title="Add document">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
-        </button>
-        <button id="debug-btn" class="icon-btn" aria-pressed="false" aria-label="Toggle debug mode" title="Debug">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m8 6-4 6 4 6M16 6l4 6-4 6M13 4l-2 16"/></svg>
-        </button>
-        <button id="theme-btn" class="icon-btn" aria-label="Toggle theme" title="Theme">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.5M12 19v2.5M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2.5 12h2.5M19 12h2.5M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
-        </button>
-        <button id="hdr-settings" class="icon-btn" aria-label="Settings" title="Settings">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.9 2.9l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.9-2.9l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.9-2.9l.1.1a1.7 1.7 0 0 0 1.9.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.9 2.9l-.1.1a1.7 1.7 0 0 0-.3 1.9v.1a1.7 1.7 0 0 0 1.5 1h.2a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg>
-        </button>
-      </div>
-    </header>
-
-    <div id="offline" class="offline-banner" role="alert">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warn)" stroke-width="2" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 2.4 17.5A1.8 1.8 0 0 0 4 20.2h16a1.8 1.8 0 0 0 1.6-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0z"/></svg>
-      <span>Unable to connect to the assistant.</span>
-      <button id="retry-btn" class="offline-banner__btn">Retry</button>
-    </div>
-
-    <div id="doc-strip" class="doc-strip" aria-label="Uploaded documents"></div>
-
-    <div id="chat" class="chat" role="log" aria-live="polite">
-      <div id="welcome" class="welcome">
-        <div class="welcome__logo" aria-hidden="true">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3.5 12h17M12 3.3c2.6 2.4 4 5.4 4 8.7s-1.4 6.3-4 8.7c-2.6-2.4-4-5.4-4-8.7s1.4-6.3 4-8.7z"/></svg>
+    <div class="app-panel">
+      <header class="app-header">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="9"/>
+              <ellipse cx="12" cy="12" rx="4" ry="9"/>
+              <path d="M3 12h18"/>
+            </svg>
+          </span>
+          <div><span class="brand-name">GAIA</span><span class="brand-caption">Your multilingual campus companion</span></div>
         </div>
-        <h2 id="welcome-greeting" class="welcome__greeting">Hello</h2>
-        <p class="welcome__sub">How can I help? Ask anything in your language.</p>
-        <div id="welcome-cards" class="welcome__cards"></div>
-      </div>
-      <div class="chat__inner" id="feed"></div>
-    </div>
-
-    <div class="composer-wrap">
-      <button id="jump" class="jump-btn" type="button" aria-label="Scroll to latest message">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
-        New messages
-      </button>
-      <form class="composer" id="composer">
-        <button type="button" id="attach-btn" class="composer__btn" aria-label="Attach document" title="Attach PDF, DOCX or TXT">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m21.4 11.1-8.5 8.5a5.7 5.7 0 0 1-8-8l8.5-8.5a3.8 3.8 0 0 1 5.4 5.4l-8.5 8.5a1.9 1.9 0 0 1-2.7-2.7l7.8-7.8"/></svg>
-        </button>
-        <button type="button" id="mic-btn" class="composer__btn mic-btn" aria-label="Voice input" aria-pressed="false" title="Voice input (Cmd/Ctrl+Shift+M)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
-          <canvas id="mic-waveform" width="48" height="24" aria-hidden="true" style="position:absolute;left:50%;bottom:100%;transform:translateX(-50%);display:none;"></canvas>
-        </button>
-        <textarea id="input" class="composer__textarea" rows="1" dir="auto" placeholder="Ask anything in any supported language…" aria-label="Message" autocomplete="off"></textarea>
-        <button type="submit" id="send" class="composer__send" aria-label="Send message">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4.5 12h14M13 6l6 6-6 6"/></svg>
-        </button>
-        <button type="button" id="stop" class="composer__stop" aria-label="Stop generating">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
-        </button>
-      </form>
-      <p class="hint"><span>Replies in your language · Enter to send · Shift+Enter for new line</span><span class="char-count" id="char-count"></span></p>
-    </div>
-  </main>
-</div>
-
-<!-- Hidden file input -->
-<input type="file" id="file-input" accept=".pdf,.docx,.txt,.md" hidden>
-
-<!-- Modal overlay -->
-<div id="overlay-m" class="dialog-overlay" hidden></div>
-
-<!-- Voice Mode Overlay -->
-<div id="voice-mode" class="dialog-overlay" role="dialog" aria-modal="true" aria-label="Voice mode" hidden>
-  <div class="dialog voice-modal" style="max-width:420px;background:var(--bg);border-color:var(--border);">
-    <button id="vm-close" class="icon-btn" style="position:absolute;top:var(--sp-3);right:var(--sp-3);" aria-label="Exit voice mode">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg>
-    </button>
-    <div class="voice-state" id="vm-state" aria-live="polite" style="display:flex;flex-direction:column;align-items:center;gap:var(--sp-4);padding:var(--sp-6) var(--sp-4);">
-      <div class="voice-orb voice-orb--idle" id="vm-orb" aria-hidden="true">
-        <div class="voice-orb__inner">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+        <div class="header-actions">
+          <button id="theme-toggle" class="button button--quiet" type="button" aria-label="Theme: system. Switch to light theme">
+            <span aria-hidden="true">◐</span><span id="theme-label">System</span>
+          </button>
+          <button id="clear-chat" class="button button--quiet" type="button" disabled>Clear chat</button>
         </div>
-        <div class="voice-orb__eq" id="vm-eq" style="display:none;">
-          <div class="voice-orb__eq-bar"></div><div class="voice-orb__eq-bar"></div><div class="voice-orb__eq-bar"></div>
-          <div class="voice-orb__eq-bar"></div><div class="voice-orb__eq-bar"></div>
+      </header>
+
+      <main id="main-content" class="chat-panel" aria-label="Multilingual conversation">
+        <div class="conversation-heading">
+          <span class="eyebrow">A LITTLE COMMON GROUND</span>
+          <span class="session-label">This session only</span>
         </div>
-      </div>
-      <div class="vm-label" id="vm-label" style="font-size:var(--fs-lg);font-weight:600;color:var(--text);">Tap to start</div>
+        <section id="chat-scroll" class="chat-scroll" tabindex="0" aria-label="Conversation messages">
+          <section id="welcome" class="welcome" aria-labelledby="welcome-title">
+            <div class="welcome-symbol" aria-hidden="true">अ</div>
+            <p class="eyebrow">YOUR WORDS. YOUR WORLD.</p>
+            <h1 id="welcome-title">Hello. नमस्ते. Hola.</h1>
+            <p id="welcome-subtitle">A question about campus? Start in your language. We'll meet you there.</p>
+            <div id="suggestions" class="suggestions" aria-label="Suggested questions"></div>
+          </section>
+          <div id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions text" aria-atomic="false" aria-label="Chat messages"></div>
+          <div id="typing-indicator" class="typing-indicator" role="status" hidden>
+            <span class="typing-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+            <span>GAIA is thinking…</span>
+          </div>
+        </section>
+
+        <footer class="composer-panel">
+          <form id="chat-form" class="composer" autocomplete="off">
+            <div class="composer-topline">
+              <div class="language-control">
+                <label for="language-select">Language</label>
+                <select id="language-select" name="language">
+                  <option value="">Auto-detect</option>
+                </select>
+              </div>
+              <span id="composer-status" class="composer-status">Auto-detect enabled</span>
+            </div>
+            <div class="composer-input-row">
+              <label class="sr-only" for="message-input">Your message</label>
+              <textarea id="message-input" name="message" rows="1" dir="auto" placeholder="Ask a question in your language…" aria-describedby="composer-hint privacy-note" autocomplete="off" enterkeyhint="send"></textarea>
+              <button id="send-button" class="send-button" type="submit" aria-label="Send message" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 19V5m-6 6 6-6 6 6"/>
+                </svg>
+              </button>
+            </div>
+          </form>
+          <p id="composer-hint" class="composer-hint">Enter to send · Shift + Enter for a new line</p>
+          <p id="privacy-note" class="privacy-note">Not saved in this browser. Refresh clears this chat. Messages are sent to the server.</p>
+          <noscript><p>Enable JavaScript to send messages and use the language selector.</p></noscript>
+        </footer>
+      </main>
     </div>
-    <div class="vm-transcript" id="vm-transcript" aria-live="polite" style="min-height:60px;max-height:200px;overflow-y:auto;font-size:var(--fs-md);line-height:var(--lh-relaxed);color:var(--text-subtle);text-align:left;padding:0 var(--sp-4);width:100%;"></div>
-    <button id="vm-end" class="btn btn--danger btn--lg vm-end-btn" style="margin-top:var(--sp-3);" aria-label="End voice session">End</button>
   </div>
-</div>
-
-<!-- JS Modules (loaded in dependency order) -->
-<script src="/static/js/api.js"></script>
-<script src="/static/js/store.js"></script>
-<script src="/static/js/markdown.js"></script>
-<script src="/static/js/components.js"></script>
-<script src="/static/js/chat.js"></script>
-<script src="/static/js/sidebar.js"></script>
-<script src="/static/js/documents.js"></script>
-<script src="/static/js/voiceInput.js"></script>
-<script src="/static/js/voiceOutput.js"></script>
-<script src="/static/js/voiceMode.js"></script>
-<script src="/static/js/settings.js"></script>
-<script src="/static/js/main.js"></script>
-
+  <p id="announcer" class="sr-only" role="status" aria-live="polite"></p>
 </body>
 </html>
