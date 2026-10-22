@@ -115,14 +115,17 @@ export function initDocuments(chat) {
     preview.hidden = false;
     previewTitle.textContent = source ? `Evidence from ${record.document}` : 'Extracted text';
     const chunkLabel = Number.isFinite(Number(source?.chunk)) ? ` · retrieved chunk ${Number(source.chunk) + 1}` : '';
-    previewMeta.textContent = source?.page ? `Page ${source.page}${chunkLabel}` : 'The readable text returned by the document service.';
+    previewMeta.textContent = source?.excerpt
+      ? `Retrieved passage${source.page ? ` · page ${source.page}` : ''}${chunkLabel}`
+      : source?.page ? `Page ${source.page}${chunkLabel}` : 'The readable text returned by the document service.';
     preview.textContent = 'Loading extracted text…';
     try {
       const report = await getDocumentReport(serverId, record.document_id);
       if (previewOwner !== previewSequence || serverId !== chat.getServerConversationId()) return;
        const page = source?.page && Array.isArray(report.pages)
          ? report.pages.find(item => Number(item.page_number) === Number(source.page)) : null;
-       preview.textContent = page?.text || report.full_text || 'No readable text was extracted.';
+       preview.textContent = source?.excerpt || page?.text || report.full_text || 'No readable text was extracted.';
+       if (source) previewCard.scrollIntoView({ block: 'nearest', behavior: document.documentElement.dataset.motion === 'reduced' ? 'auto' : 'smooth' });
     } catch (error) {
       if (previewOwner !== previewSequence || serverId !== chat.getServerConversationId()) return;
       preview.textContent = error.message || 'Could not load the extracted text.';
@@ -257,9 +260,6 @@ export function initDocuments(chat) {
   dropzone.addEventListener('click', event => {
     if (!event.target.closest('button')) input.click();
   });
-  dropzone.addEventListener('keydown', event => {
-    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); input.click(); }
-  });
   dropzone.addEventListener('dragover', event => {
     event.preventDefault();
     dropzone.dataset.dragging = 'true';
@@ -281,15 +281,15 @@ export function initDocuments(chat) {
     if (!serverId || !source.document) return;
     openOverlay('documents-dialog', event.target instanceof Element ? event.target : document.activeElement);
     if (!records.length) await refresh();
-    const record = records.find(item => item.document === source.document);
+    const record = records.find(item => source.document_id && Number(item.document_id) === Number(source.document_id))
+      || records.find(item => item.document === source.document);
     if (record) showPreview(record, source);
     else setStatus(`Evidence source “${source.document}” is not available in this conversation.`, 'error');
   });
   document.addEventListener('v2conversationchange', () => {
     previewSequence += 1;
-    previewCard.hidden = true;
-    preview.hidden = true;
     if (active) { active = null; sequence += 1; }
+    clearView('Choose a file to add context to this conversation.');
     if (dialog.open) refresh();
   });
   clearView();

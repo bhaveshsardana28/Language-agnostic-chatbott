@@ -31,7 +31,7 @@ SSE frames (`data: {json}`):
 - `meta`: `conversation_id`, `language_meta {language, language_name, script, confidence}`, `route` (general/campus_kb/translate/document/web), `response_lang`, `reason`
 - `delta` ×N: `text` (+ `intent`/`confidence` on campus route)
 - `error` (optional): localized safe message, never a stack trace
-- `done`: `latency_ms`, `model`, `sources[]` (document: name+chunk+optional page+score; web: title+url)
+- `done`: `latency_ms`, `model`, `sources[]` (document: name+document_id+chunk+optional page+score+retrieved excerpt; web: title+url)
 
 The upload response includes `document_id`, `status`, `page_count`,
 `detected_language`, `extraction_method`, per-page warning/quality summaries,

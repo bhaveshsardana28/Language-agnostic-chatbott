@@ -89,7 +89,7 @@
 .shell-starters { grid-column: 1 / -1; padding-block-start: var(--space-1); }
 .shell-starters > .field-note { color: var(--color-muted); }
 .shell-starters .prompt-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); margin-block: var(--space-3) 0; }
-.shell-starters .prompt-button { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-block-size: 72px; padding: var(--space-3) var(--space-4); border: var(--stroke) solid var(--color-border); border-radius: var(--radius-medium); color: var(--color-ink); background: color-mix(in srgb, var(--color-raised) 76%, transparent); text-align: start; transition: transform var(--motion-fast) var(--ease-enter), border-color var(--motion-fast) var(--ease-enter), background var(--motion-fast) var(--ease-enter); }
+.shell-starters .prompt-button { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-block-size: 72px; padding: var(--space-3) var(--space-4); border: var(--stroke) solid var(--color-border); border-radius: var(--radius-medium); color: var(--color-ink); background: var(--color-raised); text-align: start; transition: transform var(--motion-fast) var(--ease-enter), border-color var(--motion-fast) var(--ease-enter), background var(--motion-fast) var(--ease-enter); }
 .shell-starters .prompt-button:hover { border-color: var(--color-accent); background: var(--color-chip); transform: translateY(-1px); }
 .shell-starters .prompt-button span { display: grid; gap: var(--space-1); min-inline-size: 0; }
 .shell-starters .prompt-button small { color: var(--color-ink); font-size: var(--text-sm); font-weight: var(--weight-medium); }

@@ -125,11 +125,11 @@
          <h2 id="documents-title">Document library</h2>
          <p>Upload, review, and manage the files used in this conversation.</p>
       </div>
-      <div class="document-head-mark" aria-hidden="true"><svg class="icon"><use href="#i-file"/></svg><span>LOCAL<br>OCR</span></div>
+       <div class="document-head-mark" aria-hidden="true"><svg class="icon"><use href="#i-file"/></svg><span>LOCAL<br>FILES</span></div>
       <button class="icon-button icon-button--quiet" data-close aria-label="Close documents"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
     </header>
     <div class="dialog-body document-panel">
-      <section class="document-upload-surface" id="document-dropzone" role="button" tabindex="0" aria-describedby="document-drop-note">
+       <section class="document-upload-surface" id="document-dropzone" aria-describedby="document-drop-note">
         <div class="document-upload-mark" aria-hidden="true"><svg class="icon"><use href="#i-plus"/></svg></div>
         <div class="document-upload-copy">
            <p class="document-eyebrow">Add source</p>
@@ -171,11 +171,6 @@
   <dialog class="dialog" id="delete-dialog" aria-labelledby="delete-title">
     <header class="dialog-head"><h2 id="delete-title">Delete this conversation?</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close delete conversation"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
     <form class="dialog-body" id="delete-form"><p id="delete-copy">This removes the saved conversation from this browser.</p><footer class="dialog-foot"><button class="button" type="button" data-close>Keep conversation</button><button class="button button--danger" type="submit">Delete conversation</button></footer></form>
-  </dialog>
-  <dialog class="dialog" id="voice-info-dialog" aria-labelledby="voice-info-title">
-    <header class="dialog-head"><h2 id="voice-info-title">Your words, your pace.</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close voice information"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
-     <div class="dialog-body"><p>Voice input uses your browser's speech recognition and places an editable transcript in your draft. It does not record or store raw audio.</p><p class="field-note">Use Settings to choose Auto or a specific speech language. Real-device microphone behavior still depends on browser and OS support.</p><a class="button" href="./components.html">Explore the component studies <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
-    <footer class="dialog-foot"><button class="button button--primary" data-close>Back to my draft</button></footer>
   </dialog>
 </body>
 </html>

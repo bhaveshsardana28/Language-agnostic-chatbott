@@ -94,7 +94,7 @@ def run_checks(browser, origin, capture):
         body = '\n\n'.join([
             'data: {"type":"meta","conversation_id":"document-server-id","language_meta":{"language":"en","language_name":"English","script":"Latin","confidence":0.99,"secondary_languages":[],"code_switched":false,"mixed_script":false,"scripts":{"Latin":1},"detection_reason":"fixture"},"route":"document","reason":"fixture","response_lang":"en"}',
             'data: {"type":"delta","text":"The policy allows refunds within 30 days."}',
-             'data: {"type":"done","latency_ms":12,"model":"fixture","sources":[{"document":"policy.txt","chunk":0,"page":2,"score":0.81},{"title":"Example source","url":"https://example.com/reference"},{"title":"Unsafe source","url":"javascript:alert(1)"},{"note":"embeddings unavailable; keyword retrieval used"}]}',
+             'data: {"type":"done","latency_ms":12,"model":"fixture","sources":[{"document":"policy.txt","document_id":1,"chunk":0,"page":2,"score":0.81,"excerpt":"Our refund policy allows refunds within 30 days."},{"title":"Example source","url":"https://example.com/reference"},{"title":"Unsafe source","url":"javascript:alert(1)"},{"note":"embeddings unavailable; keyword retrieval used"}]}',
             ''
         ])
         route.fulfill(status=200, content_type='text/event-stream', body=body)
@@ -143,7 +143,7 @@ def run_checks(browser, origin, capture):
     page.locator('.chat-source-link').click()
     expect(page.locator('#documents-dialog')).to_be_visible()
     expect(page.locator('#document-preview')).to_contain_text('refund policy allows refunds within 30 days')
-    expect(page.locator('#document-preview-meta')).to_contain_text('Page 2')
+    expect(page.locator('#document-preview-meta')).to_contain_text('page 2')
     passed('evidence: a document citation opens the actual extracted page text in the document workspace')
 
     page.reload()

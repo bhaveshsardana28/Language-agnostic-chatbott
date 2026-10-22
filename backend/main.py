@@ -348,8 +348,12 @@ def _format_sources(hits: list[dict], max_chars: int = DOCUMENT_CONTEXT_MAX_CHAR
         ctx_lines.append(f"{prefix}{text}")
         used += len(prefix) + len(text)
         source = {"document": h["document"], "chunk": h["chunk"]}
+        if h.get("document_id") is not None:
+            source["document_id"] = h["document_id"]
         if h.get("page") is not None: source["page"] = h["page"]
         if h.get("score") is not None: source["score"] = round(h["score"], 3)
+        if h.get("text"):
+            source["excerpt"] = h["text"][:800]
         sources.append(source)
     return "\n\n".join(ctx_lines), sources
 

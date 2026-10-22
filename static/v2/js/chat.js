@@ -141,15 +141,20 @@ export function initChat() {
   }
   function setHeaderLanguage(meta = {}) {
     const language = meta.language_meta || {};
-    const code = language.language;
-    if (!code) return resetHeaderLanguage();
-    const info = languageInfo(code, language);
+    const inputCode = language.language;
+    const responseCode = meta.response_lang || inputCode;
+    if (!responseCode) return resetHeaderLanguage();
+    const info = languageInfo(responseCode, responseCode === inputCode ? language : {});
     const label = document.getElementById('shell-language-label');
     const detail = document.getElementById('shell-language-detail');
     const shellLanguage = document.getElementById('shell-language');
-    if (label) label.textContent = languageLabel(code, language);
+    if (label) label.textContent = responseCode === inputCode
+      ? languageLabel(responseCode, language)
+      : `Reply · ${languageLabel(responseCode)}`;
     if (detail) detail.textContent = `· ${info.script}`;
-    if (shellLanguage) shellLanguage.title = `${info.english} detected for the latest message · ${info.script} script`;
+    if (shellLanguage) shellLanguage.title = responseCode === inputCode
+      ? `${info.english} detected for the latest message · ${info.script} script`
+      : `${info.english} reply language · input detected as ${languageLabel(inputCode, language)}`;
   }
   function formatHistoryDate(timestamp) {
     const date = new Date(timestamp);
@@ -422,9 +427,9 @@ export function initChat() {
         link.className = 'chat-source-link';
         link.textContent = `${source.document} · chunk ${Number.isFinite(Number(source.chunk)) ? Number(source.chunk) + 1 : '—'}${page}`;
         link.setAttribute('aria-label', `Inspect evidence from ${source.document}${page}`);
-        link.addEventListener('click', () => document.dispatchEvent(new CustomEvent('v2sourceopen', {
-          detail: { document: source.document, page: source.page, chunk: source.chunk },
-        })));
+         link.addEventListener('click', () => document.dispatchEvent(new CustomEvent('v2sourceopen', {
+           detail: { document: source.document, document_id: source.document_id, page: source.page, chunk: source.chunk, excerpt: source.excerpt },
+         })));
         item.append(link);
         if (Number.isFinite(Number(source.score))) {
           const score = document.createElement('small');
@@ -607,7 +612,8 @@ export function initChat() {
         insightsFor(message);
       }
     });
-    const latestLanguage = messages.slice().reverse().find(item => item.role === 'user' && item.meta?.language_meta);
+    const latestLanguage = messages.slice().reverse().find(item => item.role === 'assistant' && item.meta?.response_lang)
+      || messages.slice().reverse().find(item => item.role === 'user' && item.meta?.language_meta);
     if (latestLanguage) setHeaderLanguage(latestLanguage.meta);
     else resetHeaderLanguage();
     const hasMessages = messages.length > 0;
@@ -744,9 +750,11 @@ export function initChat() {
     const onFrame = frame => {
       if (!active || active.owner !== owner) return;
       if (frame.type === 'meta') { conversationId = frame.conversation_id || conversationId; setAssistantMeta(frame); }
-      if (frame.type === 'delta') {
-        sawDelta = true;
-        assistant.text += frame.text || '';
+       if (frame.type === 'delta') {
+         const text = typeof frame.text === 'string' ? frame.text : '';
+         if (!text) return;
+         sawDelta = true;
+         assistant.text += text;
         if (frame.intent !== undefined) assistant.meta = { ...assistant.meta, intent: frame.intent, confidence: frame.confidence, degraded: frame.degraded };
         updateAssistant();
       }
