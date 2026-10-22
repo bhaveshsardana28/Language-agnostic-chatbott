@@ -24,29 +24,37 @@
   <div class="app-shell">
     <div id="sidebar-dock">
          <aside id="app-sidebar" class="app-sidebar" aria-label="Workspace navigation">
-          <div class="sidebar-brand"><span class="brand" aria-label="Polyglot AI"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-polyglot"/></svg></span><span class="sidebar-label">Polyglot AI</span></span><span class="sidebar-label small muted">Language-agnostic AI workspace</span></div>
-        <nav class="sidebar-nav" aria-label="Workspace">
-          <button class="button button--primary sidebar-action" id="new-chat" data-new-chat aria-label="New chat" title="New chat"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span class="sidebar-label">New chat</span></button>
-          <button class="button button--quiet sidebar-action" data-shell-open="documents-dialog" aria-label="Documents" title="Documents"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg><span class="sidebar-label">Documents</span></button>
-        </nav>
-        <section class="sidebar-history sidebar-label" aria-labelledby="history-title" aria-live="polite">
-           <h2 id="history-title" class="eyebrow">Recent conversations</h2>
-          <label class="history-search-label" for="history-search">Search conversations</label>
-          <input class="input history-search" id="history-search" type="search" placeholder="Find a thought…" autocomplete="off">
+          <div class="sidebar-brand">
+            <div class="sidebar-brand-row"><span class="brand" aria-label="Polyglot AI"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-polyglot"/></svg></span><span class="sidebar-label">Polyglot AI</span></span><button class="icon-button icon-button--quiet sidebar-collapse-button" id="sidebar-collapse" type="button" aria-label="Collapse sidebar" aria-controls="app-sidebar" aria-expanded="true" title="Collapse sidebar"><svg class="icon" aria-hidden="true"><use href="#i-sidebar"/></svg></button></div>
+            <span class="sidebar-label small muted">Language-agnostic AI workspace</span>
+          </div>
+         <nav class="sidebar-nav" aria-label="Workspace">
+           <button class="button button--primary sidebar-action" id="new-chat" data-new-chat aria-label="New chat" title="New chat"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span class="sidebar-label">New chat</span></button>
+           <button class="button button--quiet sidebar-action sidebar-search-action" data-shell-open="search-dialog" aria-label="Search chats" aria-keyshortcuts="Meta+K Control+K" title="Search chats"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><span class="sidebar-label">Search chats</span><kbd class="sidebar-shortcut sidebar-label">⌘K</kbd></button>
+           <button class="button button--quiet sidebar-action sidebar-library-action" data-shell-open="documents-dialog" aria-label="Library" title="Library"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg><span class="sidebar-label">Library</span></button>
+         </nav>
+         <section class="sidebar-history sidebar-label" aria-labelledby="history-title" aria-live="polite">
+            <h2 id="history-title" class="eyebrow">Your chats</h2>
+            <label class="history-search-label" for="history-search">Search conversations</label>
+           <input class="input history-search" id="history-search" type="search" placeholder="Filter saved chats…" autocomplete="off">
            <div class="sidebar-empty" id="history-empty"><svg class="empty-art" aria-hidden="true"><use href="#empty-chat"/></svg><p>Your saved conversations<br>will appear here.</p><p class="field-note">Stored locally in this browser.</p></div>
           <p class="history-no-results field-note" id="history-no-results" hidden>No conversations match that search.</p>
           <div class="history-list" id="history-list" role="list" aria-label="Saved conversations"></div>
         </section>
-        <div class="sidebar-foot">
+         <div class="sidebar-foot">
+           <div class="sidebar-account" aria-label="Local workspace">
+             <span class="avatar sidebar-account-avatar" aria-hidden="true">P</span>
+             <span class="sidebar-account-copy sidebar-label"><strong>Local workspace</strong><span>Browser history only</span></span>
+           </div>
            <button class="button button--quiet sidebar-action" data-shell-open="settings-dialog" aria-label="Appearance settings" title="Workspace settings"><svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg><span class="sidebar-label">Workspace settings</span></button>
-            <p class="field-note sidebar-label workspace-note"><span class="workspace-note-dot" aria-hidden="true"></span>LOCAL WORKSPACE · NO ACCOUNT CONNECTED</p>
-        </div>
+           <p class="field-note sidebar-label workspace-note"><span class="workspace-note-dot" aria-hidden="true"></span>NO ACCOUNT CONNECTED</p>
+         </div>
       </aside>
     </div>
 
     <div class="shell-workspace">
       <header class="shell-header">
-        <button class="icon-button icon-button--quiet" id="sidebar-toggle" aria-label="Collapse sidebar" aria-controls="app-sidebar" aria-expanded="true"><svg class="icon" aria-hidden="true"><use href="#i-sidebar"/></svg></button>
+          <button class="icon-button icon-button--quiet" id="sidebar-toggle" aria-label="Open navigation" aria-controls="navigation-drawer" aria-expanded="false"><svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg></button>
          <div class="shell-heading"><strong id="conversation-heading">New conversation</strong><span class="field-note">Grounded answers, across languages.</span></div>
         <div class="shell-header-actions">
            <span class="shell-language" id="shell-language" title="Language is detected for each message"><svg class="icon" aria-hidden="true"><use href="#i-switch"/></svg><span id="shell-language-label">Auto</span><span class="shell-language-detail" id="shell-language-detail">· per message</span></span>
@@ -105,6 +113,15 @@
   <dialog class="dialog drawer navigation-drawer" id="navigation-drawer" aria-labelledby="navigation-title">
     <header class="dialog-head"><h2 id="navigation-title">Your workspace</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close navigation"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
     <div id="mobile-sidebar-slot"></div>
+  </dialog>
+  <dialog class="dialog sidebar-search-dialog" id="search-dialog" aria-labelledby="search-dialog-title">
+    <header class="dialog-head"><div><p class="eyebrow">Local workspace</p><h2 id="search-dialog-title">Search chats</h2></div><button class="icon-button icon-button--quiet" data-close aria-label="Close chat search"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+    <div class="dialog-body search-dialog-body">
+      <div class="field"><label for="search-dialog-input">Search saved conversations</label><input class="input" id="search-dialog-input" type="search" placeholder="Search titles and messages…" autocomplete="off" aria-describedby="search-dialog-note search-dialog-status"><span class="field-note" id="search-dialog-note">Searches the conversations saved in this browser. Server history is not exposed by the current backend.</span></div>
+      <p class="field-note" id="search-dialog-status" role="status" aria-live="polite"></p>
+      <div class="search-dialog-results" id="search-dialog-results" role="list" aria-label="Matching conversations"></div>
+      <p class="search-dialog-empty field-note" id="search-dialog-empty" hidden>No saved conversations match that search.</p>
+    </div>
   </dialog>
   <dialog class="dialog" id="settings-dialog" aria-labelledby="settings-title">
      <header class="dialog-head"><h2 id="settings-title">Workspace settings</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close workspace settings"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>

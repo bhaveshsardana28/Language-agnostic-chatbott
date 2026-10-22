@@ -102,7 +102,7 @@ def layout_and_interactions(browser, origin, capture):
             settled(page)
             fits(page)
             shot(page, f'{theme}-{width}-welcome', capture)
-            toggle = page.locator('#sidebar-toggle')
+            toggle = page.locator('#sidebar-toggle' if width < 1024 else '#sidebar-collapse')
             if width < 1024:
                 expect(page.locator('#app-sidebar')).to_be_hidden()
                 toggle.click()
@@ -184,7 +184,7 @@ def layout_and_interactions(browser, origin, capture):
         expect(page.locator('#new-chat')).to_be_focused()
         page.set_viewport_size({'width': 1440, 'height': 1000})
         expect(page.locator('#navigation-drawer')).to_be_hidden()
-        expect(page.locator('#sidebar-toggle')).to_be_focused()
+        expect(page.locator('#sidebar-collapse')).to_be_focused()
         expect(page.locator('#sidebar-dock #app-sidebar')).to_have_count(1)
         page.locator('#new-chat').focus()
         page.set_viewport_size({'width': 360, 'height': 800})
@@ -194,7 +194,7 @@ def layout_and_interactions(browser, origin, capture):
         fits(page)
         # Shared theme changes must retain the separately persisted sidebar choice.
         page.set_viewport_size({'width': 1440, 'height': 1000})
-        page.locator('#sidebar-toggle').click()
+        page.locator('#sidebar-collapse').click()
         page.locator('#theme-toggle').click()
         other = 'dark' if theme == 'light' else 'light'
         page.reload()
@@ -341,7 +341,7 @@ def storage_recovery(browser, origin):
         page.goto(origin + '/v2/index.html')
         expect(page.locator('html')).to_have_attribute('data-sidebar', 'expanded')
         expect(page.locator('html')).to_have_attribute('data-theme', 'dark')
-        page.locator('#sidebar-toggle').click()
+        page.locator('#sidebar-collapse').click()
         expect(page.locator('html')).to_have_attribute('data-sidebar', 'collapsed')
         if mode == 'blocked':
             expect(page.locator('#toast-region')).to_contain_text('Browser storage is unavailable')

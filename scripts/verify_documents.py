@@ -109,7 +109,7 @@ def run_checks(browser, origin, capture):
             if message.type == 'error' and 'status of 422' not in message.text else None)
     page.goto(origin + '/v2/index.html')
 
-    page.get_by_role('button', name='Documents', exact=True).click()
+    page.get_by_role('button', name='Library', exact=True).click()
     expect(page.locator('#documents-dialog')).to_be_visible()
     expect(page.locator('#document-empty')).to_be_visible()
     assert not state['list_calls']
@@ -148,7 +148,7 @@ def run_checks(browser, origin, capture):
 
     page.reload()
     expect(page.locator('.chat-message--assistant')).to_contain_text('policy.txt · chunk 1')
-    page.get_by_role('button', name='Documents', exact=True).click()
+    page.get_by_role('button', name='Library', exact=True).click()
     expect(page.locator('.document-row')).to_contain_text('policy.txt')
     assert state['list_calls']
     passed('restore: local history restores source cards and the active document list reloads by server ID')
@@ -177,7 +177,7 @@ def narrow_layout(browser, origin):
     page = context.new_page()
     page.goto(origin + '/v2/index.html?mock=1')
     page.locator('#sidebar-toggle').click()
-    page.get_by_role('button', name='Documents', exact=True).click()
+    page.get_by_role('button', name='Library', exact=True).click()
     expect(page.locator('#documents-dialog')).to_be_visible()
     layout = page.locator('.document-toolbar').evaluate("node => getComputedStyle(node).flexDirection")
     assert layout == 'column'

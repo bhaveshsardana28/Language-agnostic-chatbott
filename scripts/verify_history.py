@@ -64,6 +64,10 @@ def wait_for_reply(page, count=1):
     expect(page.locator('.chat-message--assistant[aria-busy="false"]')).to_have_count(count, timeout=10000)
 
 
+def open_history_menu(page, record_id):
+    page.locator(f'[data-history-menu="{record_id}"]').click()
+
+
 def history_flow(browser, origin, capture):
     context = browser.new_context(viewport={'width': 1440, 'height': 1000}, reduced_motion='reduce')
     seed_context(context)
@@ -115,7 +119,22 @@ def history_flow(browser, origin, capture):
     page.locator('#history-search').fill('')
     passed('search: title/message filtering, content snippet and explicit no-results state')
 
+    page.keyboard.press('Control+K')
+    expect(page.locator('#search-dialog')).to_be_visible()
+    page.keyboard.press('Escape')
+    expect(page.locator('#search-dialog')).to_be_hidden()
+    page.get_by_role('button', name='Search chats', exact=True).click()
+    expect(page.locator('#search-dialog')).to_be_visible()
+    expect(page.locator('#search-dialog-input')).to_be_focused()
+    page.locator('#search-dialog-input').fill('small idea')
+    expect(page.locator('[data-search-history-id]')).to_have_count(1)
+    page.locator('[data-search-history-id]').click()
+    expect(page.locator('#search-dialog')).to_be_hidden()
+    expect(page.locator('#conversation-heading')).to_contain_text('Explain a small idea')
+    passed('search dialog: local title/message search focuses on open, returns a result and restores its conversation')
+
     current_id = page.locator('[data-history-id][aria-current="true"]').get_attribute('data-history-id')
+    open_history_menu(page, current_id)
     page.locator(f'[data-record-id="{current_id}"][data-history-action="rename"]').click()
     expect(page.locator('#rename-dialog')).to_be_visible()
     page.locator('#rename-input').fill('   ')
@@ -128,6 +147,7 @@ def history_flow(browser, origin, capture):
     passed('rename: accessible dialog validates, trims and synchronizes sidebar/header/storage')
 
     current_id = page.locator('[data-history-id][aria-current="true"]').get_attribute('data-history-id')
+    open_history_menu(page, current_id)
     with page.expect_download() as download_info:
         page.locator(f'[data-record-id="{current_id}"][data-history-action="export"]').click()
     download = download_info.value
@@ -136,10 +156,12 @@ def history_flow(browser, origin, capture):
     assert '# A renamed thought' in export_text and '## You ·' in export_text and '_Language: en_' in export_text
     passed('export: selected conversation downloads a sanitized Markdown transcript with roles and language')
 
+    open_history_menu(page, current_id)
     page.locator(f'[data-record-id="{current_id}"][data-history-action="delete"]').click()
     expect(page.locator('#delete-dialog')).to_be_visible()
     page.get_by_role('button', name='Keep conversation', exact=True).click()
     expect(page.locator('[data-history-id]')).to_have_count(2)
+    open_history_menu(page, current_id)
     page.locator(f'[data-record-id="{current_id}"][data-history-action="delete"]').click()
     page.locator('#delete-form button[type="submit"]').click()
     expect(page.locator('[data-history-id]')).to_have_count(1)
@@ -183,6 +205,7 @@ def mobile_drawer_history_flow(browser, origin):
     passed('mobile row selection: drawer closes and navigation toggle regains focus')
 
     toggle.click()
+    open_history_menu(page, 'mobile-saved')
     page.locator('[data-record-id="mobile-saved"][data-history-action="rename"]').click()
     expect(drawer).to_be_hidden()
     expect(page.locator('#rename-dialog')).to_be_visible()
@@ -192,6 +215,7 @@ def mobile_drawer_history_flow(browser, origin):
     passed('mobile rename: dialog opens after closing drawer and Escape restores toggle focus')
 
     toggle.click()
+    open_history_menu(page, 'mobile-saved')
     with page.expect_download() as download_info:
         page.locator('[data-record-id="mobile-saved"][data-history-action="export"]').click()
     download = download_info.value
@@ -200,6 +224,7 @@ def mobile_drawer_history_flow(browser, origin):
     passed('mobile export: transcript downloads after closing drawer')
 
     toggle.click()
+    open_history_menu(page, 'mobile-saved')
     page.locator('[data-record-id="mobile-saved"][data-history-action="delete"]').click()
     expect(drawer).to_be_hidden()
     expect(page.locator('#delete-dialog')).to_be_visible()
@@ -245,6 +270,7 @@ def server_delete(browser, origin):
     page.goto(origin + '/v2/index.html')
     page.get_by_role('button', name='Open navigation').click()
     expect(page.locator('[data-history-id]')).to_have_count(1)
+    open_history_menu(page, 'local-history-id')
     page.locator(f'[data-record-id="local-history-id"][data-history-action="delete"]').click()
     page.locator('#delete-form button[type="submit"]').click()
     expect(page.locator('#welcome')).to_be_visible()

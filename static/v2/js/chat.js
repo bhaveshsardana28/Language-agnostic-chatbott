@@ -99,6 +99,11 @@ export function initChat() {
   const deleteDialog = document.getElementById('delete-dialog');
   const deleteForm = document.getElementById('delete-form');
   const deleteCopy = document.getElementById('delete-copy');
+  const searchDialog = document.getElementById('search-dialog');
+  const searchDialogInput = document.getElementById('search-dialog-input');
+  const searchDialogResults = document.getElementById('search-dialog-results');
+  const searchDialogEmpty = document.getElementById('search-dialog-empty');
+  const searchDialogStatus = document.getElementById('search-dialog-status');
   const navigationDrawer = document.getElementById('navigation-drawer');
   const sidebarToggle = document.getElementById('sidebar-toggle');
   const desktop = matchMedia('(min-width: 64rem)');
@@ -112,6 +117,7 @@ export function initChat() {
   let storageWarningShown = false;
   let pendingRecord = null;
   let documentProcessing = false;
+  let historyMenuSequence = 0;
   const messages = [];
 
   function persistHistory() {
@@ -204,9 +210,44 @@ export function initChat() {
     if (days <= 7) return 'Previous 7 days';
     return 'Older';
   }
+  function sortedHistory(query = '') {
+    return historyState.conversations.slice().sort((a, b) => b.updatedAt - a.updatedAt)
+      .filter(record => historyMatches(record, query));
+  }
+  function closeHistoryMenus() {
+    document.querySelectorAll('.history-menu[open], .history-menu:not([hidden])').forEach(menu => {
+      menu.hidden = true;
+      menu.closest('.history-menu-anchor')?.querySelector('[data-history-menu]')?.setAttribute('aria-expanded', 'false');
+    });
+  }
+  function renderSearchResults() {
+    if (!searchDialogResults) return;
+    const query = searchDialogInput?.value.trim() || '';
+    const matches = sortedHistory(query);
+    searchDialogResults.replaceChildren();
+    searchDialogEmpty.hidden = matches.length > 0;
+    searchDialogEmpty.textContent = query ? 'No saved conversations match that search.' : 'No saved conversations yet.';
+    searchDialogStatus.textContent = query
+      ? `${matches.length} ${matches.length === 1 ? 'conversation' : 'conversations'} found`
+      : `${matches.length} saved ${matches.length === 1 ? 'conversation' : 'conversations'} in this browser`;
+    matches.forEach(record => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'search-dialog-result';
+      button.dataset.searchHistoryId = record.id;
+      const title = document.createElement('strong');
+      appendHighlighted(title, record.title, query);
+      const detail = document.createElement('span');
+      const snippet = matchingSnippet(record, query);
+      if (snippet) appendHighlighted(detail, snippet, query);
+      else detail.textContent = `${record.messages.length} ${record.messages.length === 1 ? 'message' : 'messages'} · ${formatHistoryDate(record.updatedAt)}`;
+      button.append(title, detail);
+      searchDialogResults.append(button);
+    });
+  }
   function renderHistory() {
     const query = historySearch.value.trim();
-    const allConversations = historyState.conversations.slice().sort((a, b) => b.updatedAt - a.updatedAt);
+    const allConversations = sortedHistory();
     const conversations = allConversations.filter(record => historyMatches(record, query));
     historyEmpty.hidden = allConversations.length > 0;
     historyNoResults.hidden = !query || conversations.length > 0;
@@ -231,9 +272,10 @@ export function initChat() {
       item.setAttribute('role', 'listitem');
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = 'history-row sidebar-action';
-      button.dataset.historyId = record.id;
-      button.setAttribute('aria-current', String(record.id === historyState.currentId));
+       button.className = 'history-row sidebar-action';
+       button.dataset.historyId = record.id;
+       button.setAttribute('aria-current', String(record.id === historyState.currentId));
+       button.title = record.title;
       const title = document.createElement('strong');
       appendHighlighted(title, record.title, query);
       const detail = document.createElement('span');
@@ -242,30 +284,53 @@ export function initChat() {
       if (snippet) appendHighlighted(detail, snippet, query);
       else detail.textContent = `${record.messages.length} ${record.messages.length === 1 ? 'message' : 'messages'} · ${formatHistoryDate(record.updatedAt)}`;
       button.append(title, detail);
-      const actions = document.createElement('div');
-      actions.className = 'history-actions';
-       [['rename', 'Rename conversation', 'i-edit'], ['export', 'Export conversation', 'i-download'], ['delete', 'Delete conversation', 'i-trash']].forEach(([action, label, iconName]) => {
+       const actions = document.createElement('div');
+       actions.className = 'history-actions history-menu-anchor';
+       const menuId = `history-menu-${historyMenuSequence += 1}`;
+       const menuButton = document.createElement('button');
+       menuButton.type = 'button';
+       menuButton.className = 'icon-button icon-button--quiet history-menu-button';
+       menuButton.dataset.historyMenu = record.id;
+       menuButton.setAttribute('aria-haspopup', 'menu');
+       menuButton.setAttribute('aria-controls', menuId);
+       menuButton.setAttribute('aria-expanded', 'false');
+       menuButton.setAttribute('aria-label', `Actions for ${record.title}`);
+       menuButton.title = 'Conversation actions';
+       const menuIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+       menuIcon.classList.add('icon');
+       menuIcon.setAttribute('aria-hidden', 'true');
+       const menuUse = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+       menuUse.setAttribute('href', '#i-more');
+       menuIcon.append(menuUse);
+       menuButton.append(menuIcon);
+       const menu = document.createElement('div');
+       menu.id = menuId;
+       menu.className = 'menu history-menu';
+       menu.hidden = true;
+       menu.setAttribute('role', 'menu');
+       [['rename', 'Rename', 'i-edit'], ['export', 'Export Markdown', 'i-download'], ['delete', 'Delete', 'i-trash']].forEach(([action, label, iconName]) => {
          const control = document.createElement('button');
-        control.type = 'button';
-        control.className = 'icon-button icon-button--quiet';
-        control.dataset.historyAction = action;
-        control.dataset.recordId = record.id;
-         control.setAttribute('aria-label', label);
-         control.title = label;
+         control.type = 'button';
+         control.className = 'history-menu-item';
+         control.dataset.historyAction = action;
+         control.dataset.recordId = record.id;
+         control.setAttribute('role', 'menuitem');
          const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
          icon.classList.add('icon');
          icon.setAttribute('aria-hidden', 'true');
          const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
          use.setAttribute('href', `#${iconName}`);
          icon.append(use);
-         control.append(icon);
-         actions.append(control);
+         control.append(icon, document.createTextNode(label));
+         menu.append(control);
+       });
+       actions.append(menuButton, menu);
+       item.append(button, actions);
+       group.append(item);
       });
-      item.append(button, actions);
-      group.append(item);
-      });
-      historyList.append(group);
-    });
+       historyList.append(group);
+     });
+    renderSearchResults();
   }
   function ensureConversation() {
     if (currentConversation()) return currentConversation();
@@ -787,7 +852,14 @@ export function initChat() {
     }
   }
   input.addEventListener('input', updateInput);
-  historySearch.addEventListener('input', renderHistory);
+  historySearch.addEventListener('input', () => {
+    if (searchDialogInput) searchDialogInput.value = historySearch.value;
+    renderHistory();
+  });
+  searchDialogInput?.addEventListener('input', () => {
+    historySearch.value = searchDialogInput.value;
+    renderHistory();
+  });
   input.addEventListener('keydown', event => { if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) { event.preventDefault(); form.requestSubmit(); } });
   form.addEventListener('submit', event => { event.preventDefault(); sendMessage(); });
   document.addEventListener('v2documentstate', event => {
@@ -805,8 +877,22 @@ export function initChat() {
   send.addEventListener('click', () => { if (active) active.controller.abort(); else sendMessage(); });
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && active) { event.preventDefault(); active.controller.abort(); } });
   document.addEventListener('click', async event => {
+    const menuButton = event.target.closest('[data-history-menu]');
+    if (menuButton) {
+      event.stopPropagation();
+      const menu = document.getElementById(menuButton.getAttribute('aria-controls'));
+      const shouldOpen = menu?.hidden !== false;
+      closeHistoryMenus();
+      if (menu && shouldOpen) {
+        menu.hidden = false;
+        menuButton.setAttribute('aria-expanded', 'true');
+        menu.querySelector('[role="menuitem"]')?.focus();
+      }
+      return;
+    }
     const action = event.target.closest('[data-history-action]');
     if (action) {
+      closeHistoryMenus();
       const record = recordFor(action.dataset.recordId);
       if (!record) return;
       const fromMobileNavigation = !desktop.matches && navigationDrawer.contains(action);
@@ -817,15 +903,52 @@ export function initChat() {
       if (action.dataset.historyAction === 'delete') confirmDelete(record, opener);
       return;
     }
-    const saved = event.target.closest('[data-history-id]');
+    const saved = event.target.closest('[data-history-id], [data-search-history-id]');
     if (saved) {
+      closeHistoryMenus();
+      if (searchDialog?.open && searchDialog.contains(saved)) {
+        await closeOverlay(searchDialog);
+        historySearch.value = '';
+        if (searchDialogInput) searchDialogInput.value = '';
+      }
       if (!desktop.matches && navigationDrawer.contains(saved)) await closeNavigation();
-      restoreConversation(saved.dataset.historyId);
+      restoreConversation(saved.dataset.historyId || saved.dataset.searchHistoryId);
       return;
     }
     const fresh = event.target.closest('[data-new-chat]');
     if (fresh) {
       clearActiveView();
+    }
+  });
+  document.addEventListener('keydown', event => {
+    const menuButton = document.activeElement?.closest?.('[data-history-menu]');
+    if (menuButton && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      menuButton.click();
+    } else if (event.key === 'Escape') {
+      const openMenu = document.querySelector('.history-menu:not([hidden])');
+      if (openMenu) {
+        event.preventDefault();
+        closeHistoryMenus();
+        openMenu.closest('.history-menu-anchor')?.querySelector('[data-history-menu]')?.focus();
+      }
+    }
+  });
+  document.addEventListener('keydown', event => {
+    if (event.defaultPrevented || (!event.metaKey && !event.ctrlKey) || event.key.toLowerCase() !== 'k') return;
+    event.preventDefault();
+    const opener = document.querySelector('[data-shell-open="search-dialog"]');
+    if (opener && !searchDialog?.open) openOverlay('search-dialog', opener);
+    if (searchDialogInput) {
+      searchDialogInput.value = historySearch.value;
+      renderSearchResults();
+      requestAnimationFrame(() => searchDialogInput.focus());
+    }
+  });
+  document.addEventListener('click', event => {
+    if (event.target.closest('[data-shell-open="search-dialog"]')) {
+      if (searchDialogInput) searchDialogInput.value = historySearch.value;
+      renderSearchResults();
     }
   });
   composerNote.textContent = mock

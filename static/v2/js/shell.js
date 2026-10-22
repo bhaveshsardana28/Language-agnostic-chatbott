@@ -9,6 +9,7 @@ export async function closeNavigation() {
 export function initShell() {
   const desktop = matchMedia('(min-width: 64rem)');
   const toggle = document.getElementById('sidebar-toggle');
+  const collapse = document.getElementById('sidebar-collapse');
   const sidebar = document.getElementById('app-sidebar');
   const drawer = document.getElementById('navigation-drawer');
   const draft = document.getElementById('message-input');
@@ -21,6 +22,12 @@ export function initShell() {
     toggle.setAttribute('aria-label', desktop.matches ? `${expanded ? 'Collapse' : 'Expand'} sidebar` : 'Open navigation');
     toggle.setAttribute('aria-controls', desktop.matches ? 'app-sidebar' : 'navigation-drawer');
     toggle.querySelector('use').setAttribute('href', desktop.matches ? '#i-sidebar' : '#i-menu');
+    if (collapse) {
+      collapse.setAttribute('aria-expanded', String(expanded));
+      collapse.setAttribute('aria-label', `${expanded ? 'Collapse' : 'Expand'} sidebar`);
+      collapse.title = `${expanded ? 'Collapse' : 'Expand'} sidebar`;
+      collapse.querySelector('use').setAttribute('href', '#i-sidebar');
+    }
   }
   function placeSidebar() {
     // CSS can hide the desktop sidebar before matchMedia's event, moving focus to body.
@@ -32,7 +39,7 @@ export function initShell() {
     }
     document.getElementById(desktop.matches ? 'sidebar-dock' : 'mobile-sidebar-slot').append(sidebar);
     syncToggle();
-    if (hadFocus) toggle.focus({ preventScroll: true });
+    if (hadFocus) (desktop.matches ? collapse : toggle).focus({ preventScroll: true });
   }
   placeSidebar();
   desktop.addEventListener('change', placeSidebar);
@@ -49,12 +56,21 @@ export function initShell() {
       syncToggle();
     }
   });
+  collapse?.addEventListener('click', () => {
+    if (!desktop.matches) return;
+    if (!setPreferences({ sideCollapsed: !getPreferences().sideCollapsed })) {
+      toast('Sidebar changed for this visit. Browser storage is unavailable.');
+    }
+  });
 
   document.querySelectorAll('[data-shell-open]').forEach(button => {
     button.addEventListener('click', async () => {
       const wasMobileNav = drawer.contains(button);
-      await closeNavigation();
-      openOverlay(button.dataset.shellOpen, wasMobileNav && !desktop.matches ? toggle : button);
+       await closeNavigation();
+       openOverlay(button.dataset.shellOpen, wasMobileNav && !desktop.matches ? toggle : button);
+       if (button.dataset.shellOpen === 'search-dialog') {
+         requestAnimationFrame(() => document.getElementById('search-dialog-input')?.focus());
+       }
     });
   });
   document.querySelectorAll('[data-new-chat]').forEach(button => {
