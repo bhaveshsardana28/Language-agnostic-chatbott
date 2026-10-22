@@ -137,11 +137,12 @@ def layout_and_interactions(browser, origin, capture):
                 prompt.click()
                 expect(page.locator('#message-input')).to_have_value(text)
                 expect(page.locator('#message-input')).to_be_focused()
+                expect(page.get_by_role('button', name='Send', exact=True)).to_be_enabled()
                 fits(page)
             assert page.evaluate('window.scrollY') == 0
             draft = page.locator('#message-input')
             draft.fill('Draft kept while I move around.')
-            draft.press('Enter')
+            draft.press('Shift+Enter')
             assert draft.input_value().endswith('\n')
             draft.fill('line\n' * 30)
             assert draft.bounding_box()['height'] <= 200
@@ -172,12 +173,10 @@ def layout_and_interactions(browser, origin, capture):
                 shot(page, f'{theme}-{width}-documents', capture)
             page.keyboard.press('Escape')
             expect(page.get_by_role('button', name='Attach a document', exact=True)).to_be_focused()
-            page.get_by_role('button', name='Voice input availability', exact=True).click()
-            expect(page.locator('#voice-info-dialog')).to_contain_text('Your microphone is off')
-            page.keyboard.press('Escape')
-            expect(page.locator('#voice-info-dialog')).to_be_hidden()
+            expect(page.locator('#voice-input-button')).to_be_visible()
+            expect(page.locator('#voice-input-status')).to_contain_text('Voice input')
             assert page.evaluate('window.mediaCalls') == 0
-            passed(f'{theme}/{width}: prompts edit only, long draft fits, modal focus, New chat and future-feature entry points')
+            passed(f'{theme}/{width}: prompts/Shift+Enter edit, long draft fits, modal focus, New chat and future-feature entry points')
 
         # Resize with focus inside open navigation must clear top-layer/inert state.
         page.set_viewport_size({'width': 360, 'height': 800})

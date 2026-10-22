@@ -76,12 +76,11 @@ export function initShell() {
   draft.addEventListener('input', resizeDraft);
   window.addEventListener('resize', resizeDraft);
   document.querySelectorAll('[data-prompt]').forEach(button => button.addEventListener('click', () => {
-    draft.value = button.dataset.prompt;
-    resizeDraft();
+   draft.value = button.dataset.prompt;
+    draft.dispatchEvent(new Event('input', { bubbles: true }));
+   resizeDraft();
     draft.focus({ preventScroll: true });
     draft.setSelectionRange(draft.value.length, draft.value.length);
   }));
-  // Shell-only boundary: Enter edits the draft; no generated message or server ID.
-  document.getElementById('composer-form').addEventListener('submit', event => event.preventDefault());
   document.fonts.ready.then(resizeDraft);
 }
