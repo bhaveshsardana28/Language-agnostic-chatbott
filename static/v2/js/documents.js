@@ -1,5 +1,5 @@
 import { clearDocuments, getDocumentReport, listDocuments, uploadDocument } from './api.js';
-import { toast } from './ui.js';
+import { openOverlay, toast } from './ui.js';
 
 const DEFAULT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const ALLOWED_EXTENSIONS = new Set(['.pdf', '.docx', '.txt', '.md', '.csv', '.json', '.py', '.js', '.png', '.jpg', '.jpeg', '.tif', '.tiff', '.bmp', '.webp', '.heic', '.heif']);
@@ -32,6 +32,10 @@ export function initDocuments(chat) {
   const count = document.getElementById('document-count');
   const preview = document.getElementById('document-preview');
   const previewCard = document.getElementById('document-preview-card');
+  const previewTitle = document.getElementById('document-preview-title');
+  const previewMeta = document.getElementById('document-preview-meta');
+  const composerContext = document.getElementById('composer-context');
+  const composerContextText = document.getElementById('composer-context-text');
   const dropzone = document.getElementById('document-dropzone');
   let records = [];
   let active = null;
@@ -42,12 +46,30 @@ export function initDocuments(chat) {
     status.textContent = text;
     status.dataset.state = state;
   }
+  function renderComposerContext() {
+    const ready = records.filter(item => item.status === 'ready');
+    const processing = records.filter(item => item.status === 'processing');
+    if (!ready.length && !processing.length) {
+      composerContext.hidden = true;
+      composerContextText.textContent = '';
+      return;
+    }
+    composerContext.hidden = false;
+    if (processing.length) {
+      composerContextText.textContent = `${processing.length} source${processing.length === 1 ? '' : 's'} preparing · wait until Ready before asking about them`;
+    } else {
+      const names = ready.slice(0, 2).map(item => item.document).join(', ');
+      const suffix = ready.length > 2 ? ` + ${ready.length - 2} more` : '';
+      composerContextText.textContent = `${ready.length} source${ready.length === 1 ? '' : 's'} ready · ${names}${suffix}`;
+    }
+  }
   function render() {
     list.replaceChildren();
     empty.hidden = records.length > 0;
     const ready = records.filter(item => item.status === 'ready').length;
     count.textContent = `${ready} ready · ${records.length} ${records.length === 1 ? 'document' : 'documents'}`;
     clear.disabled = !records.length || Boolean(active);
+    renderComposerContext();
     records.forEach(record => {
       const row = document.createElement('li');
       row.className = 'document-row';
@@ -85,17 +107,22 @@ export function initDocuments(chat) {
       list.append(row);
     });
   }
-  async function showPreview(record) {
+  async function showPreview(record, source = null) {
     if (!record.document_id) return;
     const previewOwner = ++previewSequence;
     const serverId = chat.getServerConversationId();
     previewCard.hidden = false;
     preview.hidden = false;
+    previewTitle.textContent = source ? `Evidence from ${record.document}` : 'Extracted text';
+    const chunkLabel = Number.isFinite(Number(source?.chunk)) ? ` · retrieved chunk ${Number(source.chunk) + 1}` : '';
+    previewMeta.textContent = source?.page ? `Page ${source.page}${chunkLabel}` : 'The readable text returned by the document service.';
     preview.textContent = 'Loading extracted text…';
     try {
       const report = await getDocumentReport(serverId, record.document_id);
       if (previewOwner !== previewSequence || serverId !== chat.getServerConversationId()) return;
-      preview.textContent = report.full_text || 'No readable text was extracted.';
+       const page = source?.page && Array.isArray(report.pages)
+         ? report.pages.find(item => Number(item.page_number) === Number(source.page)) : null;
+       preview.textContent = page?.text || report.full_text || 'No readable text was extracted.';
     } catch (error) {
       if (previewOwner !== previewSequence || serverId !== chat.getServerConversationId()) return;
       preview.textContent = error.message || 'Could not load the extracted text.';
@@ -108,6 +135,8 @@ export function initDocuments(chat) {
     previewCard.hidden = true;
     preview.hidden = true;
     preview.textContent = '';
+    previewTitle.textContent = 'Extracted text';
+    previewMeta.textContent = '';
     render();
   }
   async function refresh() {
@@ -245,6 +274,16 @@ export function initDocuments(chat) {
   });
   document.addEventListener('click', event => {
     if (event.target.closest('[data-shell-open="documents-dialog"]')) setTimeout(refresh, 0);
+  });
+  document.addEventListener('v2sourceopen', async event => {
+    const source = event.detail || {};
+    const serverId = chat.getServerConversationId();
+    if (!serverId || !source.document) return;
+    openOverlay('documents-dialog', event.target instanceof Element ? event.target : document.activeElement);
+    if (!records.length) await refresh();
+    const record = records.find(item => item.document === source.document);
+    if (record) showPreview(record, source);
+    else setStatus(`Evidence source “${source.document}” is not available in this conversation.`, 'error');
   });
   document.addEventListener('v2conversationchange', () => {
     previewSequence += 1;

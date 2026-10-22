@@ -4,18 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="GAIA is a private multilingual intelligence workspace for conversation, documents, and source-aware answers.">
-  <meta name="theme-color" content="#f3f5f7">
-  <title>GAIA — Multilingual intelligence workspace</title>
+  <meta name="description" content="Polyglot AI is a language-agnostic workspace for grounded answers across conversations and documents.">
+  <meta name="theme-color" content="#f5f4f0">
+  <title>Polyglot AI — Language-agnostic AI workspace</title>
   <link rel="icon" href="./assets/brand/favicon.svg" type="image/svg+xml">
   <script src="./js/theme-init.js"></script>
-  <link rel="stylesheet" href="./css/tokens.css?v=gaia-premium-20261020">
-  <link rel="stylesheet" href="./css/base.css?v=gaia-premium-20261020">
-  <link rel="stylesheet" href="./css/components.css?v=gaia-premium-20261020">
-  <link rel="stylesheet" href="./css/layout.css?v=gaia-premium-20261020">
-  <link rel="stylesheet" href="./css/shell.css?v=gaia-premium-20261020">
-  <link rel="stylesheet" href="./css/chat.css?v=gaia-premium-20261020">
-  <link rel="stylesheet" href="./css/motion.css?v=gaia-premium-20261020">
+  <link rel="stylesheet" href="./css/tokens.css?v=polyglot-20261022">
+  <link rel="stylesheet" href="./css/base.css?v=polyglot-20261022">
+  <link rel="stylesheet" href="./css/components.css?v=polyglot-20261022">
+  <link rel="stylesheet" href="./css/layout.css?v=polyglot-20261022">
+  <link rel="stylesheet" href="./css/shell.css?v=polyglot-20261022">
+  <link rel="stylesheet" href="./css/chat.css?v=polyglot-20261022">
+  <link rel="stylesheet" href="./css/motion.css?v=polyglot-20261022">
   <script type="module" src="./js/main.js"></script>
 </head>
 <body>
@@ -23,8 +23,8 @@
   <noscript><p class="shell-noscript">Enable JavaScript for the interactive shell.</p></noscript>
   <div class="app-shell">
     <div id="sidebar-dock">
-      <aside id="app-sidebar" class="app-sidebar" aria-label="Workspace navigation">
-         <div class="sidebar-brand"><span class="brand" aria-label="GAIA"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-gaia"/></svg></span><span class="sidebar-label">GAIA</span></span><span class="sidebar-label small muted">Document intelligence workspace</span></div>
+         <aside id="app-sidebar" class="app-sidebar" aria-label="Workspace navigation">
+          <div class="sidebar-brand"><span class="brand" aria-label="Polyglot AI"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-polyglot"/></svg></span><span class="sidebar-label">Polyglot AI</span></span><span class="sidebar-label small muted">Language-agnostic AI workspace</span></div>
         <nav class="sidebar-nav" aria-label="Workspace">
           <button class="button button--primary sidebar-action" id="new-chat" data-new-chat aria-label="New chat" title="New chat"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span class="sidebar-label">New chat</span></button>
           <button class="button button--quiet sidebar-action" data-shell-open="documents-dialog" aria-label="Documents" title="Documents"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg><span class="sidebar-label">Documents</span></button>
@@ -40,7 +40,7 @@
         <div class="sidebar-foot">
            <button class="button button--quiet sidebar-action" data-shell-open="settings-dialog" aria-label="Appearance settings" title="Workspace settings"><svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg><span class="sidebar-label">Workspace settings</span></button>
           <a class="button button--quiet sidebar-action" href="./components.html" aria-label="Design system studies" title="Design system studies"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg><span class="sidebar-label">Design system studies</span></a>
-           <p class="field-note sidebar-label">PRIVATE WORKSPACE</p>
+            <p class="field-note sidebar-label workspace-note"><span class="workspace-note-dot" aria-hidden="true"></span>LOCAL WORKSPACE · NO ACCOUNT CONNECTED</p>
         </div>
       </aside>
     </div>
@@ -48,9 +48,9 @@
     <div class="shell-workspace">
       <header class="shell-header">
         <button class="icon-button icon-button--quiet" id="sidebar-toggle" aria-label="Collapse sidebar" aria-controls="app-sidebar" aria-expanded="true"><svg class="icon" aria-hidden="true"><use href="#i-sidebar"/></svg></button>
-         <div class="shell-heading"><strong id="conversation-heading">New conversation</strong><span class="field-note">Ask questions across your files and languages.</span></div>
+         <div class="shell-heading"><strong id="conversation-heading">New conversation</strong><span class="field-note">Grounded answers, across languages.</span></div>
         <div class="shell-header-actions">
-          <span class="shell-language" title="Language is detected per message once chat is connected"><svg class="icon" aria-hidden="true"><use href="#i-switch"/></svg><span>Auto<span class="shell-language-detail"> · per message</span></span></span>
+           <span class="shell-language" id="shell-language" title="Language is detected for each message"><svg class="icon" aria-hidden="true"><use href="#i-switch"/></svg><span id="shell-language-label">Auto</span><span class="shell-language-detail" id="shell-language-detail">· per message</span></span>
           <button class="icon-button icon-button--quiet" data-shell-open="documents-dialog" aria-label="Open documents" title="Open documents"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg></button>
           <button class="icon-button icon-button--quiet" id="theme-toggle" aria-label="Switch to dark theme" title="Change theme"><svg class="icon" aria-hidden="true"><use href="#i-theme"/></svg></button>
         </div>
@@ -68,35 +68,36 @@
         <section class="shell-welcome" id="welcome" aria-labelledby="welcome-title">
           <div class="welcome-copy">
              <div class="greeting-line"><span class="sr-only">Workspace ready. Start a conversation or add a source.</span><span id="greeting" aria-hidden="true" lang="en">Workspace ready</span><span id="greeting-script" aria-hidden="true">Auto-detect</span><button class="icon-button icon-button--quiet" id="greeting-pause" aria-label="Pause greeting rotation" aria-pressed="false" title="Pause workspace status rotation"><svg class="icon" aria-hidden="true"><use href="#i-pause"/></svg></button></div>
-             <p class="eyebrow">GAIA</p>
-             <h1 id="welcome-title">How can I help you today?</h1>
-             <p class="welcome-intro">Ask a question, upload a document, or start with one of the suggestions below.</p>
+              <p class="eyebrow">Polyglot AI · Language-agnostic AI workspace</p>
+              <h1 id="welcome-title">Understand anything.<br><em>In every language.</em></h1>
+              <p class="welcome-intro">How can I help you today? Ask naturally in your language. Polyglot AI can connect the question to your documents, keep the answer grounded, and show you the evidence it used.</p>
           </div>
            <aside class="language-notebook" aria-label="Document library overview">
-             <p class="eyebrow">Document library</p><span>Upload and inspect sources</span><span>OCR and page-aware extraction</span><span>Source-aware answers</span><button class="button" type="button" data-shell-open="documents-dialog">Open document library <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button><p class="field-note">Files stay attached to the conversation they support.</p>
+              <p class="eyebrow">One AI · every language</p><span>Ask in Hindi about an English report.</span><span>Keep the answer close to the source.</span><span>Inspect the evidence when you need it.</span><button class="button" type="button" data-shell-open="documents-dialog">Open document library <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button><p class="field-note">Files stay attached to the conversation they support.</p>
           </aside>
            <div class="shell-starters"><p class="field-note">Try one of these</p><div class="prompt-list" id="starter-prompts">
-             <button class="prompt-button" data-prompt="Summarize the key points of the document I attach."><span><small>Summarize a document</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-             <button class="prompt-button" data-prompt="Explain a complex idea in simple terms."><span><small>Explain something</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-             <button class="prompt-button" data-prompt="Help me write a Python function and explain how it works."><span><small>Help me write code</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-             <button class="prompt-button" data-prompt="Translate the attached document into Hindi and preserve the structure."><span><small>Translate text</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-             <button class="prompt-button" data-prompt="Find the key risks, decisions, and action items in the document I attach."><span><small>Find key decisions</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-             <button class="prompt-button" data-prompt="Compare the attached documents and show the important differences."><span><small>Compare documents</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+              <button class="prompt-button" data-prompt="Explain this document in simple Hindi."><span><small>Explain a document in Hindi</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+              <button class="prompt-button" data-prompt="Compare these two documents and identify contradictions."><span><small>Compare documents</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+              <button class="prompt-button" data-prompt="Answer in English using evidence from my Spanish document."><span><small>Cross-language evidence</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+              <button class="prompt-button" data-prompt="Summarize this report and cite the relevant pages."><span><small>Summarize with sources</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+              <button class="prompt-button" data-prompt="Ask me a question to test my understanding of this document."><span><small>Test my understanding</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+              <button class="prompt-button" data-prompt="Explain a complex idea in simple terms."><span><small>Explain something</small></span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
           </div></div>
         </section>
         <section class="conversation-view" id="conversation-view" aria-labelledby="conversation-view-title" hidden>
            <div class="conversation-view-head"><div><p class="eyebrow">Conversation workspace</p><h1 id="conversation-view-title">Working session</h1></div><span class="chip" id="conversation-mode">Server conversation</span></div>
-          <div class="message-log" id="message-log" role="log" aria-live="polite" aria-relevant="additions text"></div>
+           <div class="message-log" id="message-log" role="log" aria-live="polite" aria-relevant="additions text"></div>
         </section>
       </main>
 
       <footer class="shell-compose-region" id="compose-region">
         <form class="composer shell-composer" id="composer-form">
-           <label for="message-input">Message</label>
-           <textarea class="textarea" id="message-input" dir="auto" rows="1" placeholder="Ask a question or describe a task…" aria-describedby="shell-scope draft-note message-count"></textarea>
+            <label for="message-input">Message</label>
+            <textarea class="textarea" id="message-input" dir="auto" rows="1" placeholder="Ask in any language about your work…" aria-describedby="shell-scope draft-note message-count"></textarea>
+           <div class="composer-context" id="composer-context" hidden><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg><span id="composer-context-text"></span><button class="button button--quiet" type="button" data-shell-open="documents-dialog">Manage sources</button></div>
           <div class="composer-tools"><button class="icon-button icon-button--quiet" type="button" data-shell-open="documents-dialog" aria-label="Attach a document" title="Attach a document"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button><button class="icon-button icon-button--quiet voice-input-button" id="voice-input-button" type="button" aria-label="Start voice input" title="Start voice input"><svg class="icon" aria-hidden="true"><use href="#i-voice"/></svg></button><span class="field-note voice-input-status" id="voice-input-status" role="status" aria-live="polite">Voice input ready when supported.</span><span class="field-note" id="draft-note">Draft stays in this tab.</span><span class="field-note" id="message-count" role="status">0 / 4,000</span><button class="button button--primary" id="send-button" type="submit" disabled aria-describedby="shell-scope message-count">Send <svg class="icon" aria-hidden="true"><use href="#i-send"/></svg></button></div>
         </form>
-           <div class="shell-compose-note"><span id="shell-scope">Your conversation and attached sources stay in this browser.</span></div>
+            <div class="shell-compose-note"><span id="shell-scope">Private to this conversation · responses follow your language automatically.</span></div>
       </footer>
     </div>
   </div>
@@ -153,8 +154,8 @@
         <ul class="document-list" id="document-list" aria-label="Conversation documents"></ul>
       </section>
 
-      <section class="document-preview-card" id="document-preview-card" aria-labelledby="document-preview-title" hidden>
-        <header><div><p class="document-eyebrow">Readable layer</p><h3 id="document-preview-title">Extracted text</h3></div><span class="chip chip--quiet">Preview</span></header>
+       <section class="document-preview-card" id="document-preview-card" aria-labelledby="document-preview-title" hidden>
+         <header><div><p class="document-eyebrow">Readable layer</p><h3 id="document-preview-title">Extracted text</h3><p class="field-note" id="document-preview-meta"></p></div><span class="chip chip--quiet">Preview</span></header>
         <pre class="document-preview" id="document-preview" aria-label="Extracted text preview"></pre>
       </section>
     </div>

@@ -9,6 +9,7 @@ import { loadHistory, newConversation, saveHistory, serializeMessage, titleFromM
 const MAX_CHARS = 4000;
 const STREAM_TIMEOUT = 30000;
 const mock = new URLSearchParams(location.search).get('mock') === '1';
+const ASSISTANT_NAME = 'Polyglot AI';
 const LANGUAGE_NAMES = Object.freeze({
   en: { native: 'English', english: 'English', script: 'Latin' },
   hi: { native: 'हिन्दी', english: 'Hindi', script: 'Devanagari' },
@@ -28,6 +29,8 @@ function safeError(error) {
   if (error?.name === 'AbortError') return 'The request was stopped before it finished.';
   if (error?.status === 400) return 'Write a message before sending.';
   if (error?.status === 413) return 'That message is too long. Keep it under 4,000 characters.';
+  if (error?.status === 403) return 'This conversation is not available in the current workspace. Start a new conversation.';
+  if (error?.status === 404) return 'That conversation is no longer available. Start a new conversation.';
   return 'I could not complete that reply. Check the connection and try again.';
 }
 function languageInfo(code, meta = {}) {
@@ -128,6 +131,26 @@ export function initChat() {
   function setHeading(title) {
     document.getElementById('conversation-heading').textContent = title || 'New conversation';
   }
+  function resetHeaderLanguage() {
+    const label = document.getElementById('shell-language-label');
+    const detail = document.getElementById('shell-language-detail');
+    const shellLanguage = document.getElementById('shell-language');
+    if (label) label.textContent = 'Auto';
+    if (detail) detail.textContent = '· per message';
+    if (shellLanguage) shellLanguage.title = 'Language is detected for each message';
+  }
+  function setHeaderLanguage(meta = {}) {
+    const language = meta.language_meta || {};
+    const code = language.language;
+    if (!code) return resetHeaderLanguage();
+    const info = languageInfo(code, language);
+    const label = document.getElementById('shell-language-label');
+    const detail = document.getElementById('shell-language-detail');
+    const shellLanguage = document.getElementById('shell-language');
+    if (label) label.textContent = `${info.native} · ${info.english}`;
+    if (detail) detail.textContent = `· ${info.script}`;
+    if (shellLanguage) shellLanguage.title = `${info.english} detected for the latest message · ${info.script} script`;
+  }
   function formatHistoryDate(timestamp) {
     const date = new Date(timestamp);
     const today = new Date();
@@ -148,7 +171,7 @@ export function initChat() {
     const index = lowerText.indexOf(lowerQuery);
     const start = Math.max(0, index - 28);
     const end = Math.min(source.text.length, index + query.length + 52);
-    return `${source.role === 'user' ? 'You' : 'GAIA'}: ${start ? '…' : ''}${source.text.slice(start, end)}${end < source.text.length ? '…' : ''}`;
+     return `${source.role === 'user' ? 'You' : ASSISTANT_NAME}: ${start ? '…' : ''}${source.text.slice(start, end)}${end < source.text.length ? '…' : ''}`;
   }
   function appendHighlighted(parent, text, query) {
     if (!query) { parent.textContent = text; return; }
@@ -358,10 +381,10 @@ export function initChat() {
     if (!Array.isArray(sources) || !sources.length) return;
     const section = document.createElement('section');
     section.className = 'chat-sources';
-    section.setAttribute('aria-label', 'Sources');
-    const heading = document.createElement('strong');
-    heading.className = 'chat-sources-title';
-    heading.textContent = 'Sources';
+     section.setAttribute('aria-label', 'Evidence used in this reply');
+     const heading = document.createElement('strong');
+     heading.className = 'chat-sources-title';
+     heading.textContent = 'Evidence used';
     section.append(heading);
     sources.forEach((source, index) => {
       if (!source || typeof source !== 'object') return;
@@ -386,10 +409,16 @@ export function initChat() {
           item.append(text);
         }
       } else if (typeof source.document === 'string') {
-        const text = document.createElement('span');
         const page = Number.isFinite(Number(source.page)) ? ` · page ${Number(source.page)}` : '';
-        text.textContent = `${source.document} · chunk ${Number.isFinite(Number(source.chunk)) ? Number(source.chunk) + 1 : '—'}${page}`;
-        item.append(text);
+        const link = document.createElement('button');
+        link.type = 'button';
+        link.className = 'chat-source-link';
+        link.textContent = `${source.document} · chunk ${Number.isFinite(Number(source.chunk)) ? Number(source.chunk) + 1 : '—'}${page}`;
+        link.setAttribute('aria-label', `Inspect evidence from ${source.document}${page}`);
+        link.addEventListener('click', () => document.dispatchEvent(new CustomEvent('v2sourceopen', {
+          detail: { document: source.document, page: source.page, chunk: source.chunk },
+        })));
+        item.append(link);
         if (Number.isFinite(Number(source.score))) {
           const score = document.createElement('small');
           score.textContent = `match ${Number(source.score).toFixed(2)}`;
@@ -410,7 +439,7 @@ export function initChat() {
     article.dataset.role = role;
     article.dir = 'auto';
     const head = document.createElement('div'); head.className = 'chat-message-head';
-    const name = document.createElement('strong'); name.textContent = role === 'user' ? 'You' : 'GAIA'; head.append(name);
+     const name = document.createElement('strong'); name.textContent = role === 'user' ? 'You' : ASSISTANT_NAME; head.append(name);
     const time = document.createElement('time'); time.textContent = localTimestamp(timestamp); time.dateTime = new Date(timestamp).toISOString(); head.append(time);
     const body = document.createElement('div'); body.className = 'chat-message-body';
     body.dir = 'auto';
@@ -450,6 +479,7 @@ export function initChat() {
     assistant.sourceUser.meta = { ...assistant.sourceUser.meta, language_meta: meta.language_meta };
     const record = currentConversation();
     if (record && meta.conversation_id) record.serverId = meta.conversation_id;
+    setHeaderLanguage(meta);
     applyMessageLanguage(assistant.sourceUser);
     applyMessageLanguage(assistant);
     applyAssistantRoute(assistant);
@@ -568,6 +598,9 @@ export function initChat() {
         insightsFor(message);
       }
     });
+    const latestLanguage = messages.slice().reverse().find(item => item.role === 'user' && item.meta?.language_meta);
+    if (latestLanguage) setHeaderLanguage(latestLanguage.meta);
+    else resetHeaderLanguage();
     const hasMessages = messages.length > 0;
     welcome.hidden = hasMessages;
     chatView.hidden = !hasMessages;
@@ -614,7 +647,7 @@ export function initChat() {
     record.messages.forEach(message => {
       const meta = message.meta || {};
       const language = meta.response_lang || meta.language_meta?.language;
-      lines.push(`## ${message.role === 'user' ? 'You' : 'GAIA'} · ${new Date(message.timestamp).toISOString()}`);
+       lines.push(`## ${message.role === 'user' ? 'You' : ASSISTANT_NAME} · ${new Date(message.timestamp).toISOString()}`);
       if (language) lines.push(`_Language: ${language}_`, '');
       lines.push(message.text, '');
     });
@@ -635,6 +668,7 @@ export function initChat() {
     messages.length = 0;
     log.replaceChildren(); chatView.hidden = true; welcome.hidden = false;
     setHeading('New conversation');
+    resetHeaderLanguage();
     persistHistory();
     renderHistory();
     setSendButton('Send'); updateInput();
@@ -692,7 +726,7 @@ export function initChat() {
     assistant = addMessage('assistant', '', { pending: true });
     assistant.sourceUser = userMessage;
     assistant.article.setAttribute('aria-busy', 'true');
-    assistant.body.innerHTML = '<div class="thinking-lines" aria-hidden="true"><span></span><span></span><span></span></div><span class="sr-only">GAIA is preparing a reply</span>';
+     assistant.body.innerHTML = `<div class="thinking-lines" aria-hidden="true"><span></span><span></span><span></span></div><span class="sr-only">${ASSISTANT_NAME} is preparing a reply</span>`;
     setSendButton('Stop', true); send.disabled = false;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), STREAM_TIMEOUT);
@@ -779,7 +813,7 @@ export function initChat() {
   });
   composerNote.textContent = mock
     ? 'Mock chat only · no backend request or server memory.'
-    : 'Phase 6 chat · conversations stay in this browser.';
+    : 'Your conversation and attached sources stay in this browser.';
   renderHistory();
   if (historyResult.status === 'unavailable') toast('Browser history storage is unavailable. This chat will remain for this tab.');
   if (historyState.currentId) restoreConversation(historyState.currentId, { persistCurrent: false });

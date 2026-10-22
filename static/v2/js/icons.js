@@ -2,7 +2,8 @@
 export function initIcons() {
   document.body.insertAdjacentHTML('afterbegin', `
   <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" hidden>
-    <symbol id="i-gaia" viewBox="0 0 32 32"><path d="M22 6h-7a7 7 0 1 0 7 7V6m0 7v11c0 5-10 6-14 2M15 6h11"/></symbol>
+     <symbol id="i-gaia" viewBox="0 0 32 32"><path d="M22 6h-7a7 7 0 1 0 7 7V6m0 7v11c0 5-10 6-14 2M15 6h11"/></symbol>
+     <symbol id="i-polyglot" viewBox="0 0 32 32"><path d="M5 9h10a6 6 0 0 1 0 12H5M27 23H17a6 6 0 0 1 0-12h10"/><path d="M11 9v12m10-10v12"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4zM8 9h8m-8 3h5"/></symbol>
     <symbol id="i-voice" viewBox="0 0 24 24"><path d="M4 9v6m4-10v14m4-12v10m4-13v16m4-11v6"/></symbol>

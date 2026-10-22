@@ -56,7 +56,7 @@ async def _read_upload(file: UploadFile, limit: int):
             return _UPLOAD_TOO_LARGE
     return b"".join(parts)
 
-app = FastAPI(title="Global Multilingual AI Assistant", version="0.1.0")
+app = FastAPI(title="Polyglot AI — Language-Agnostic AI Workspace", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173",
@@ -381,7 +381,7 @@ def _not_found_in_docs(lang: str) -> str:
 def _system_prompt(response_lang: str) -> str:
     name = LANG_NAMES.get(response_lang, "the user's language")
     return (
-        f"You are GAIA, a helpful multilingual assistant. Always reply in {name} "
+        f"You are Polyglot AI, a helpful multilingual assistant. Always reply in {name} "
         "unless the user explicitly asks for another language. Be concise and natural. "
         "Never fabricate facts, sources or capabilities. Preserve code, numbers, URLs "
         "and technical terms exactly; never translate code unless asked. "
