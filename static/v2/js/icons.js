@@ -14,10 +14,14 @@ export function initIcons() {
     <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></symbol>
     <symbol id="i-switch" viewBox="0 0 24 24"><path d="M4 8h15m-4-4 4 4-4 4M20 16H5m4-4-4 4 4 4"/></symbol>
-    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4H4v12h4"/></symbol>
+     <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4H4v12h4"/></symbol>
+     <symbol id="i-edit" viewBox="0 0 24 24"><path d="m4 16-.8 4.8L8 20l10.8-10.8a2.8 2.8 0 0 0-4-4zM13.5 6.5l4 4"/></symbol>
+     <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m-4-4 4 4 4-4M5 20h14"/></symbol>
+     <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14m-9 4v5m4-5v5M9 7V4h6v3m-9 0 1 13h10l1-13"/></symbol>
     <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 9a8 8 0 1 0 0 6M20 3v6h-6"/></symbol>
     <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H5v18h14V8zM14 3v5h5M9 13h6m-6 4h6"/></symbol>
-    <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 20V4M5 11l7-7 7 7"/></symbol>
+     <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 20V4M5 11l7-7 7 7"/></symbol>
+     <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
     <symbol id="i-sound" viewBox="0 0 24 24"><path d="m11 5-5 4H3v6h3l5 4zM16 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol>
     <symbol id="i-sidebar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></symbol>
     <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></symbol>

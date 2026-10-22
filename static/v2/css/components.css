@@ -84,6 +84,9 @@
 .choice { position: relative; display: flex; align-items: center; gap: var(--space-2); min-block-size: var(--control-size); border: var(--stroke) solid var(--color-control-border); padding: var(--space-2); border-radius: var(--radius-small); font-size: var(--text-sm); }
 .choice:has(:checked) { background: var(--color-soft); border-color: var(--color-accent); }
 .choice input { margin: 0; accent-color: var(--color-action); }
+.settings-block { display: grid; gap: var(--space-2); padding-block-start: var(--space-2); }
+.settings-block h3 { font-size: var(--text-base); font-weight: var(--weight-strong); }
+.settings-block > p:last-child { max-inline-size: 58ch; color: var(--color-muted); font-size: var(--text-sm); line-height: var(--line-reading); }
 .chip {
   display: inline-flex;
   align-items: center;

@@ -39,7 +39,6 @@
         </section>
         <div class="sidebar-foot">
            <button class="button button--quiet sidebar-action" data-shell-open="settings-dialog" aria-label="Appearance settings" title="Workspace settings"><svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg><span class="sidebar-label">Workspace settings</span></button>
-          <a class="button button--quiet sidebar-action" href="./components.html" aria-label="Design system studies" title="Design system studies"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg><span class="sidebar-label">Design system studies</span></a>
             <p class="field-note sidebar-label workspace-note"><span class="workspace-note-dot" aria-hidden="true"></span>LOCAL WORKSPACE · NO ACCOUNT CONNECTED</p>
         </div>
       </aside>
@@ -109,8 +108,9 @@
   </dialog>
   <dialog class="dialog" id="settings-dialog" aria-labelledby="settings-title">
      <header class="dialog-head"><h2 id="settings-title">Workspace settings</h2><button class="icon-button icon-button--quiet" data-close aria-label="Close workspace settings"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></header>
-    <div class="dialog-body"><p class="small muted">A considered palette, in the light that suits you.</p>
-      <fieldset class="choice-group"><legend>Theme</legend><div class="choices"><label class="choice"><input type="radio" name="theme" value="light">Light</label><label class="choice"><input type="radio" name="theme" value="dark">Dark</label><label class="choice"><input type="radio" name="theme" value="system">System</label></div></fieldset>
+     <div class="dialog-body"><p class="small muted">A considered palette for a focused, language-aware workspace.</p>
+       <fieldset class="choice-group"><legend>Theme</legend><div class="choices"><label class="choice"><input type="radio" name="theme" value="light">Light</label><label class="choice"><input type="radio" name="theme" value="dark">Dark</label><label class="choice"><input type="radio" name="theme" value="system">System</label></div></fieldset>
+       <section class="settings-block" aria-labelledby="language-behavior-title"><p class="eyebrow">Language behavior</p><h3 id="language-behavior-title">Automatic by default</h3><p>Each message is detected independently, so you can switch languages naturally. When the backend provides the metadata, the reply shows its language and script beside the message.</p></section>
        <div class="check"><input id="reduce-motion" type="checkbox" aria-describedby="motion-note"><label for="reduce-motion">Reduce motion<br><span class="field-note" id="motion-note">Your device preference is also respected. Greeting rotation pauses while reduced motion is on.</span></label></div>
        <div class="check"><input id="show-insights" type="checkbox" aria-describedby="insights-note"><label for="show-insights">Show reply insights<br><span class="field-note" id="insights-note">Reveal detected language, response route and timing for each assistant reply. Off by default.</span></label></div>
        <div class="field"><label for="speech-language">Speech input language</label><select class="select" id="speech-language"><option value="auto">Auto · use the latest detected language</option><option value="en-IN">English · India</option><option value="hi-IN">Hindi · India</option><option value="pa-IN">Punjabi · India</option><option value="es-ES">Spanish · Spain</option><option value="fr-FR">French · France</option><option value="de-DE">German · Germany</option><option value="it-IT">Italian · Italy</option></select><span class="field-note">Voice input puts an editable transcript in the composer. It never sends automatically.</span></div>

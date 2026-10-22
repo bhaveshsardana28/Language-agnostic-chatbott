@@ -147,7 +147,7 @@ export function initChat() {
     const label = document.getElementById('shell-language-label');
     const detail = document.getElementById('shell-language-detail');
     const shellLanguage = document.getElementById('shell-language');
-    if (label) label.textContent = `${info.native} · ${info.english}`;
+    if (label) label.textContent = languageLabel(code, language);
     if (detail) detail.textContent = `· ${info.script}`;
     if (shellLanguage) shellLanguage.title = `${info.english} detected for the latest message · ${info.script} script`;
   }
@@ -239,15 +239,22 @@ export function initChat() {
       button.append(title, detail);
       const actions = document.createElement('div');
       actions.className = 'history-actions';
-      [['rename', 'Rename conversation'], ['export', 'Export conversation'], ['delete', 'Delete conversation']].forEach(([action, label]) => {
-        const control = document.createElement('button');
+       [['rename', 'Rename conversation', 'i-edit'], ['export', 'Export conversation', 'i-download'], ['delete', 'Delete conversation', 'i-trash']].forEach(([action, label, iconName]) => {
+         const control = document.createElement('button');
         control.type = 'button';
         control.className = 'icon-button icon-button--quiet';
         control.dataset.historyAction = action;
         control.dataset.recordId = record.id;
-        control.setAttribute('aria-label', label);
-        control.title = label;
-        actions.append(control);
+         control.setAttribute('aria-label', label);
+         control.title = label;
+         const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+         icon.classList.add('icon');
+         icon.setAttribute('aria-hidden', 'true');
+         const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+         use.setAttribute('href', `#${iconName}`);
+         icon.append(use);
+         control.append(icon);
+         actions.append(control);
       });
       item.append(button, actions);
       group.append(item);
@@ -556,6 +563,8 @@ export function initChat() {
   }
   function setSendButton(label, danger = false) {
     const icon = send.querySelector('.icon');
+    const use = icon?.querySelector('use');
+    if (use) use.setAttribute('href', label === 'Stop' ? '#i-stop' : '#i-send');
     send.replaceChildren(document.createTextNode(label));
     if (icon) send.append(icon);
     send.classList.toggle('button--danger', danger);

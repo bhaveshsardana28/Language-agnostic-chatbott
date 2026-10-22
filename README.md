@@ -69,7 +69,7 @@ cp .env.example .env                 # add LLM_API_KEY (free: console.groq.com)
 make run                              # -> http://localhost:8000
 ```
 
-`http://localhost:8000/` now opens the redesigned Common Ground frontend. The
+`http://localhost:8000/` now opens the redesigned **Polyglot AI** workspace. The
 explicit `/legacy` route is retained only for regression comparison.
 
 | Route | What handles it | Needs LLM key? |
@@ -80,8 +80,10 @@ explicit `/legacy` route is retained only for regression comparison.
 | `document` | per-chat uploaded PDF/DOCX/TXT/Markdown/images; native-text + local page-level OCR; cross-language retrieval via `paraphrase-multilingual-MiniLM-L12-v2`; honest "not found" | yes |
 | `web` | recency questions via keyless DuckDuckGo, sources shown | yes |
 
-Per-message language detection, language-switch instructions ("answer in
-Hindi"), bounded conversation memory, SSE streaming, dark/light/system themes,
+The Polyglot AI frontend makes the language-agnostic workflow visible without
+claiming unsupported capabilities: per-message language detection,
+language-switch instructions ("answer in Hindi"), bounded conversation memory,
+SSE streaming, dark/light/system themes,
 welcome screen with suggestions, markdown + code blocks with copy buttons,
 per-conversation sidebar (search/rename/delete/export, grouped by date),
 message actions (copy/regenerate/edit), document chips, sources,
