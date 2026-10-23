@@ -86,6 +86,27 @@ def test_api_rejects_cross_workspace_document_access():
     assert second.delete(f"/api/v1/chat/{cid}").json()["deleted"] is False
 
 
+def test_api_removes_one_document_without_deleting_the_conversation(isolated_store):
+    client = TestClient(app, raise_server_exceptions=False)
+    cid = client.post("/api/v1/conversations").json()["conversation_id"]
+    first = client.post("/api/v1/documents", data={"conversation_id": cid},
+                        files={"file": ("first.txt", b"first private note")})
+    second = client.post("/api/v1/documents", data={"conversation_id": cid},
+                         files={"file": ("second.txt", b"second private note")})
+    assert first.status_code == 200 and second.status_code == 200
+    first_id = first.json()["document_id"]
+    second_id = second.json()["document_id"]
+
+    removed = client.delete(f"/api/v1/documents/{cid}/{first_id}")
+    assert removed.status_code == 200 and removed.json()["deleted"] is True
+    remaining = client.get(f"/api/v1/documents/{cid}").json()["documents"]
+    assert [item["document_id"] for item in remaining] == [second_id]
+    assert client.post("/api/v1/chat", json={"conversation_id": cid, "message": "second"}).status_code == 200
+
+    missing = client.delete(f"/api/v1/documents/{cid}/{first_id}")
+    assert missing.status_code == 404
+
+
 def test_additive_migration_handles_legacy_table_shapes(tmp_path, monkeypatch):
     path = tmp_path / "legacy.db"
     db = sqlite3.connect(path)

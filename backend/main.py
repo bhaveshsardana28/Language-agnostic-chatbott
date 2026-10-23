@@ -205,6 +205,16 @@ def document_report(request: Request, conversation_id: str, document_id: int):
     return _json_workspace(result["report"], workspace_id)
 
 
+@app.delete("/api/v1/documents/{conversation_id}/{document_id}")
+def delete_document(request: Request, conversation_id: str, document_id: int):
+    workspace_id = _workspace_id(request)
+    deleted = rag.delete_document(conversation_id, document_id, owner_id=workspace_id)
+    owner = storage.conversation_owner(conversation_id)
+    if owner is not None and owner != workspace_id:
+        return _json_workspace({"deleted": False}, workspace_id, 403)
+    return _json_workspace({"deleted": deleted}, workspace_id, 200 if deleted else 404)
+
+
 @app.delete("/api/v1/documents/{conversation_id}")
 def delete_documents(request: Request, conversation_id: str):
     workspace_id = _workspace_id(request)

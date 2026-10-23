@@ -1,4 +1,4 @@
-import { clearDocuments, getDocumentReport, listDocuments, uploadDocument } from './api.js';
+import { clearDocuments, deleteDocument, getDocumentReport, listDocuments, uploadDocument } from './api.js';
 import { openOverlay, toast } from './ui.js';
 
 const DEFAULT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
@@ -68,7 +68,7 @@ export function initDocuments(chat) {
   }
   function renderComposerAttachments() {
     composerAttachments.replaceChildren();
-    const visible = records.filter(item => ['processing', 'ready', 'failed'].includes(item.status));
+    const visible = records.filter(item => ['processing', 'ready', 'failed', 'removing'].includes(item.status));
     composerAttachments.hidden = visible.length === 0;
     visible.forEach(record => {
       const extension = extensionOf(record.document).replace('.', '').toUpperCase().slice(0, 4) || 'FILE';
@@ -111,10 +111,24 @@ export function initDocuments(chat) {
       name.textContent = record.document;
       const state = document.createElement('span');
       state.textContent = record.status === 'processing' ? 'Uploading · preparing text…'
-        : record.status === 'failed' ? 'Upload failed · open Library to retry'
-          : 'Ready to use in this chat';
+        : record.status === 'removing' ? 'Removing from this chat…'
+          : record.status === 'failed' ? 'Upload failed · open Library to retry'
+            : 'Ready to use in this chat';
       copy.append(name, state);
-      card.append(visual, copy);
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'composer-attachment-remove';
+      remove.setAttribute('aria-label', `Remove ${record.document}`);
+      remove.title = 'Remove attachment';
+      const removeIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      removeIcon.classList.add('icon');
+      removeIcon.setAttribute('aria-hidden', 'true');
+      const removeUse = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      removeUse.setAttribute('href', '#i-close');
+      removeIcon.append(removeUse);
+      remove.append(removeIcon);
+      remove.addEventListener('click', () => removeRecord(record));
+      card.append(visual, copy, remove);
       composerAttachments.append(card);
     });
   }
@@ -137,12 +151,13 @@ export function initDocuments(chat) {
       name.textContent = record.document;
       const detail = document.createElement('span');
       detail.className = 'field-note';
-      detail.textContent = record.status === 'processing' ? 'Uploading and preparing…'
-        : record.status === 'failed' ? (record.error || 'Upload failed')
-          : `${record.chunks || 0} ${record.chunks === 1 ? 'chunk' : 'chunks'}${record.page_count ? ` · ${record.page_count} page${record.page_count === 1 ? '' : 's'}` : ''}${record.detected_language ? ` · ${record.detected_language}` : ''}`;
+       detail.textContent = record.status === 'processing' ? 'Uploading and preparing…'
+         : record.status === 'removing' ? 'Removing…'
+           : record.status === 'failed' ? (record.error || 'Upload failed')
+             : `${record.chunks || 0} ${record.chunks === 1 ? 'chunk' : 'chunks'}${record.page_count ? ` · ${record.page_count} page${record.page_count === 1 ? '' : 's'}` : ''}${record.detected_language ? ` · ${record.detected_language}` : ''}`;
       const chip = document.createElement('span');
       chip.className = `chip document-status document-status--${record.status}`;
-      chip.textContent = record.status === 'processing' ? 'Processing' : record.status === 'failed' ? 'Failed' : 'Ready';
+       chip.textContent = record.status === 'processing' ? 'Processing' : record.status === 'removing' ? 'Removing' : record.status === 'failed' ? 'Failed' : 'Ready';
       row.append(mark, name, detail, chip);
       if (record.status === 'failed' && record.file) {
         const retry = document.createElement('button');
@@ -215,7 +230,11 @@ export function initDocuments(chat) {
     try {
       const result = await listDocuments(serverId);
       if (owner !== sequence || serverId !== chat.getServerConversationId()) return;
-      records = (result.documents || []).map(item => ({ ...item, status: 'ready' }));
+       const previous = new Map(records.map(item => [item.document, item]));
+       records = (result.documents || []).map(item => {
+         const old = previous.get(item.document);
+         return { ...item, status: 'ready', file: old?.file, previewUrl: old?.previewUrl };
+       });
       setStatus(records.length ? 'Documents ready for this conversation.' : 'Choose a file to add context to this conversation.');
       render();
     } catch (error) {
@@ -254,7 +273,8 @@ export function initDocuments(chat) {
     setStatus(`Processing ${file.name}…`, 'loading');
     document.dispatchEvent(new CustomEvent('v2documentstate', { detail: { processing: true } }));
     const owner = ++sequence;
-    active = { owner };
+    const controller = new AbortController();
+    active = { owner, controller, record };
     clear.disabled = true;
     try {
       const serverId = await chat.ensureServerConversationId();
@@ -264,7 +284,7 @@ export function initDocuments(chat) {
         if (active?.owner !== owner) return;
         record.status = 'ready'; record.chunks = 1;
       } else {
-        const report = await uploadDocument(file, serverId);
+         const report = await uploadDocument(file, serverId, { signal: controller.signal });
         if (active?.owner !== owner) return;
         Object.assign(record, report);
         record.status = report.status === 'completed' || !report.status ? 'ready' : report.status;
@@ -295,6 +315,48 @@ export function initDocuments(chat) {
         render();
       }
       document.dispatchEvent(new CustomEvent('v2documentstate', { detail: { processing: false } }));
+    }
+  }
+  async function removeRecord(record) {
+    if (!records.includes(record)) return;
+    if (record.status === 'removing') return;
+    if (record.status === 'processing' && active?.record === record) {
+      active.controller.abort();
+      active = null;
+      sequence += 1;
+      records = records.filter(item => item !== record);
+      if (record.previewUrl) URL.revokeObjectURL(record.previewUrl);
+      input.value = '';
+      render();
+      setStatus('Attachment removed before processing completed.');
+      document.dispatchEvent(new CustomEvent('v2documentstate', { detail: { processing: false } }));
+      toast(`${record.document} removed.`);
+      return;
+    }
+    if (!record.document_id || mock) {
+      records = records.filter(item => item !== record);
+      if (record.previewUrl) URL.revokeObjectURL(record.previewUrl);
+      render();
+      toast(`${record.document} removed.`);
+      return;
+    }
+    const serverId = chat.getServerConversationId();
+    if (!serverId) return;
+    const previousStatus = record.status;
+    record.status = 'removing';
+    render();
+    try {
+      await deleteDocument(serverId, record.document_id);
+      records = records.filter(item => item !== record);
+      if (record.previewUrl) URL.revokeObjectURL(record.previewUrl);
+      setStatus(`${record.document} removed from this conversation.`, 'ready');
+      render();
+      toast(`${record.document} removed.`);
+    } catch (error) {
+      record.status = previousStatus;
+      render();
+      setStatus(error.message || `Could not remove ${record.document}.`, 'error');
+      toast(error.message || `Could not remove ${record.document}.`);
     }
   }
   async function clearAll() {

@@ -20,6 +20,7 @@ LIMITATIONS.md before deploying anywhere).
 | `/api/v1/documents` | POST | multipart upload (validated PDF/DOCX/TXT/Markdown/image ≤ 10 MiB, max 100 PDF pages), per-conversation scope |
 | `/api/v1/documents/{cid}` | GET | list this chat's documents, status, pages, method and chunk counts |
 | `/api/v1/documents/{cid}/{document_id}` | GET | structured page-aware extraction report and extracted-text preview |
+| `/api/v1/documents/{cid}/{document_id}` | DELETE | remove one authorized document and its indexed chunks |
 | `/api/v1/documents/{cid}` | DELETE | drop this chat's document store |
 | `/api/v1/chat/{cid}` | DELETE | delete conversation memory AND its documents |
 | `/api/v1/health` | GET | status, provider, model, llm_ready, storage and OCR capability |

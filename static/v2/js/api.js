@@ -61,6 +61,12 @@ export async function getDocumentReport(conversationId, documentId, { signal } =
   }), 'Could not load the extracted document text.');
 }
 
+export async function deleteDocument(conversationId, documentId, { signal } = {}) {
+  return documentResponse(await fetch(`${API_BASE}/api/v1/documents/${encodeURIComponent(conversationId)}/${encodeURIComponent(documentId)}`, {
+    method: 'DELETE', signal, credentials: 'include',
+  }), 'Could not remove that document.');
+}
+
 export async function clearDocuments(conversationId, { signal } = {}) {
   return documentResponse(await fetch(`${API_BASE}/api/v1/documents/${encodeURIComponent(conversationId)}`, {
     method: 'DELETE', signal, credentials: 'include',

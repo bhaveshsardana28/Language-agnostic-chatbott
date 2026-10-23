@@ -402,6 +402,32 @@ def document_report(session_id: str, document_id: int, owner_id: str | None = No
     return result
 
 
+def delete_document(session_id: str, document_id: int, owner_id: str | None = None) -> bool:
+    """Delete one document and its chunks, preserving the conversation session."""
+    with connect() as db:
+        row = db.execute("""SELECT d.source_path, r.owner_id FROM documents d
+                           JOIN rag_sessions r ON r.session_id = d.session_id
+                           WHERE d.id = ? AND d.session_id = ?""",
+                         (document_id, session_id)).fetchone()
+        if not row or (owner_id is not None and row["owner_id"] != owner_id):
+            return False
+        source_path = row["source_path"]
+        result = db.execute("DELETE FROM documents WHERE id = ? AND session_id = ?",
+                            (document_id, session_id))
+        db.execute("UPDATE rag_sessions SET updated_at = ? WHERE session_id = ?",
+                   (time.time(), session_id))
+        remaining = {item[0] for item in db.execute(
+            "SELECT source_path FROM documents WHERE source_path IS NOT NULL").fetchall()}
+    if source_path and source_path not in remaining:
+        root = os.path.abspath(settings.DOCUMENT_STORAGE_DIR)
+        try:
+            if os.path.commonpath([root, os.path.abspath(source_path)]) == root:
+                os.unlink(source_path)
+        except (OSError, ValueError):
+            pass
+    return result.rowcount > 0
+
+
 def delete_rag_session(session_id: str) -> bool:
     with connect() as db:
         paths = [row[0] for row in db.execute(

@@ -53,7 +53,7 @@ def run_checks(browser, origin, capture):
     context = browser.new_context(viewport={'width': 1440, 'height': 1000}, reduced_motion='reduce')
     seed_context(context)
     state = {'server_id': 'document-server-id', 'documents': [], 'create_calls': 0,
-             'upload_calls': [], 'list_calls': [], 'clear_calls': [], 'chat_calls': []}
+             'upload_calls': [], 'list_calls': [], 'clear_calls': [], 'remove_calls': [], 'chat_calls': []}
 
     def conversations(route):
         state['create_calls'] += 1
@@ -74,6 +74,11 @@ def run_checks(browser, origin, capture):
                 'conversation_id': state['server_id'], 'documents': state['documents']}))
             return
         if request.method == 'DELETE':
+            if request.url.endswith('/document-server-id/1'):
+                state['remove_calls'].append(request.url)
+                state['documents'] = []
+                route.fulfill(status=200, content_type='application/json', body=json.dumps({'deleted': True}))
+                return
             state['clear_calls'].append(request.url)
             state['documents'] = []
             route.fulfill(status=200, content_type='application/json', body=json.dumps({'deleted': True}))
@@ -124,6 +129,14 @@ def run_checks(browser, origin, capture):
         'buffer': b'Our refund policy allows refunds within 30 days.'})
     expect(page.locator('#composer-context')).to_be_visible()
     expect(page.locator('#composer-context-text')).to_contain_text('policy.txt')
+    page.locator('.composer-attachment-remove').click()
+    expect(page.locator('#composer-attachments')).to_be_hidden()
+    assert state['remove_calls'] == [f'{origin}/api/v1/documents/{state["server_id"]}/1']
+    page.get_by_role('button', name='Attach files', exact=True).click()
+    page.locator('[data-attach-action="upload"]').click()
+    page.locator('#document-file').set_input_files({
+        'name': 'policy.txt', 'mimeType': 'text/plain',
+        'buffer': b'Our refund policy allows refunds within 30 days.'})
     page.get_by_role('button', name='Library', exact=True).click()
     expect(page.locator('#document-status')).to_contain_text('ready')
     expect(page.locator('.document-row')).to_contain_text('policy.txt')

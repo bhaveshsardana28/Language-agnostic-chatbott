@@ -334,3 +334,16 @@ def delete_session(session_id: str, owner_id: str | None = None) -> bool:
         return False
     cached = _sessions.pop(session_id, None) is not None
     return storage.delete_rag_session(session_id) or cached
+
+
+def delete_document(session_id: str, document_id: int, owner_id: str | None = None) -> bool:
+    """Remove one document while keeping the rest of the conversation's index."""
+    session = storage.rag_session(session_id)
+    if owner_id is not None and session and session["owner_id"] != owner_id:
+        return False
+    deleted = storage.delete_document(session_id, document_id, owner_id=owner_id)
+    if deleted:
+        _sessions.pop(session_id, None)
+        if storage.rag_chunks(session_id):
+            _load_store(session_id)
+    return deleted
