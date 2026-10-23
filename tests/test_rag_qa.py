@@ -129,6 +129,11 @@ def test_document_qa_broad_specific_absent_and_prompt_context():
         assert captured and "uploaded documents" in captured[-1][0]["content"]
         assert "42 employees" in captured[-1][-1]["content"]
 
+        bare_explain = post("explain", cid)
+        bare_explain_text = "".join(frame.get("text", "") for frame in bare_explain if frame["type"] == "delta")
+        assert "42 employees" in bare_explain_text
+        assert bare_explain[0]["route"] == "document"
+
         specific = post("What is the internal project code?", cid)
         specific_text = "".join(frame.get("text", "") for frame in specific if frame["type"] == "delta")
         assert "AURORA-731" in specific_text
@@ -162,6 +167,7 @@ def test_grounding_rescues_natural_fact_wording_without_accepting_absent_query()
     assert router.is_document_overview("What is the content of this document?")
     assert router.is_document_overview("What is written in this document?")
     assert router.is_document_followup("What does it say?")
+    assert router.is_document_followup("explain")
     assert router.is_document_overview("What are the important details?")
     assert router.is_document_overview("Please list the facts in the document.")
     assert router.is_document_overview("What information does the file contain?")

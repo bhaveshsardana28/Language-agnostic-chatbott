@@ -174,7 +174,7 @@ def is_document_followup(text: str) -> bool:
     """Whether a short, context-dependent question asks for a broad read."""
     return bool(re.search(
         r"^\s*(?:what does it say|what is it about|tell me more|read it|"
-        r"summari[sz]e it|explain it|what are the main points|give me the details)\s*[?.!]*\s*$",
+        r"summari[sz]e it|explain(?: it)?|what are the main points|give me the details)\s*[?.!]*\s*$",
         text or "", re.IGNORECASE,
     ))
 
