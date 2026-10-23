@@ -34,6 +34,7 @@ export function initDocuments(chat) {
   const previewCard = document.getElementById('document-preview-card');
   const previewTitle = document.getElementById('document-preview-title');
   const previewMeta = document.getElementById('document-preview-meta');
+  const composerAttachments = document.getElementById('composer-attachments');
   const composerContext = document.getElementById('composer-context');
   const composerContextText = document.getElementById('composer-context-text');
   const composer = document.getElementById('composer-form');
@@ -65,12 +66,65 @@ export function initDocuments(chat) {
       composerContextText.textContent = `${ready.length} source${ready.length === 1 ? '' : 's'} ready · ${names}${suffix}`;
     }
   }
+  function renderComposerAttachments() {
+    composerAttachments.replaceChildren();
+    const visible = records.filter(item => ['processing', 'ready', 'failed'].includes(item.status));
+    composerAttachments.hidden = visible.length === 0;
+    visible.forEach(record => {
+      const extension = extensionOf(record.document).replace('.', '').toUpperCase().slice(0, 4) || 'FILE';
+      const card = document.createElement('article');
+      card.className = 'composer-attachment';
+      card.dataset.state = record.status;
+      card.setAttribute('aria-label', `${record.document}, ${record.status}`);
+      const mark = document.createElement('span');
+      mark.className = 'composer-attachment-mark';
+      mark.setAttribute('aria-hidden', 'true');
+      let visual = mark;
+      const previewUrl = record.file && (extension === 'PDF' || ['PNG', 'JPG', 'JPEG', 'WEBP', 'GIF'].includes(extension))
+        ? (record.previewUrl || (record.previewUrl = URL.createObjectURL(record.file))) : null;
+      if (previewUrl && extension === 'PDF') {
+        const preview = document.createElement('embed');
+        preview.className = 'composer-attachment-preview composer-attachment-preview--pdf';
+        preview.src = previewUrl;
+        preview.type = 'application/pdf';
+        preview.setAttribute('aria-label', `${record.document} preview`);
+        visual = preview;
+      } else if (previewUrl && extension !== 'PDF') {
+        const preview = document.createElement('img');
+        preview.className = 'composer-attachment-preview';
+        preview.src = previewUrl;
+        preview.alt = `${record.document} preview`;
+        visual = preview;
+      } else if (record.status === 'processing') {
+        const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        icon.classList.add('icon');
+        const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+        use.setAttribute('href', '#i-refresh');
+        icon.append(use);
+        mark.append(icon);
+      } else {
+        mark.textContent = extension;
+      }
+      const copy = document.createElement('span');
+      copy.className = 'composer-attachment-copy';
+      const name = document.createElement('strong');
+      name.textContent = record.document;
+      const state = document.createElement('span');
+      state.textContent = record.status === 'processing' ? 'Uploading · preparing text…'
+        : record.status === 'failed' ? 'Upload failed · open Library to retry'
+          : 'Ready to use in this chat';
+      copy.append(name, state);
+      card.append(visual, copy);
+      composerAttachments.append(card);
+    });
+  }
   function render() {
     list.replaceChildren();
     empty.hidden = records.length > 0;
     const ready = records.filter(item => item.status === 'ready').length;
     count.textContent = `${ready} ready · ${records.length} ${records.length === 1 ? 'document' : 'documents'}`;
     clear.disabled = !records.length || Boolean(active);
+    renderComposerAttachments();
     renderComposerContext();
     records.forEach(record => {
       const row = document.createElement('li');
@@ -134,6 +188,7 @@ export function initDocuments(chat) {
     }
   }
   function clearView(text = 'Choose a file to add context to this conversation.') {
+    records.forEach(record => { if (record.previewUrl) URL.revokeObjectURL(record.previewUrl); });
     records = [];
     previewSequence += 1;
     setStatus(text);
@@ -192,6 +247,7 @@ export function initDocuments(chat) {
        return;
     }
     const record = { document: file.name, chunks: 0, status: 'processing' };
+    records.filter(item => item.document === file.name).forEach(item => { if (item.previewUrl) URL.revokeObjectURL(item.previewUrl); });
     records = records.filter(item => item.document !== file.name);
     records.unshift(record);
     render();

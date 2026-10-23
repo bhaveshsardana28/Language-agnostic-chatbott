@@ -864,8 +864,8 @@ export function initChat() {
   form.addEventListener('submit', event => { event.preventDefault(); sendMessage(); });
   document.addEventListener('v2documentstate', event => {
     documentProcessing = Boolean(event.detail?.processing);
-    if (documentProcessing) composerNote.textContent = 'Document processing… wait until it is ready before asking about it.';
-    else if (!mock) composerNote.textContent = 'Documents are ready when the panel says Ready.';
+     if (documentProcessing) composerNote.textContent = 'Document processing… wait until it is ready before asking about it.';
+     else composerNote.textContent = mock ? 'Mock source ready in this tab.' : 'Documents are ready when the panel says Ready.';
     updateInput();
   });
   renameForm.addEventListener('submit', event => { event.preventDefault(); saveRename(); });

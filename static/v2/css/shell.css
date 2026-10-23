@@ -115,13 +115,25 @@
 .shell-composer > label { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .shell-composer .textarea { min-block-size: 44px; max-block-size: var(--shell-draft-max); padding: var(--space-2); border: 0; resize: none; background: transparent; font-size: var(--text-sm); }
 .shell-composer .textarea:focus { outline: none; }
+.composer-attachments { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-1) var(--space-2) var(--space-2); }
+.composer-attachment { display: grid; grid-template-rows: 86px auto; min-inline-size: 220px; max-inline-size: min(280px, 100%); overflow: hidden; border: var(--stroke) solid var(--color-border); border-radius: var(--radius-medium); background: var(--color-soft); }
+.composer-attachment-mark, .composer-attachment-preview { display: grid; place-items: center; min-block-size: 86px; color: var(--color-accent); background: color-mix(in srgb, var(--color-chip) 72%, var(--color-soft)); font-size: 10px; font-weight: var(--weight-strong); letter-spacing: .04em; }
+.composer-attachment-preview { inline-size: 100%; border: 0; object-fit: cover; }
+.composer-attachment-preview--pdf { block-size: 86px; }
+.composer-attachment-mark .icon { inline-size: var(--space-5); block-size: var(--space-5); }
+.composer-attachment-copy { display: grid; align-content: center; gap: 1px; min-inline-size: 0; padding: var(--space-2) var(--space-3); }
+.composer-attachment-copy strong, .composer-attachment-copy span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.composer-attachment-copy strong { color: var(--color-ink); font-size: var(--text-xs); font-weight: var(--weight-medium); }
+.composer-attachment-copy span { color: var(--color-muted); font-size: 11px; }
+.composer-attachment[data-state='processing'] .composer-attachment-mark { color: var(--color-warning); }
+.composer-attachment[data-state='failed'] .composer-attachment-mark { color: var(--color-danger); }
 .composer-context { display: flex; align-items: center; gap: var(--space-2); min-block-size: 30px; padding: var(--space-1) var(--space-2); border-block-end: var(--stroke) solid var(--color-border); color: var(--color-muted); font-size: var(--text-xs); }
 .composer-context .icon { inline-size: var(--icon-small); block-size: var(--icon-small); color: var(--color-accent); }
 .composer-context span { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .composer-context .button { min-block-size: 28px; margin-inline-start: auto; padding: var(--space-1) var(--space-2); color: var(--color-accent); font-size: var(--text-xs); white-space: nowrap; }
 .composer-tools { gap: var(--space-2); }
 .composer-tools .icon-button { border-radius: var(--radius-small); }
-.composer-attach-menu { inset-inline-start: 0; inset-inline-end: auto; inset-block-start: auto; inset-block-end: calc(100% + var(--space-2)); min-inline-size: 250px; padding: var(--space-1); }
+.composer-attach-menu { inset-inline-start: 0; inset-inline-end: auto; inset-block-start: auto; inset-block-end: calc(100% + var(--space-2)); min-inline-size: 340px; padding: var(--space-2); }
 .attach-menu-item { display: flex; align-items: center; gap: var(--space-3); inline-size: 100%; min-block-size: 52px; padding: var(--space-2) var(--space-3); border: 0; border-radius: var(--radius-small); color: var(--color-ink); background: transparent; text-align: start; }
 .attach-menu-item:hover, .attach-menu-item:focus-visible { background: var(--color-soft); }
 .attach-menu-item > .icon { color: var(--color-accent); }
