@@ -82,14 +82,14 @@ export function initDocuments(chat) {
       let visual = mark;
       const previewUrl = record.file && (extension === 'PDF' || ['PNG', 'JPG', 'JPEG', 'WEBP', 'GIF'].includes(extension))
         ? (record.previewUrl || (record.previewUrl = URL.createObjectURL(record.file))) : null;
-      if (previewUrl && extension === 'PDF') {
+       if (previewUrl && extension === 'PDF' && record.status !== 'processing') {
         const preview = document.createElement('embed');
         preview.className = 'composer-attachment-preview composer-attachment-preview--pdf';
         preview.src = previewUrl;
         preview.type = 'application/pdf';
         preview.setAttribute('aria-label', `${record.document} preview`);
         visual = preview;
-      } else if (previewUrl && extension !== 'PDF') {
+       } else if (previewUrl && extension !== 'PDF' && record.status !== 'processing') {
         const preview = document.createElement('img');
         preview.className = 'composer-attachment-preview';
         preview.src = previewUrl;

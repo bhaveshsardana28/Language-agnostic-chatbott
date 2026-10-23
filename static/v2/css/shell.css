@@ -125,6 +125,8 @@
 .composer-attachment-copy strong, .composer-attachment-copy span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .composer-attachment-copy strong { color: var(--color-ink); font-size: var(--text-xs); font-weight: var(--weight-medium); }
 .composer-attachment-copy span { color: var(--color-muted); font-size: 11px; }
+.composer-attachment[data-state='processing'] { grid-template-rows: auto; }
+.composer-attachment[data-state='processing'] .composer-attachment-mark { min-block-size: 46px; }
 .composer-attachment[data-state='processing'] .composer-attachment-mark { color: var(--color-warning); }
 .composer-attachment[data-state='failed'] .composer-attachment-mark { color: var(--color-danger); }
 .composer-context { display: flex; align-items: center; gap: var(--space-2); min-block-size: 30px; padding: var(--space-1) var(--space-2); border-block-end: var(--stroke) solid var(--color-border); color: var(--color-muted); font-size: var(--text-xs); }
