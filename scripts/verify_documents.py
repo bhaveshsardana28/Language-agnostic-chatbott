@@ -115,16 +115,23 @@ def run_checks(browser, origin, capture):
     assert not state['list_calls']
     passed('empty: documents before chat show an honest empty state without a list request')
 
+    page.get_by_role('button', name='Back to my draft', exact=True).click()
+    page.get_by_role('button', name='Attach files', exact=True).click()
+    expect(page.locator('#attach-menu')).to_be_visible()
+    page.locator('[data-attach-action="upload"]').click()
     page.locator('#document-file').set_input_files({
         'name': 'policy.txt', 'mimeType': 'text/plain',
         'buffer': b'Our refund policy allows refunds within 30 days.'})
+    expect(page.locator('#composer-context')).to_be_visible()
+    expect(page.locator('#composer-context-text')).to_contain_text('policy.txt')
+    page.get_by_role('button', name='Library', exact=True).click()
     expect(page.locator('#document-status')).to_contain_text('ready')
     expect(page.locator('.document-row')).to_contain_text('policy.txt')
     expect(page.locator('.document-status--ready')).to_have_text('Ready')
     expect(page.locator('#document-count')).to_contain_text('1 ready')
     assert state['create_calls'] == 1
     assert state['upload_calls'] and state['server_id'] in state['upload_calls'][0]['body']
-    passed('upload: pre-chat upload creates one server conversation, uses its ID and reaches Ready')
+    passed('upload: composer attachment menu uploads from the computer, creates one server conversation, and reaches Ready')
 
     page.get_by_role('button', name='Back to my draft', exact=True).click()
     page.locator('#message-input').fill('What is the refund window?')

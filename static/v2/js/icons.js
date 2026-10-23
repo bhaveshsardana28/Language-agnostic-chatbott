@@ -20,7 +20,8 @@ export function initIcons() {
      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m-4-4 4 4 4-4M5 20h14"/></symbol>
      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14m-9 4v5m4-5v5M9 7V4h6v3m-9 0 1 13h10l1-13"/></symbol>
     <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 9a8 8 0 1 0 0 6M20 3v6h-6"/></symbol>
-    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H5v18h14V8zM14 3v5h5M9 13h6m-6 4h6"/></symbol>
+     <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H5v18h14V8zM14 3v5h5M9 13h6m-6 4h6"/></symbol>
+     <symbol id="i-library" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></symbol>
      <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 20V4M5 11l7-7 7 7"/></symbol>
      <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
     <symbol id="i-sound" viewBox="0 0 24 24"><path d="m11 5-5 4H3v6h3l5 4zM16 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol>

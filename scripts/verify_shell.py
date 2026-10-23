@@ -167,12 +167,14 @@ def layout_and_interactions(browser, origin, capture):
             expect(draft).to_have_value('')
             expect(draft).to_be_focused()
             expect(page.locator('#conversation-heading')).to_have_text('New conversation')
-            page.get_by_role('button', name='Attach a document', exact=True).click()
+            page.get_by_role('button', name='Attach files', exact=True).click()
+            expect(page.locator('#attach-menu')).to_be_visible()
+            page.locator('[data-attach-action="browse"]').click()
             expect(page.locator('#documents-dialog')).to_be_visible()
             if width == 1440:
                 shot(page, f'{theme}-{width}-documents', capture)
             page.keyboard.press('Escape')
-            expect(page.get_by_role('button', name='Attach a document', exact=True)).to_be_focused()
+            expect(page.get_by_role('button', name='Attach files', exact=True)).to_be_focused()
             expect(page.locator('#voice-input-button')).to_be_visible()
             expect(page.locator('#voice-input-status')).to_contain_text('Voice input')
             assert page.evaluate('window.mediaCalls') == 0

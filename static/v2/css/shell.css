@@ -110,6 +110,7 @@
 /* Composer */
 .shell-compose-region { padding: var(--space-3) clamp(var(--space-5), 4vw, var(--space-10)) calc(var(--space-4) + env(safe-area-inset-bottom)); border-block-start: var(--stroke) solid var(--color-border); background: var(--color-page); flex: none; }
 .shell-composer { position: relative; max-inline-size: 840px; margin: 0 auto; padding: var(--space-3); border: var(--stroke) solid var(--color-control-border); border-radius: var(--radius-dialog); background: var(--color-raised); box-shadow: var(--shadow-float); }
+.shell-composer[data-upload-dragging='true'] { border-color: var(--color-accent); outline: 3px solid color-mix(in srgb, var(--color-focus) 20%, transparent); background: var(--color-chip); }
 .shell-composer:focus-within { border-color: var(--color-accent); outline: var(--stroke-strong) solid color-mix(in srgb, var(--color-focus) 22%, transparent); outline-offset: 2px; box-shadow: var(--shadow-float); }
 .shell-composer > label { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .shell-composer .textarea { min-block-size: 44px; max-block-size: var(--shell-draft-max); padding: var(--space-2); border: 0; resize: none; background: transparent; font-size: var(--text-sm); }
@@ -120,6 +121,13 @@
 .composer-context .button { min-block-size: 28px; margin-inline-start: auto; padding: var(--space-1) var(--space-2); color: var(--color-accent); font-size: var(--text-xs); white-space: nowrap; }
 .composer-tools { gap: var(--space-2); }
 .composer-tools .icon-button { border-radius: var(--radius-small); }
+.composer-attach-menu { inset-inline-start: 0; inset-inline-end: auto; inset-block-start: auto; inset-block-end: calc(100% + var(--space-2)); min-inline-size: 250px; padding: var(--space-1); }
+.attach-menu-item { display: flex; align-items: center; gap: var(--space-3); inline-size: 100%; min-block-size: 52px; padding: var(--space-2) var(--space-3); border: 0; border-radius: var(--radius-small); color: var(--color-ink); background: transparent; text-align: start; }
+.attach-menu-item:hover, .attach-menu-item:focus-visible { background: var(--color-soft); }
+.attach-menu-item > .icon { color: var(--color-accent); }
+.attach-menu-item span { display: grid; gap: 2px; }
+.attach-menu-item strong { font-size: var(--text-sm); font-weight: var(--weight-medium); }
+.attach-menu-item small { color: var(--color-muted); font-size: var(--text-xs); }
 .voice-input-button[data-state='requesting'], .voice-input-button[data-state='listening'] { color: var(--color-accent); background: var(--color-chip); }
 .voice-input-button[data-state='listening'] { border-color: var(--color-accent); }
 .voice-input-button[data-state='unsupported'] { color: var(--color-disabled-ink); }

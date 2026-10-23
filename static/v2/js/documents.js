@@ -36,6 +36,8 @@ export function initDocuments(chat) {
   const previewMeta = document.getElementById('document-preview-meta');
   const composerContext = document.getElementById('composer-context');
   const composerContextText = document.getElementById('composer-context-text');
+  const composer = document.getElementById('composer-form');
+  const attachButton = document.getElementById('attach-menu-button');
   const dropzone = document.getElementById('document-dropzone');
   let records = [];
   let active = null;
@@ -169,17 +171,25 @@ export function initDocuments(chat) {
   }
   async function upload(file) {
     if (!file) return;
+    if (active) {
+      toast('A document is already being prepared. Wait until it is Ready.');
+      return;
+    }
     const extension = extensionOf(file.name);
     if (!ALLOWED_EXTENSIONS.has(extension)) {
        setStatus('That file type is not supported. Use PDF, DOCX, TXT, Markdown, or a supported image.', 'error');
+      toast('That file type is not supported. Choose a PDF, DOCX, text, or image file.');
       input.value = '';
       return;
     }
     const maxUploadBytes = Number(globalThis.gaiaDocumentCapabilities?.max_upload_bytes || DEFAULT_MAX_UPLOAD_BYTES);
-    if (!file.size || file.size > maxUploadBytes) {
-      setStatus('That file is empty or larger than 10 MiB.', 'error');
-      input.value = '';
-      return;
+     if (!file.size || file.size > maxUploadBytes) {
+       const limitMiB = maxUploadBytes / (1024 * 1024);
+       const limitLabel = Number.isInteger(limitMiB) ? String(limitMiB) : limitMiB.toFixed(1);
+       setStatus(`That file is empty or larger than ${limitLabel} MiB.`, 'error');
+       toast(`Choose a file smaller than ${limitLabel} MiB.`);
+       input.value = '';
+       return;
     }
     const record = { document: file.name, chunks: 0, status: 'processing' };
     records = records.filter(item => item.document !== file.name);
@@ -221,6 +231,7 @@ export function initDocuments(chat) {
       record.status = 'failed'; record.error = uploadError(error); record.file = file;
       records.unshift(record);
       setStatus(record.error, 'error');
+      toast(record.error);
     } finally {
       if (active?.owner === owner) {
         active = null;
@@ -257,6 +268,26 @@ export function initDocuments(chat) {
   choose.addEventListener('click', () => input.click());
   input.addEventListener('change', () => upload(input.files?.[0]));
   clear.addEventListener('click', clearAll);
+  composer?.addEventListener('dragover', event => {
+    if (!event.dataTransfer?.files?.length) return;
+    event.preventDefault();
+    composer.dataset.uploadDragging = 'true';
+  });
+  composer?.addEventListener('dragleave', event => {
+    if (!composer.contains(event.relatedTarget)) delete composer.dataset.uploadDragging;
+  });
+  composer?.addEventListener('drop', event => {
+    if (!event.dataTransfer?.files?.length) return;
+    event.preventDefault();
+    delete composer.dataset.uploadDragging;
+    upload(event.dataTransfer.files[0]);
+  });
+  composer?.addEventListener('paste', event => {
+    const file = [...(event.clipboardData?.files || [])][0];
+    if (!file) return;
+    event.preventDefault();
+    upload(file);
+  });
   dropzone.addEventListener('click', event => {
     if (!event.target.closest('button')) input.click();
   });
@@ -273,6 +304,12 @@ export function initDocuments(chat) {
     upload(event.dataTransfer?.files?.[0]);
   });
   document.addEventListener('click', event => {
+    const attachAction = event.target.closest('[data-attach-action]');
+    if (attachAction) {
+      if (attachAction.dataset.attachAction === 'upload') input.click();
+      if (attachAction.dataset.attachAction === 'browse') openOverlay('documents-dialog', attachButton);
+      return;
+    }
     if (event.target.closest('[data-shell-open="documents-dialog"]')) setTimeout(refresh, 0);
   });
   document.addEventListener('v2sourceopen', async event => {
