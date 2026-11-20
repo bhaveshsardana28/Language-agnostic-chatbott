@@ -19,7 +19,7 @@ import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from backend import rag, settings, storage  # noqa: E402
+from backend import settings  # noqa: E402
 
 
 CASES = [
@@ -50,10 +50,13 @@ def main() -> int:
     args = parser.parse_args()
 
     with tempfile.TemporaryDirectory(prefix="gaia-rag-eval-") as directory:
+        old_uploads = settings.DOCUMENT_STORAGE_DIR
+        settings.DOCUMENT_STORAGE_DIR = os.path.join(directory, "uploads")
         old_path = settings.GAIA_DB_PATH
         settings.GAIA_DB_PATH = os.path.join(directory, "eval.db")
+        from backend import rag, storage
         storage.init_db()
-        rag._sessions.clear()
+        rag._read_index.cache_clear()
         session_id = "multilingual-evaluation"
         try:
             for filename, content in DOCUMENTS.items():
@@ -79,8 +82,9 @@ def main() -> int:
                 "results": results,
             }
         finally:
+            settings.DOCUMENT_STORAGE_DIR = old_uploads
             settings.GAIA_DB_PATH = old_path
-            rag._sessions.clear()
+            rag._read_index.cache_clear()
 
     if args.json:
         print(json.dumps(report, ensure_ascii=False, indent=2))

@@ -42,7 +42,7 @@ def web_search(query: str, max_results: int = 5) -> List[Dict[str, str]]:
         )
         resp.raise_for_status()
     except Exception as exc:
-        logger.warning("web_search failed: %s", exc)
+        logger.warning("web search unavailable: %s", type(exc).__name__)
         return []
 
     soup = BeautifulSoup(resp.text, "html.parser")

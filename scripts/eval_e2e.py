@@ -19,7 +19,8 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config
-from src import classifier, pipeline
+from src import classifier
+from archive import campus_pipeline as pipeline
 
 SLEEP = 0.5  # be polite to the translation API; also keeps rate limits away
 

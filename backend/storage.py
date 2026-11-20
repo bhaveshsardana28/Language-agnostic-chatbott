@@ -31,11 +31,7 @@ def connect():
     path = db_path()
     parent = os.path.dirname(os.path.abspath(path))
     if parent:
-        os.makedirs(parent, exist_ok=True)
-        try:
-            os.chmod(parent, 0o700)
-        except OSError:
-            pass
+        os.makedirs(parent, mode=0o700, exist_ok=True)
     connection = sqlite3.connect(path, timeout=settings.SQLITE_TIMEOUT)
     connection.row_factory = sqlite3.Row
     for database_file in (path, f"{path}-wal", f"{path}-shm"):
@@ -159,7 +155,7 @@ def _now() -> float:
 def create_conversation(owner_id: str = "local") -> str:
     import uuid
 
-    conversation_id = uuid.uuid4().hex[:12]
+    conversation_id = uuid.uuid4().hex
     now = _now()
     with connect() as db:
         db.execute("INSERT INTO conversations(id, owner_id, created_at, updated_at) VALUES (?, ?, ?, ?)",
@@ -207,31 +203,53 @@ def claim_legacy_workspace(conversation_id: str, owner_id: str) -> bool:
     return True
 
 
-def append_message(conversation_id: str, role: str, content: str, limit: int) -> None:
+def append_messages(conversation_id: str, messages: list[tuple[str, str]], limit: int,
+                    owner_id: str | None = None, replace_reply: int | None = None) -> int | None:
     now = _now()
     with connect() as db:
-        db.execute("INSERT OR IGNORE INTO conversations(id, owner_id, created_at, updated_at) VALUES (?, 'local', ?, ?)",
-                   (conversation_id, now, now))
-        db.execute("INSERT INTO messages(conversation_id, role, content, created_at) VALUES (?, ?, ?, ?)",
-                   (conversation_id, role, content, now))
+        # Take the write lock before checking ownership. A late stream cannot
+        # recreate a deleted conversation or append to another owner's chat.
+        db.execute("BEGIN IMMEDIATE")
+        row = db.execute("SELECT owner_id FROM conversations WHERE id = ?", (conversation_id,)).fetchone()
+        if row is None or (owner_id is not None and row["owner_id"] != owner_id):
+            return
+        if replace_reply is not None:
+            recent = db.execute("SELECT id, role, content FROM messages WHERE conversation_id = ? "
+                                "ORDER BY id DESC LIMIT 2", (conversation_id,)).fetchall()
+            if (len(recent) != 2 or recent[0]["id"] != replace_reply or recent[0]["role"] != "assistant"
+                    or recent[1]["role"] != "user" or recent[1]["content"] != messages[0][1]):
+                raise ValueError("conversation changed before regeneration completed")
+            db.execute("DELETE FROM messages WHERE conversation_id = ? AND id IN (?, ?)",
+                       (conversation_id, recent[0]["id"], recent[1]["id"]))
+        db.executemany("INSERT INTO messages(conversation_id, role, content, created_at) VALUES (?, ?, ?, ?)",
+                       [(conversation_id, role, content, now) for role, content in messages])
         db.execute("""DELETE FROM messages WHERE conversation_id = ? AND id NOT IN
                     (SELECT id FROM messages WHERE conversation_id = ? ORDER BY id DESC LIMIT ?)""",
                    (conversation_id, conversation_id, limit))
         db.execute("UPDATE conversations SET updated_at = ? WHERE id = ?", (now, conversation_id))
+        return db.execute("SELECT last_insert_rowid()").fetchone()[0]
 
 
-def history(conversation_id: str) -> list[dict]:
+def history(conversation_id: str, owner_id: str | None = None, *, include_ids: bool = False) -> list[dict]:
     with connect() as db:
-        rows = db.execute("SELECT role, content FROM messages WHERE conversation_id = ? ORDER BY id",
-                          (conversation_id,)).fetchall()
+        rows = db.execute("SELECT m.id, m.role, m.content FROM messages m JOIN conversations c ON c.id = m.conversation_id "
+                          "WHERE c.id = ? AND (? IS NULL OR c.owner_id = ?) ORDER BY m.id",
+                          (conversation_id, owner_id, owner_id)).fetchall()
+    if include_ids:
+        return [dict(row) for row in rows]
     return [{"role": row["role"], "content": row["content"]} for row in rows]
 
 
-def delete_conversation(conversation_id: str) -> bool:
-    rag_deleted = delete_rag_session(conversation_id)
+def delete_conversation(conversation_id: str, owner_id: str | None = None) -> bool:
     with connect() as db:
-        result = db.execute("DELETE FROM conversations WHERE id = ?", (conversation_id,))
-    return result.rowcount > 0 or rag_deleted
+        db.execute("BEGIN IMMEDIATE")
+        result = db.execute("DELETE FROM conversations WHERE id = ? AND (? IS NULL OR owner_id = ?)",
+                            (conversation_id, owner_id, owner_id))
+        if not result.rowcount:
+            return False
+        paths = _delete_session_rows(db, conversation_id, owner_id)
+    _remove_unused_sources(paths)
+    return True
 
 
 def _persist_source(source_bytes: bytes, content_hash: str) -> tuple[str, bool]:
@@ -258,7 +276,8 @@ def _persist_source(source_bytes: bytes, content_hash: str) -> tuple[str, bool]:
 def save_document(session_id: str, filename: str, chunks: Iterable[dict], *, mode: str,
                   embedding_model: str | None, embedding_dim: int | None,
                   owner_id: str = "local", content_hash: str | None = None,
-                  extraction: dict | None = None, source_bytes: bytes | None = None) -> dict:
+                  extraction: dict | None = None, source_bytes: bytes | None = None,
+                  require_conversation: bool = False) -> dict:
     now = _now()
     chunks = list(chunks)
     extraction = extraction or {}
@@ -267,9 +286,14 @@ def save_document(session_id: str, filename: str, chunks: Iterable[dict], *, mod
     source_path = None
     created_source = False
     try:
-        if source_bytes is not None and content_hash:
-            source_path, created_source = _persist_source(source_bytes, content_hash)
         with connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            if require_conversation and not db.execute(
+                "SELECT 1 FROM conversations WHERE id = ? AND owner_id = ?", (session_id, owner_id)
+            ).fetchone():
+                raise PermissionError("conversation is unavailable")
+            if source_bytes is not None and content_hash:
+                source_path, created_source = _persist_source(source_bytes, content_hash)
             existing = db.execute("SELECT owner_id, mode, embedding_model, embedding_dim FROM rag_sessions WHERE session_id = ?",
                                   (session_id,)).fetchone()
             if existing is None:
@@ -281,6 +305,8 @@ def save_document(session_id: str, filename: str, chunks: Iterable[dict], *, mod
                     raise PermissionError("document session belongs to another workspace")
                 if existing["mode"] != mode:
                     raise RuntimeError("cannot mix embedding and keyword indexes in one document session")
+                if embedding_model != existing["embedding_model"]:
+                    raise RuntimeError("embedding model changed within this document session")
                 if embedding_dim and existing["embedding_dim"] and embedding_dim != existing["embedding_dim"]:
                     raise RuntimeError("embedding dimension changed within this document session")
                 db.execute("UPDATE rag_sessions SET updated_at = ? WHERE session_id = ?", (now, session_id))
@@ -322,10 +348,7 @@ def save_document(session_id: str, filename: str, chunks: Iterable[dict], *, mod
         return {"document_id": document_id, "duplicate": False}
     except Exception:
         if created_source and source_path:
-            try:
-                os.unlink(source_path)
-            except OSError:
-                pass
+            _remove_unused_sources([source_path])
         raise
 
 
@@ -335,23 +358,26 @@ def rag_session(session_id: str) -> dict | None:
     return dict(row) if row else None
 
 
-def rag_chunks(session_id: str) -> list[dict]:
+def rag_chunks(session_id: str, owner_id: str | None = None) -> list[dict]:
     with connect() as db:
         rows = db.execute("""SELECT c.chunk_index, c.text, c.page, c.embedding, c.embedding_dim,
                                   d.id AS document_id, d.filename
                            FROM chunks c JOIN documents d ON d.id = c.document_id
-                           WHERE d.session_id = ? ORDER BY c.id""", (session_id,)).fetchall()
+                           JOIN rag_sessions r ON d.session_id = r.session_id
+                           WHERE d.session_id = ? AND (? IS NULL OR r.owner_id = ?) ORDER BY c.id""",
+                          (session_id, owner_id, owner_id)).fetchall()
     return [dict(row) for row in rows]
 
 
-def list_documents(session_id: str) -> list[dict]:
+def list_documents(session_id: str, owner_id: str | None = None) -> list[dict]:
     with connect() as db:
         rows = db.execute("""SELECT d.id AS document_id, d.filename AS document, COUNT(*) AS chunks,
                                   d.status, d.extraction_method, d.detected_language,
                                   d.page_count, d.char_count, d.warnings
                            FROM documents d JOIN chunks c ON c.document_id = d.id
-                           WHERE d.session_id = ? GROUP BY d.id ORDER BY d.id""",
-                          (session_id,)).fetchall()
+                           JOIN rag_sessions r ON d.session_id = r.session_id
+                           WHERE d.session_id = ? AND (? IS NULL OR r.owner_id = ?) GROUP BY d.id ORDER BY d.id""",
+                          (session_id, owner_id, owner_id)).fetchall()
     result = []
     for row in rows:
         item = dict(row)
@@ -405,6 +431,7 @@ def document_report(session_id: str, document_id: int, owner_id: str | None = No
 def delete_document(session_id: str, document_id: int, owner_id: str | None = None) -> bool:
     """Delete one document and its chunks, preserving the conversation session."""
     with connect() as db:
+        db.execute("BEGIN IMMEDIATE")
         row = db.execute("""SELECT d.source_path, r.owner_id FROM documents d
                            JOIN rag_sessions r ON r.session_id = d.session_id
                            WHERE d.id = ? AND d.session_id = ?""",
@@ -416,44 +443,41 @@ def delete_document(session_id: str, document_id: int, owner_id: str | None = No
                             (document_id, session_id))
         db.execute("UPDATE rag_sessions SET updated_at = ? WHERE session_id = ?",
                    (time.time(), session_id))
-        remaining = {item[0] for item in db.execute(
-            "SELECT source_path FROM documents WHERE source_path IS NOT NULL").fetchall()}
-    if source_path and source_path not in remaining:
-        root = os.path.abspath(settings.DOCUMENT_STORAGE_DIR)
-        try:
-            if os.path.commonpath([root, os.path.abspath(source_path)]) == root:
-                os.unlink(source_path)
-        except (OSError, ValueError):
-            pass
+    _remove_unused_sources([source_path])
     return result.rowcount > 0
 
 
-def delete_rag_session(session_id: str) -> bool:
-    with connect() as db:
-        paths = [row[0] for row in db.execute(
-            "SELECT source_path FROM documents WHERE session_id = ? AND source_path IS NOT NULL",
-            (session_id,),
-        ).fetchall()]
-        result = db.execute("DELETE FROM rag_sessions WHERE session_id = ?", (session_id,))
-        remaining = {
-            row[0] for row in db.execute(
-                "SELECT source_path FROM documents WHERE source_path IS NOT NULL"
-            ).fetchall()
-        }
+def _delete_session_rows(db, session_id, owner_id):
+    paths = [row[0] for row in db.execute(
+        "SELECT source_path FROM documents WHERE session_id = ?", (session_id,)
+    )]
+    result = db.execute("DELETE FROM rag_sessions WHERE session_id = ? AND (? IS NULL OR owner_id = ?)",
+                        (session_id, owner_id, owner_id))
+    return paths if result.rowcount else None
+
+
+def _remove_unused_sources(paths):
+    if not paths:
+        return
     root = os.path.abspath(settings.DOCUMENT_STORAGE_DIR)
-    for path in paths:
-        try:
-            if path and path not in remaining and os.path.commonpath([root, os.path.abspath(path)]) == root:
-                os.unlink(path)
-        except (OSError, ValueError):
-            pass
-    return result.rowcount > 0
-
-
-def reset_for_tests() -> None:
     with connect() as db:
-        db.execute("DELETE FROM conversations")
-        db.execute("DELETE FROM rag_sessions")
+        db.execute("BEGIN IMMEDIATE")
+        for path in set(paths):
+            if not path or os.path.dirname(os.path.abspath(path)) != root:
+                continue
+            if not db.execute("SELECT 1 FROM documents WHERE source_path = ? LIMIT 1", (path,)).fetchone():
+                try:
+                    os.unlink(path)
+                except FileNotFoundError:
+                    pass
+
+
+def delete_rag_session(session_id: str, owner_id: str | None = None) -> bool:
+    with connect() as db:
+        db.execute("BEGIN IMMEDIATE")
+        paths = _delete_session_rows(db, session_id, owner_id)
+    _remove_unused_sources(paths)
+    return paths is not None
 
 
 init_db()

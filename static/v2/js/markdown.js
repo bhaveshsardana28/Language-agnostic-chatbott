@@ -5,18 +5,20 @@ const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({
 }[char]));
 
 function inline(value) {
-  let text = escapeHtml(value);
-  const links = [];
-  text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_, label, url) => {
-    const index = links.push(`<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${label}</a>`) - 1;
-    return `\u0000LINK${index}\u0000`;
-  });
-  text = text.replace(/`([^`\n]+)`/g, '<code>$1</code>');
-  text = text.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
-  text = text.replace(/__([^_\n]+)__/g, '<strong>$1</strong>');
-  text = text.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
-  text = text.replace(/(^|[^_])_([^_\n]+)_/g, '$1<em>$2</em>');
-  return text.replace(/\u0000LINK(\d+)\u0000/g, (_, index) => links[index]);
+  // Tokenize code and links before emphasis. Markup inside a code span is literal.
+  const pieces = String(value).split(/(`[^`\n]+`|\[[^\]\n]+\]\(https?:\/\/[^\s)]+\))/g);
+  return pieces.map((piece, index) => {
+    if (index % 2) {
+      if (piece.startsWith('`')) return `<code>${escapeHtml(piece.slice(1, -1))}</code>`;
+      const [, label, url] = piece.match(/^\[([^\]\n]+)\]\((.+)\)$/);
+      return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
+    }
+    return escapeHtml(piece)
+      .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/__([^_\n]+)__/g, '<strong>$1</strong>')
+      .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>')
+      .replace(/(^|[^_])_([^_\n]+)_/g, '$1<em>$2</em>');
+  }).join('');
 }
 
 function codeBlock(language, content, index) {

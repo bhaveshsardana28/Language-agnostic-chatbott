@@ -32,14 +32,12 @@ class TinyEmbed:
 def isolated_store(tmp_path, monkeypatch):
     monkeypatch.setattr(settings, "GAIA_DB_PATH", str(tmp_path / "recovery.db"))
     storage.init_db()
-    memory._conversations.clear()
-    rag._sessions.clear()
+    rag._read_index.cache_clear()
     old_model = rag._model
     rag._model = TinyEmbed()
     yield
     rag._model = old_model
-    memory._conversations.clear()
-    rag._sessions.clear()
+    rag._read_index.cache_clear()
 
 
 def test_conversation_and_document_recover_after_cache_reset(isolated_store):
@@ -51,8 +49,7 @@ def test_conversation_and_document_recover_after_cache_reset(isolated_store):
     assert report["embeddings"] is True
 
     # A process restart discards both hot caches but not SQLite state.
-    memory._conversations.clear()
-    rag._sessions.clear()
+    rag._read_index.cache_clear()
     assert memory.history(cid) == [
         {"role": "user", "content": "hello"},
         {"role": "assistant", "content": "hi"},

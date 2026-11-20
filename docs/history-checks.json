@@ -1,0 +1,23 @@
+{
+  "phase": 6,
+  "environment": {
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "python": "3.12.7"
+  },
+  "scope": "V2 local history persistence, restoration, switching, malformed storage and storage failure",
+  "passed_groups": [
+    "persist: V2 history stores title, server ID, turns and no DOM runtime objects",
+    "restore: reload reconstructs the conversation, metadata and assistant rendering",
+    "switch: New chat preserves old history and selecting a row restores without duplicates",
+    "search: title/message filtering, content snippet and explicit no-results state",
+    "rename: accessible dialog validates, trims and synchronizes sidebar/header/storage",
+    "export: selected conversation downloads a sanitized Markdown transcript with roles and language",
+    "delete: cancel is a no-op and confirmation removes the selected local record",
+    "malformed: invalid V2 history falls back to an empty usable shell",
+    "server cleanup: confirmed delete uses the server ID and preserves legacy storage",
+    "blocked: storage failure leaves the current-tab chat usable and protects legacy storage"
+  ],
+  "screenshots": [
+    "docs/screenshots/phase6/light-1440-history.png"
+  ]
+}

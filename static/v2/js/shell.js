@@ -13,6 +13,32 @@ export function initShell() {
   const sidebar = document.getElementById('app-sidebar');
   const drawer = document.getElementById('navigation-drawer');
   const draft = document.getElementById('message-input');
+  const connection = document.querySelector('.service-menu');
+  document.addEventListener('click', event => {
+    if (!connection.contains(event.target)) connection.open = false;
+  });
+  connection.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      connection.open = false;
+      connection.querySelector('summary').focus();
+    }
+  });
+
+  const languageDialog = document.getElementById('language-dialog');
+  const replyLanguage = document.getElementById('reply-language');
+  const instruction = /(?:^|\n)Reply in (English|Hindi|Punjabi|Spanish|French|German|Italian)\.\s*$/;
+  document.getElementById('reply-language-form').addEventListener('submit', event => {
+    event.preventDefault();
+    const body = draft.value.replace(instruction, '');
+    const lang = replyLanguage.value;
+    draft.value = lang ? body + '\nReply in ' + lang + '.' : body;
+    // Only the unfilled template is disabled. A hand-typed follow-up is a valid message.
+    draft.dataset.languageTemplate = !body.trim() && lang ? draft.value : '';
+    draft.dispatchEvent(new Event('input', { bubbles: true }));
+    languageDialog.close();
+    draft.focus();
+    draft.setSelectionRange(body.length, body.length);
+  });
   let lastFocused = document.activeElement;
   document.addEventListener('focusin', event => { lastFocused = event.target; });
 
@@ -67,6 +93,7 @@ export function initShell() {
     button.addEventListener('click', async () => {
       const wasMobileNav = drawer.contains(button);
        await closeNavigation();
+       if (button.dataset.shellOpen === 'language-dialog') replyLanguage.value = draft.value.match(instruction)?.[1] || '';
        openOverlay(button.dataset.shellOpen, wasMobileNav && !desktop.matches ? toggle : button);
        if (button.dataset.shellOpen === 'search-dialog') {
          requestAnimationFrame(() => document.getElementById('search-dialog-input')?.focus());
@@ -81,7 +108,7 @@ export function initShell() {
       document.getElementById('conversation-heading').textContent = 'New conversation';
       document.getElementById('main-content').scrollTop = 0;
       draft.focus({ preventScroll: true });
-      toast('A fresh draft. No server conversation was created.');
+      toast('New chat ready.');
     });
   });
   function resizeDraft() {

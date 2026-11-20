@@ -15,6 +15,7 @@ Design decisions (documented, not vibes):
 
 from __future__ import annotations
 
+from functools import lru_cache
 import logging
 import hashlib
 import json
@@ -35,16 +36,21 @@ KEYWORD_GROUND_THRESHOLD = 0.05
 
 _model = None
 _model_lock = threading.Lock()
-_sessions: dict[str, dict] = {}  # session_id -> {texts, metas, matrix}
 
 
-def _load_store(session_id: str) -> dict | None:
-    """Load one persisted session into the hot cache, if it exists."""
-    if session_id in _sessions:
-        return _sessions[session_id]
+def _load_store(session_id: str, owner_id: str | None = None) -> dict | None:
     session = storage.rag_session(session_id)
-    rows = storage.rag_chunks(session_id)
-    if not session or not rows:
+    if not session or (owner_id is not None and session["owner_id"] != owner_id):
+        return None
+    return _read_index(storage.db_path(), session_id, session["owner_id"], session["updated_at"],
+                       session["mode"], session["embedding_model"], session["embedding_dim"])
+
+
+@lru_cache(maxsize=16)
+def _read_index(db_path, session_id, owner_id, revision, mode, model, dimension):
+    """Cache immutable snapshots by database, owner and committed revision."""
+    rows = storage.rag_chunks(session_id, owner_id)
+    if not rows:
         return None
     texts = [row["text"] for row in rows]
     metas = []
@@ -57,9 +63,10 @@ def _load_store(session_id: str) -> dict | None:
         metas.append(meta)
 
     matrix = None
-    if session["mode"] == "embedding":
+    if mode == "embedding":
         vectors = []
-        dimension = session["embedding_dim"]
+        if model != EMBEDDING_MODEL:
+            raise RuntimeError("persisted embedding model does not match configured model")
         for row in rows:
             if not row["embedding"] or row["embedding_dim"] != dimension:
                 raise RuntimeError(f"persisted embedding is invalid for session {session_id}")
@@ -69,7 +76,6 @@ def _load_store(session_id: str) -> dict | None:
             vectors.append(vector)
         matrix = np.vstack(vectors).astype(np.float32, copy=False)
     store = {"texts": texts, "metas": metas, "matrix": matrix}
-    _sessions[session_id] = store
     return store
 
 
@@ -93,14 +99,11 @@ def embeddings_available() -> bool:
 
 
 def has_session(session_id: str, owner_id: str | None = None) -> bool:
-    session = storage.rag_session(session_id)
-    if owner_id is not None and session and session["owner_id"] != owner_id:
-        return False
-    store = _load_store(session_id)
-    return bool(store and store["texts"])
+    return bool(storage.list_documents(session_id, owner_id))
 
 
-def add_document(session_id: str, file_bytes: bytes, filename: str, owner_id: str = "local") -> dict:
+def add_document(session_id: str, file_bytes: bytes, filename: str, owner_id: str = "local",
+                 require_conversation: bool = False) -> dict:
     """Extract -> chunk -> embed -> store under the session. Returns an
     ingestion report (never silently skips a failed document — caller 400s)."""
     session = storage.rag_session(session_id)
@@ -139,19 +142,6 @@ def add_document(session_id: str, file_bytes: bytes, filename: str, owner_id: st
     chunks = [chunk for chunk, _ in chunk_records]
     if not chunks:
         raise documents.EmptyExtraction(f"no extractable text in {filename}")
-    metas = []
-    for i, (chunk, page) in enumerate(chunk_records):
-        meta = {"document": filename, "chunk": i}
-        if page is None:
-            page = documents.page_number(chunk)
-        if page is not None:
-            meta["page"] = page
-        metas.append(meta)
-
-    store = _load_store(session_id)
-    created = store is None
-    if store is None:
-        store = {"texts": [], "metas": [], "matrix": None}
 
     # A keyword session stays keyword-only after restart. Conversely, an
     # embedding session must keep its model/dimension contract stable.
@@ -162,28 +152,16 @@ def add_document(session_id: str, file_bytes: bytes, filename: str, owner_id: st
     if session and session["mode"] == "embedding" and not use_embeddings:
         raise RuntimeError("embedding service is unavailable for this persisted document session")
 
-    try:
-        if use_embeddings:
-            vecs = _get_model().encode(chunks, normalize_embeddings=True,
-                                       show_progress_bar=False)
-            vecs = np.asarray(vecs, dtype=np.float32)
-            if vecs.ndim != 2 or len(vecs) != len(chunks) or not np.isfinite(vecs).all():
-                raise RuntimeError(f"embedding generation returned an invalid matrix for {filename}")
-            if store["matrix"] is not None and store["matrix"].shape[1] != vecs.shape[1]:
-                raise RuntimeError("embedding dimension changed within this conversation")
-            combined = vecs if store["matrix"] is None else np.vstack([store["matrix"], vecs])
-        elif store["matrix"] is not None:
-            raise RuntimeError("embedding service became unavailable for an existing vector session")
-        else:
-            combined = None
-    except Exception:
-        if created and not store["texts"]: _sessions.pop(session_id, None)
-        raise
-
-    embedding_dim = int(combined.shape[1]) if combined is not None else None
+    embedding_dim = None
+    if use_embeddings:
+        vecs = np.asarray(_get_model().encode(chunks, normalize_embeddings=True,
+                                              show_progress_bar=False), dtype=np.float32)
+        if vecs.ndim != 2 or len(vecs) != len(chunks) or not np.isfinite(vecs).all():
+            raise RuntimeError("invalid embedding matrix")
+        embedding_dim = int(vecs.shape[1])
     chunk_rows = []
-    for index, chunk in enumerate(chunks):
-        row = {"text": chunk, "page": metas[index].get("page")}
+    for index, (chunk, page) in enumerate(chunk_records):
+        row = {"text": chunk, "page": page if page is not None else documents.page_number(chunk)}
         if use_embeddings:
             row["embedding"] = np.asarray(vecs[index], dtype=np.float32).tobytes()
             row["embedding_dim"] = int(vecs.shape[1])
@@ -196,39 +174,24 @@ def add_document(session_id: str, file_bytes: bytes, filename: str, owner_id: st
     # Commit text, metadata and vectors together only after extraction and
     # embedding have both succeeded. SQLite's transaction means a failed
     # upload cannot poison either the durable or hot session.
-    try:
-        saved = storage.save_document(
-            session_id, filename, chunk_rows,
-            mode="embedding" if use_embeddings else "keyword",
-            embedding_model=EMBEDDING_MODEL if use_embeddings else None,
-            embedding_dim=embedding_dim, owner_id=owner_id,
-            content_hash=content_hash, extraction=report.to_dict(), source_bytes=file_bytes,
-        )
-    except Exception:
-        if created and not store["texts"]:
-            _sessions.pop(session_id, None)
-        raise
-    if saved.get("duplicate"):
-        # A concurrent request won the content-hash race.  Do not append a
-        # second copy to the hot cache; reload the committed canonical rows.
-        _sessions.pop(session_id, None)
-        canonical = _load_store(session_id)
-        report.document_id = saved["document_id"]
-        return _ingestion_response(
-            report.to_dict(), saved["document_id"], duplicate=True,
-            document=filename, chars=len(text),
-            chunks=len(canonical["texts"]) if canonical else len(chunks),
-            embeddings=bool(canonical and canonical["matrix"] is not None),
-        )
-    store["texts"].extend(chunks)
-    store["metas"].extend(metas)
-    store["matrix"] = combined
-    _sessions[session_id] = store
+    saved = storage.save_document(
+        session_id, filename, chunk_rows, mode="embedding" if use_embeddings else "keyword",
+        embedding_model=EMBEDDING_MODEL if use_embeddings else None,
+        embedding_dim=embedding_dim, owner_id=owner_id, content_hash=content_hash,
+        extraction=report.to_dict(), source_bytes=file_bytes, require_conversation=require_conversation,
+    )
+    if saved["duplicate"]:
+        # A concurrent upload indexed these bytes first. Return its canonical filename/report.
+        canonical = storage.document_report(session_id, saved["document_id"], owner_id)
+        if canonical:
+            report_data = canonical["report"]
+            return _ingestion_response(report_data, saved["document_id"], duplicate=True,
+                                       chunks=len(chunks), embeddings=use_embeddings)
     report.document_id = saved["document_id"]
     return _ingestion_response(report.to_dict(), saved["document_id"],
                                duplicate=saved.get("duplicate", False),
                                document=filename, chars=report.to_dict()["char_count"], chunks=len(chunks),
-                               embeddings=store["matrix"] is not None)
+                               embeddings=use_embeddings)
 
 
 def _ingestion_response(report: dict, document_id: int, *, duplicate: bool = False,
@@ -260,8 +223,9 @@ def _ingestion_response(report: dict, document_id: int, *, duplicate: bool = Fal
     return response
 
 
-def query(session_id: str, query_text: str, top_k: int = TOP_K, overview: bool = False) -> dict:
-    store = _load_store(session_id)
+def query(session_id: str, query_text: str, top_k: int = TOP_K, overview: bool = False,
+          owner_id: str | None = None) -> dict:
+    store = _load_store(session_id, owner_id)
     if not store or not store["texts"]:
         return {"hits": [], "degraded": False}
 
@@ -322,28 +286,12 @@ def grounded(hits: list[dict], degraded: bool = False, query_text: str = "") -> 
 
 def list_documents(session_id: str, owner_id: str | None = None) -> list[dict]:
     """Unique documents + chunk counts for this session (UI document panel)."""
-    session = storage.rag_session(session_id)
-    if owner_id is not None and session and session["owner_id"] != owner_id:
-        return []
-    return storage.list_documents(session_id)
+    return storage.list_documents(session_id, owner_id)
 
 
 def delete_session(session_id: str, owner_id: str | None = None) -> bool:
-    session = storage.rag_session(session_id)
-    if owner_id is not None and session and session["owner_id"] != owner_id:
-        return False
-    cached = _sessions.pop(session_id, None) is not None
-    return storage.delete_rag_session(session_id) or cached
+    return storage.delete_rag_session(session_id, owner_id)
 
 
 def delete_document(session_id: str, document_id: int, owner_id: str | None = None) -> bool:
-    """Remove one document while keeping the rest of the conversation's index."""
-    session = storage.rag_session(session_id)
-    if owner_id is not None and session and session["owner_id"] != owner_id:
-        return False
-    deleted = storage.delete_document(session_id, document_id, owner_id=owner_id)
-    if deleted:
-        _sessions.pop(session_id, None)
-        if storage.rag_chunks(session_id):
-            _load_store(session_id)
-    return deleted
+    return storage.delete_document(session_id, document_id, owner_id)

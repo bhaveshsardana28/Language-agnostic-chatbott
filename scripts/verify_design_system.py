@@ -248,13 +248,17 @@ def interactions(page, theme, capture):
 
     opener.click()
     page.locator("#reset-preferences").click()
-    expect(dialog.locator(".toast-inline")).to_contain_text("Preview preferences reset")
+    expect(dialog.locator(".toast-inline")).to_contain_text("Preferences reset")
     assert page.evaluate(f"localStorage.getItem('{KEY}')") is None
     assert page.evaluate("localStorage.getItem('gaia.store.v1')") == "legacy sentinel"
     page.keyboard.press("Escape")
     expect(dialog).to_be_hidden()
     page.emulate_media(reduced_motion="reduce")
     expect(page.locator("html")).to_have_attribute("data-motion", "reduced")
+    expect(page.locator("html")).to_have_attribute("data-theme", "dark")
+    opener.click()
+    page.locator('input[name="theme"][value="system"]').check()
+    page.keyboard.press("Escape")
     page.emulate_media(color_scheme=other)
     expect(page.locator("html")).to_have_attribute("data-theme", other)
     page.locator("#preview-message").fill("Timer check")
@@ -273,6 +277,7 @@ def run(origin, capture):
             context = browser.new_context(color_scheme=theme, reduced_motion="no-preference",
                                           permissions=["clipboard-read", "clipboard-write"])
             context.add_init_script("""if (!sessionStorage.getItem('test-seeded')) {
+                localStorage.setItem('gaia.redesign.v2', JSON.stringify({theme:'system'}));
                 localStorage.setItem('gaia.store.v1', 'legacy sentinel');
                 sessionStorage.setItem('test-seeded', 'true');
               }

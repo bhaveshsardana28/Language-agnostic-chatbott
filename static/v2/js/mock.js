@@ -19,7 +19,7 @@ const responseFor = message => {
   };
   return {
     language_meta: { language: 'en', primary_language: 'en', language_name: 'English', secondary_languages: [], code_switched: false, mixed_script: false, scripts: { Latin: 1 }, script: 'Latin', confidence: 0.99, detection_reason: 'fixture' },
-    route: 'campus_kb', reason: 'fixture', response_lang: 'en', intent: 'general', confidence: 0.92, degraded: false,
+    route: 'general', reason: 'fixture', response_lang: 'en',
     text: 'Start with a little of it every day. Choose a useful phrase, listen to how it sounds, and use it in a real conversation.\n\n> Small conversations make a good beginning.',
   };
 };

@@ -36,7 +36,7 @@ export function initAppearance() {
   });
   reset?.addEventListener('click', () => {
     const cleared = resetPreferences();
-    toast(cleared ? 'Preview preferences reset. Your existing chats were not touched.'
+    toast(cleared ? 'Preferences reset. Your saved chats are unchanged.'
       : 'Preferences reset for this visit. Browser storage could not be cleared.');
   });
 }

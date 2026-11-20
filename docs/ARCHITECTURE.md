@@ -1,31 +1,12 @@
-# Architecture (what actually runs — 30 Sep 2026)
+# GAIA V2 architecture
 
-Core separation: **engine** (language-agnostic) vs **domain** (the campus KB).
-Everything in `src/` is language- and domain-agnostic; everything
-campus-specific lives in `data/intents_en.json` + `config.py`.
+The main entry point serves static HTML, CSS and native JavaScript modules from FastAPI. The browser sends a message and optional conversation ID to `POST /api/v1/chat`. Workspace-cookie checks scope stored messages and documents to the conversation owner.
 
-```
-user text (any supported language)
-  │
-  ▼  src/detection.py — langdetect (55-lang naive-Bayes profiles) + heuristics
-language metadata {language, language_name, script, confidence}
-  │
-  ▼  config.SUPPORTED_LANGS gate — unsupported → localized decline
-  ▼  src/translation.py — translate to English (pivot)
-  │     provider chain: Google → MyMemory, retry+backoff, disk cache
-  ▼  src/classifier.py — TF-IDF(unigram) + LogisticRegression (ONE English model)
-intent + probability
-  │
-  ▼  confidence gate (0.30, tuned by scripts/tune_threshold.py)
-low → localized fallback (per-language strings, no MT needed)   high ↓
-  ▼  response KB: random choice from 4 responses/intent (data/intents_en.json)
-  ▼  translate back over the same provider chain
-reply + metadata + per-stage timings  →  Flask UI (language · intent · conf badges)
-```
+1. `src/detection.py` identifies the language of each message, including mixed-script signals.
+2. `backend/router.py` honors explicit translation requests, reply-language instructions, document questions and recency signals. Other messages use general chat, or the existing document route when the conversation has uploads.
+3. `backend/main.py` builds the relevant provider messages. General chat uses the original text and recent conversation history. Document chat adds retrieved excerpts. Web chat adds search results. Explicit translation uses the cached translation helper.
+4. `backend/llm.py` streams the configured provider. Successful turns are recorded in SQLite. The browser renders text, metadata and returned sources.
 
-Extension mechanics (the thesis): a new language = add it to
-`config.SUPPORTED_LANGS` + one fallback string. Italian was added live as
-proof. A new *intent* = 20 English examples + 4 responses + `train.py` rerun.
+The separate legacy form submits stateless JSON to `/chat` on Flask or FastAPI. Both use the same compatibility adapter and general assistant instructions. Trained intent models, bundled FAQ data and classifier evaluation scripts have no role in startup, live routing or document indexing.
 
-Deliberately absent (v2 roadmap, not bugs): vector retrieval/RAG, LLM
-generation, server-side memory, auth, Docker. Rationale in LIMITATIONS.md.
+See [API](API.md), [models](MODELS.md), and [deployment](DEPLOYMENT.md).

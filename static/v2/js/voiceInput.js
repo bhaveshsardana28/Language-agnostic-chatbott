@@ -1,3 +1,4 @@
+import { stopPlayback } from './voiceOutput.js';
 import { getPreferences } from './preferences.js';
 import { toast } from './ui.js';
 
@@ -26,10 +27,13 @@ export function initVoiceInput(chat) {
   let state = 'idle';
   let baseText = '';
   let finalSegments = [];
-  let lastError = false;
+  let watchdog;
 
   const supported = Boolean(recognitionConstructor());
-  const setStatus = text => { status.textContent = text; };
+  const setStatus = text => {
+    status.textContent = text;
+    status.dataset.quiet = String(text === 'Voice input ready.');
+  };
   const localeFor = () => {
     const preference = getPreferences().speechLanguage;
     if (preference !== 'auto') return preference;
@@ -37,12 +41,13 @@ export function initVoiceInput(chat) {
   };
   const syncButton = () => {
     const listening = state === 'listening';
+    const engaged = listening || state === 'processing';
     const requesting = state === 'requesting';
     button.disabled = !supported || requesting;
     button.setAttribute('aria-pressed', String(listening));
     button.dataset.state = state;
-    button.setAttribute('aria-label', listening ? 'Stop voice input' : 'Start voice input');
-    button.title = supported ? (listening ? 'Stop voice input' : 'Start voice input') : 'Voice input is not supported in this browser';
+    button.setAttribute('aria-label', engaged ? 'Stop voice input' : 'Start voice input');
+    button.title = supported ? (engaged ? 'Stop voice input' : 'Start voice input') : 'Voice input is not supported in this browser';
   };
   const setState = (next, message) => {
     state = next;
@@ -56,8 +61,9 @@ export function initVoiceInput(chat) {
     input.dispatchEvent(new Event('input', { bubbles: true }));
   };
   const finish = message => {
+    clearTimeout(watchdog);
     recognition = null;
-    setState('idle', message || (lastError ? status.textContent : 'Voice input ready when supported.'));
+    setState('idle', message || 'Voice input ready.');
   };
   const stop = (message = 'Voice input stopped.') => {
     if (!recognition) {
@@ -69,11 +75,11 @@ export function initVoiceInput(chat) {
   };
   const start = () => {
     if (!supported) return;
-    if (state === 'requesting' || state === 'listening') { stop(); return; }
+    if (state === 'requesting' || state === 'listening' || state === 'processing') { stop(); return; }
+    stopPlayback();
     const Recognition = recognitionConstructor();
     baseText = input.value;
     finalSegments = [];
-    lastError = false;
     let instance;
     try { instance = new Recognition(); recognition = instance; } catch {
       finish('Voice input could not start. Type your message instead.');
@@ -83,7 +89,24 @@ export function initVoiceInput(chat) {
     instance.interimResults = true;
     instance.maxAlternatives = 1;
     instance.lang = localeFor();
-    instance.onstart = () => { if (recognition === instance) setState('listening', `Listening in ${instance.lang}. Speak when ready.`); };
+    const timeout = (delay, message) => {
+      clearTimeout(watchdog);
+      watchdog = setTimeout(() => {
+        if (recognition !== instance) return;
+        finish(message);
+        try { instance.abort(); } catch { /* engine already ended */ }
+      }, delay);
+    };
+    instance.onstart = () => {
+      if (recognition !== instance) return;
+      setState('listening', `Listening in ${instance.lang}. Speak when ready.`);
+      timeout(90000, 'Voice input timed out. Your draft is ready to edit.');
+    };
+    instance.onspeechend = () => {
+      if (recognition !== instance) return;
+      setState('processing', 'Finishing transcription…');
+      timeout(12000, 'Transcription timed out. Review your draft or try again.');
+    };
     instance.onresult = event => {
       if (recognition !== instance) return;
       let interim = '';
@@ -97,13 +120,13 @@ export function initVoiceInput(chat) {
     };
     instance.onerror = event => {
       if (recognition !== instance) return;
-      lastError = true;
       const message = ERROR_COPY[event.error] || 'Voice input stopped unexpectedly. Type your message instead.';
-      setStatus(message);
+      finish(message);
       toast(message);
     };
-    instance.onend = () => { if (recognition === instance) finish(lastError ? status.textContent : 'Voice input ready when supported.'); };
+    instance.onend = () => { if (recognition === instance) finish(); };
     setState('requesting', `Requesting voice input in ${instance.lang}…`);
+    timeout(20000, 'Voice service did not start. Check microphone permissions or type your message.');
     try { instance.start(); }
     catch { finish('Voice input could not start. Type your message instead.'); }
   };
@@ -116,6 +139,7 @@ export function initVoiceInput(chat) {
     button.title = 'Voice input is not supported in this browser';
     setStatus('Voice input is not supported in this browser. Type your message instead.');
   } else {
+    setStatus('Voice input ready.');
     syncButton();
     button.addEventListener('click', start);
     document.addEventListener('keydown', event => {
@@ -126,7 +150,7 @@ export function initVoiceInput(chat) {
   }
   form.addEventListener('submit', () => stop('Voice input stopped. Draft is ready to send.'), true);
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && (state === 'requesting' || state === 'listening')) {
+    if (event.key === 'Escape' && (state === 'requesting' || state === 'listening' || state === 'processing')) {
       event.preventDefault();
       stop();
     }

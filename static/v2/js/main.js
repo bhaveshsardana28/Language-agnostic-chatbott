@@ -7,6 +7,7 @@ import { initConnection } from './connection.js';
 import { initChat } from './chat.js';
 import { initDocuments } from './documents.js';
 import { initVoiceInput } from './voiceInput.js';
+import { initIntelligence } from './intelligence.js';
 
 initIcons();
 initUI();
@@ -14,6 +15,7 @@ initAppearance();
 initShell();
 initWelcome();
 initConnection();
+initIntelligence();
 const chatController = initChat();
 initDocuments(chatController);
 initVoiceInput(chatController);

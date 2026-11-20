@@ -1,0 +1,17 @@
+{
+  "phase": 5,
+  "environment": {
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "python": "3.12.7"
+  },
+  "scope": "per-message language metadata, switching dividers, direction, confidence hints and Insights",
+  "passed_groups": [
+    "metadata: native/English language labels, script label, confidence boundary and auto direction",
+    "insights: default-off toggle persists and reveals real reply metadata",
+    "switching: divider appears once only when assistant response language changes",
+    "low-confidence: dashed language hint and accessible verification title are exposed"
+  ],
+  "screenshots": [
+    "docs/screenshots/phase5/dark-1440-multilingual.png"
+  ]
+}

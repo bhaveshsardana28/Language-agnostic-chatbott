@@ -1,0 +1,24 @@
+{
+  "phase": 4,
+  "environment": {
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "python": "3.12.7"
+  },
+  "scope": "chat transport, mock stream, rendering, cancellation and keyless campus smoke",
+  "passed_groups": [
+    "mock: labelled simulation, delayed stream, 4,000-char guard, code rendering, route metadata, copy actions and no chat POST",
+    "mock: Escape cancellation retains a partial/error-safe answer and blocks late deltas",
+    "mock: New chat aborts ownership, clears the log and resets the draft",
+    "renderer: hostile HTML escaped, javascript links rejected, HTTPS links constrained and plain text extracted",
+    "live-shaped error: HTTP 413 becomes a safe assistant error with Retry",
+    "stream: meta without delta becomes an explicit empty-reply state",
+    "stream: malformed SSE never injects raw data and remains recoverable",
+    "LIVE campus: two SSE replies rendered; second request carried server conversation ID 5da6f6ca7df2"
+  ],
+  "screenshots": [
+    "docs/screenshots/phase4/mock-1440-code.png",
+    "docs/screenshots/phase4/light-360-errors.png",
+    "docs/screenshots/phase4/light-1024-live-campus.png"
+  ],
+  "live": true
+}

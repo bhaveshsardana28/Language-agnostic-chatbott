@@ -1,3 +1,4 @@
+import { addPlaybackButton, stopPlayback } from './voiceOutput.js';
 import { API_BASE } from '../config.js';
 import { createConversation, deleteConversation as deleteServerConversation } from './api.js';
 import { mockStream } from './mock.js';
@@ -6,10 +7,10 @@ import { closeNavigation } from './shell.js';
 import { toast, openOverlay, closeOverlay } from './ui.js';
 import { loadHistory, newConversation, saveHistory, serializeMessage, titleFromMessage } from './history.js';
 
-const MAX_CHARS = 4000;
+const messageLimit = () => globalThis.gaiaDocumentCapabilities?.max_message_chars || 4000;
 const STREAM_TIMEOUT = 30000;
 const mock = new URLSearchParams(location.search).get('mock') === '1';
-const ASSISTANT_NAME = 'Polyglot AI';
+const ASSISTANT_NAME = 'GAIA';
 const LANGUAGE_NAMES = Object.freeze({
   en: { native: 'English', english: 'English', script: 'Latin' },
   hi: { native: 'हिन्दी', english: 'Hindi', script: 'Devanagari' },
@@ -28,8 +29,10 @@ function localTimestamp(timestamp = Date.now()) {
 function safeError(error) {
   if (error?.name === 'AbortError') return 'The request was stopped before it finished.';
   if (error?.status === 400) return 'Write a message before sending.';
-  if (error?.status === 413) return 'That message is too long. Keep it under 4,000 characters.';
+  if (error?.status === 413) return `That message is too long. Keep it under ${messageLimit().toLocaleString()} characters.`;
   if (error?.status === 403) return 'This conversation is not available in the current workspace. Start a new conversation.';
+  if (error?.status === 429) return 'The service is busy. Wait a moment and retry.';
+  if (error?.status === 409) return 'The conversation changed. Send a new message to continue.';
   if (error?.status === 404) return 'That conversation is no longer available. Start a new conversation.';
   return 'I could not complete that reply. Check the connection and try again.';
 }
@@ -70,10 +73,10 @@ async function readSSE(response, onFrame, signal) {
   if (!sawDone) throw new Error('The reply ended before completion.');
 }
 
-async function streamLive(message, conversationId, { signal, onFrame }) {
+async function streamLive(message, conversationId, { signal, onFrame, replaceReply }) {
   const response = await fetch(`${API_BASE}/api/v1/chat`, {
     method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' }, credentials: 'include',
-    body: JSON.stringify({ message, conversation_id: conversationId }), signal,
+    body: JSON.stringify({ message, conversation_id: conversationId, replace_reply: replaceReply }), signal,
   });
   await readSSE(response, onFrame, signal);
 }
@@ -120,6 +123,10 @@ export function initChat() {
   let historyMenuSequence = 0;
   const messages = [];
 
+  function intelligence(detail) {
+    document.dispatchEvent(new CustomEvent('v2intelligence', { detail }));
+  }
+
   function persistHistory() {
     if (saveHistory(historyState)) return true;
     if (!storageWarningShown) {
@@ -136,6 +143,7 @@ export function initChat() {
   }
   function setHeading(title) {
     document.getElementById('conversation-heading').textContent = title || 'New conversation';
+    document.getElementById('conversation-view-title').textContent = title || 'Conversation';
   }
   function resetHeaderLanguage() {
     const label = document.getElementById('shell-language-label');
@@ -349,6 +357,7 @@ export function initChat() {
       return record.serverId;
     }
     record.serverId = mock ? 'mock-document-conversation' : await createConversation();
+    if (currentConversation() !== record) throw new DOMException("Conversation changed", "AbortError");
     conversationId = record.serverId;
     record.updatedAt = Date.now();
     persistHistory();
@@ -383,15 +392,20 @@ export function initChat() {
     banner.hidden = false;
     banner.textContent = 'Simulation mode · delayed fixture stream · no backend request';
     composerNote.textContent = 'Mock chat only · no backend request or server memory.';
+    document.getElementById('conversation-mode').hidden = false;
     document.getElementById('conversation-mode').textContent = 'Simulated stream';
   }
   function scrollLatest() { main.scrollTo({ top: main.scrollHeight, behavior: document.documentElement.dataset.motion === 'reduced' ? 'auto' : 'smooth' }); }
+  function hasQuestion(value) {
+    return Boolean(value.trim()) && value !== input.dataset.languageTemplate;
+  }
   function updateInput() {
-    const length = input.value.length;
-    counter.textContent = `${length.toLocaleString()} / ${MAX_CHARS.toLocaleString()}`;
-    counter.dataset.state = length > MAX_CHARS ? 'over' : length > 3600 ? 'warn' : '';
-    send.disabled = active ? false : documentProcessing || !input.value.trim() || length > MAX_CHARS;
-    input.setAttribute('aria-invalid', String(length > MAX_CHARS));
+    const length = Array.from(input.value).length;
+    const limit = messageLimit();
+    counter.textContent = `${length.toLocaleString()} / ${limit.toLocaleString()}`;
+    counter.dataset.state = length > limit ? 'over' : length > limit * 0.9 ? 'warn' : '';
+    send.disabled = active ? false : documentProcessing || !hasQuestion(input.value) || length > limit;
+    input.setAttribute('aria-invalid', String(length > limit));
   }
   function appendLanguageChip(head, code, meta, { detected = false } = {}) {
     if (!code) return;
@@ -442,7 +456,8 @@ export function initChat() {
     const route = document.createElement('span');
     route.className = 'chat-route';
     route.dataset.chatMeta = 'route';
-    route.textContent = message.meta.route;
+    const labels = { campus_kb: 'Campus', document: 'Documents', translate: 'Translation', web: 'Web', general: 'General' };
+    route.textContent = labels[message.meta.route] || message.meta.route;
     route.title = message.meta.reason || 'Response route';
     head.insertBefore(route, head.querySelector('time'));
   }
@@ -486,17 +501,17 @@ export function initChat() {
           item.append(text);
         }
       } else if (typeof source.document === 'string') {
-        const page = Number.isFinite(Number(source.page)) ? ` · page ${Number(source.page)}` : '';
+        const page = Number.isFinite(source.page) ? ` · page ${Number(source.page)}` : '';
         const link = document.createElement('button');
         link.type = 'button';
         link.className = 'chat-source-link';
-        link.textContent = `${source.document} · chunk ${Number.isFinite(Number(source.chunk)) ? Number(source.chunk) + 1 : '—'}${page}`;
+        link.textContent = `${source.document} · chunk ${Number.isFinite(source.chunk) ? Number(source.chunk) + 1 : '—'}${page}`;
         link.setAttribute('aria-label', `Inspect evidence from ${source.document}${page}`);
          link.addEventListener('click', () => document.dispatchEvent(new CustomEvent('v2sourceopen', {
            detail: { document: source.document, document_id: source.document_id, page: source.page, chunk: source.chunk, excerpt: source.excerpt },
          })));
         item.append(link);
-        if (Number.isFinite(Number(source.score))) {
+        if (Number.isFinite(source.score)) {
           const score = document.createElement('small');
           score.textContent = `match ${Number(source.score).toFixed(2)}`;
           item.append(score);
@@ -600,15 +615,29 @@ export function initChat() {
     details.append(list);
     message.article.append(details);
   }
-  function updateAssistant() {
-    if (!assistant) return;
+  function paintAssistant() {
+    const follow = main.scrollHeight - main.scrollTop - main.clientHeight < 100;
     assistant.body.innerHTML = renderMarkdown(assistant.text);
     attachCodeCopy(assistant.article);
-    scrollLatest();
+    if (follow) main.scrollTo({ top: main.scrollHeight, behavior: 'instant' });
+  }
+  function updateAssistant() {
+    const message = assistant;
+    if (!message || message.paintFrame != null) return;
+    message.paintFrame = requestAnimationFrame(() => {
+      message.paintFrame = null;
+      if (assistant === message) paintAssistant();
+    });
   }
   function retryMessage(message) {
     if (active || !message?.sourceUser) return;
     const index = messages.indexOf(message);
+    if (index !== messages.length - 1) {
+      input.value = message.sourceUser.text;
+      updateInput();
+      input.focus();
+      return;
+    }
     if (index !== -1) messages.splice(index, 1);
     message.article.remove();
     const record = currentConversation();
@@ -618,13 +647,14 @@ export function initChat() {
       persistHistory();
       renderHistory();
     }
-    sendMessage(message.sourceUser.text, { existingUser: message.sourceUser });
+    sendMessage(message.sourceUser.text, { existingUser: message.sourceUser, replaceReply: message.meta?.done?.reply_id || message.meta?.replace_reply });
   }
   function actionsFor(article, message) {
     if (article.querySelector('.chat-actions')) return;
     const actions = document.createElement('div'); actions.className = 'chat-actions';
     if (message.role === 'assistant') {
       const copy = document.createElement('button'); copy.type = 'button'; copy.className = 'icon-button icon-button--quiet'; copy.textContent = 'Copy'; copy.addEventListener('click', async () => { try { await navigator.clipboard.writeText(plainText(message.text)); toast('Reply copied as text.'); } catch { toast('Clipboard unavailable. Select the reply and copy it manually.'); } }); actions.append(copy);
+      addPlaybackButton(actions, message);
       const retry = document.createElement('button'); retry.type = 'button'; retry.className = 'button button--quiet'; retry.textContent = 'Retry'; retry.addEventListener('click', () => retryMessage(message)); actions.append(retry);
     } else {
       const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'button button--quiet'; edit.textContent = 'Edit'; edit.addEventListener('click', () => { input.value = message.text; updateInput(); input.focus(); }); actions.append(edit);
@@ -632,6 +662,7 @@ export function initChat() {
     article.append(actions);
   }
   function setSendButton(label, danger = false) {
+    send.type = danger ? 'button' : 'submit';
     const icon = send.querySelector('.icon');
     const use = icon?.querySelector('use');
     if (use) use.setAttribute('href', label === 'Stop' ? '#i-stop' : '#i-send');
@@ -641,6 +672,11 @@ export function initChat() {
   }
   function finishMessage() {
     if (!assistant) return;
+    if (assistant.paintFrame != null) {
+      cancelAnimationFrame(assistant.paintFrame);
+      paintAssistant();
+    }
+    document.getElementById('generation-status').textContent = assistant.meta?.error ? 'Reply interrupted.' : 'Reply ready.';
     assistant.article.setAttribute('aria-busy', 'false');
     persistMessage(assistant);
     renderSources(assistant);
@@ -672,6 +708,7 @@ export function initChat() {
         sourceUser = message;
         actionsFor(message.article, message);
       } else {
+        message.article.setAttribute('aria-busy', 'false');
         message.sourceUser = sourceUser;
         actionsFor(message.article, message);
         insightsFor(message);
@@ -753,6 +790,7 @@ export function initChat() {
     renderHistory();
     setSendButton('Send'); updateInput();
     document.dispatchEvent(new CustomEvent('v2conversationchange', { detail: { serverId: null } }));
+    intelligence({ type: 'reset' });
   }
   async function confirmDelete(record, opener = document.activeElement) {
     if (!record) return;
@@ -784,11 +822,13 @@ export function initChat() {
     if (serverFailed) toast('Conversation removed locally, but server cleanup failed.');
     else toast('Conversation deleted.');
   }
-  async function sendMessage(value = input.value, { existingUser = null } = {}) {
+  async function sendMessage(value = input.value, { existingUser = null, replaceReply } = {}) {
     const message = value.trim();
-    if (!message || message.length > MAX_CHARS || active) return;
+    if (!hasQuestion(value) || Array.from(message).length > messageLimit() || active || documentProcessing) return;
     requestNumber += 1;
+    stopPlayback();
     const owner = requestNumber;
+    intelligence({ type: 'start', message });
     if (!existingUser) {
       input.value = '';
       updateInput();
@@ -803,8 +843,9 @@ export function initChat() {
       persistMessage(userMessage);
       actionsFor(userMessage.article, userMessage);
     }
-    assistant = addMessage('assistant', '', { pending: true });
+    assistant = addMessage('assistant', '', { pending: true, replace_reply: replaceReply });
     assistant.sourceUser = userMessage;
+    document.getElementById('generation-status').textContent = 'GAIA is preparing a reply.';
     assistant.article.setAttribute('aria-busy', 'true');
      assistant.body.innerHTML = `<div class="thinking-lines" aria-hidden="true"><span></span><span></span><span></span></div><span class="sr-only">${ASSISTANT_NAME} is preparing a reply</span>`;
     setSendButton('Stop', true); send.disabled = false;
@@ -814,27 +855,36 @@ export function initChat() {
     let sawError = false, sawDelta = false;
     const onFrame = frame => {
       if (!active || active.owner !== owner) return;
-      if (frame.type === 'meta') { conversationId = frame.conversation_id || conversationId; setAssistantMeta(frame); }
+       if (frame.type === 'meta') { conversationId = frame.conversation_id || conversationId; setAssistantMeta(frame); intelligence({ type: 'meta', frame }); }
        if (frame.type === 'delta') {
          const text = typeof frame.text === 'string' ? frame.text : '';
          if (!text) return;
+         if (frame.response_lang && frame.response_lang !== assistant.meta.response_lang) {
+           assistant.switchDivider?.remove();
+           assistant.switchDivider = null;
+           setAssistantMeta({ ...assistant.meta, response_lang: frame.response_lang });
+         }
          sawDelta = true;
          assistant.text += text;
         if (frame.intent !== undefined) assistant.meta = { ...assistant.meta, intent: frame.intent, confidence: frame.confidence, degraded: frame.degraded };
-        updateAssistant();
+         updateAssistant();
+          intelligence({ type: 'delta', frame });
       }
       if (frame.type === 'error') {
         sawError = true;
         assistant.meta = { ...assistant.meta, error: true, technical_error: frame.message || 'stream error' };
         assistant.text = frame.message || 'The assistant returned an error.';
-        updateAssistant();
-      }
-      if (frame.type === 'done') assistant.meta = { ...assistant.meta, done: frame };
+         updateAssistant();
+         intelligence({ type: 'error', frame });
+       }
+       if (frame.type === 'done') { assistant.meta = { ...assistant.meta, done: frame }; intelligence({ type: 'done', frame }); }
     };
     try {
       if (mock) await mockStream(message, { signal: controller.signal, onFrame });
-      else await streamLive(message, conversationId, { signal: controller.signal, onFrame });
+      else await streamLive(message, conversationId, { signal: controller.signal, onFrame, replaceReply });
+      if (active?.owner !== owner) return;
       if (!sawDelta && !sawError) { assistant.text = 'The assistant returned an empty reply.'; sawError = true; updateAssistant(); }
+      if (sawError) assistant.meta.error = true;
       finishMessage();
     } catch (error) {
       if (active?.owner === owner) {
@@ -843,6 +893,7 @@ export function initChat() {
           : safeError(error);
         assistant.meta = { ...assistant.meta, error: true, technical_error: error.name === 'AbortError' ? 'Reply stopped' : safeError(error) };
         updateAssistant();
+        intelligence({ type: 'error', frame: { message: safeError(error) } });
         finishMessage();
         if (error.name !== 'AbortError') toast(safeError(error));
       }
@@ -860,8 +911,8 @@ export function initChat() {
     historySearch.value = searchDialogInput.value;
     renderHistory();
   });
-  input.addEventListener('keydown', event => { if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) { event.preventDefault(); form.requestSubmit(); } });
-  form.addEventListener('submit', event => { event.preventDefault(); sendMessage(); });
+  input.addEventListener('keydown', event => { if (event.key === 'Enter' && !event.shiftKey && !event.isComposing && event.keyCode !== 229) { event.preventDefault(); form.requestSubmit(); } });
+  form.addEventListener('submit', event => { event.preventDefault(); if (!active) sendMessage(); });
   document.addEventListener('v2documentstate', event => {
     documentProcessing = Boolean(event.detail?.processing);
      if (documentProcessing) composerNote.textContent = 'Document processing… wait until it is ready before asking about it.';
@@ -874,7 +925,7 @@ export function initChat() {
     await closeOverlay(deleteDialog);
     await removeConversation();
   });
-  send.addEventListener('click', () => { if (active) active.controller.abort(); else sendMessage(); });
+  send.addEventListener('click', event => { if (active) { event.preventDefault(); active.controller.abort(); } });
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && active) { event.preventDefault(); active.controller.abort(); } });
   document.addEventListener('click', async event => {
     const menuButton = event.target.closest('[data-history-menu]');
@@ -953,10 +1004,11 @@ export function initChat() {
   });
   composerNote.textContent = mock
     ? 'Mock chat only · no backend request or server memory.'
-    : 'Your conversation and attached sources stay in this browser.';
+    : 'Chat history is saved on this device.';
   renderHistory();
   if (historyResult.status === 'unavailable') toast('Browser history storage is unavailable. This chat will remain for this tab.');
-  if (historyState.currentId) restoreConversation(historyState.currentId, { persistCurrent: false });
+   if (historyState.currentId) restoreConversation(historyState.currentId, { persistCurrent: false });
+   else intelligence({ type: 'reset' });
   updateInput();
   return {
     ensureServerConversationId,

@@ -1,86 +1,30 @@
-# Language-Agnostic Chatbot
+# GAIA V2 – A Language-Agnostic, General-Purpose AI Chatbot
 
-**A Pivot-Translation Based Multilingual Conversational System**
-+ **GAIA v2 — Global Multilingual AI Assistant layer**
-
-Final-year project — B.Tech CSE (AI/ML), The NorthCap University, Gurugram.
-
-| | |
-|---|---|
-| **Team** | Bhavesh Sardana (23csu070) · Dakksh Sharma (23csu081) · Avi (23csu061) |
-| **Supervisor** | Ms. Meghna Sharma |
-
-## Core idea
-
-Instead of training one intent model per language, the system detects the
-user's language, translates the message into a **pivot language** (English),
-classifies intent with **one model trained once in English**, selects a
-response, and translates it back. **Adding a language needs no new training
-data** — only translation support for that language.
-
-## Pipeline
-
-```
-User message (hi / pa / es / fr / de / en)
-  1. Language detection            (langdetect, short-text heuristics)
-  2. Translate -> English (pivot)  (deep-translator / Google)
-  3. Intent classification         (TF-IDF + Logistic Regression, scikit-learn)
-  4. Response selection            (intent -> response knowledge base)
-  5. Translate reply -> user's language
-  6. Render in Flask web UI        (+ detected-language badge)
-```
-
-Domain: **campus assistant** (timetable, exams, fees, hostel, library,
-identity, …) — 16 intents, 20 English examples each. A separate multilingual
-test set (30 queries × 6 languages) is never used in training.
+GAIA V2 is a multilingual AI assistant for everyday questions, learning, writing, programming, research and document-based conversations. People can switch languages within a chat or request a particular reply language.
 
 ## Quick start
 
-```bash
-python3 -m venv venv                 # Python 3.12.7 is pinned in .python-version
-./venv/bin/pip install -r requirements.lock
-./venv/bin/python app.py             # GAIA V2 -> http://localhost:8000
-```
-
-The repository is reproducible from a clean checkout: `.python-version` pins
-Python 3.12.7, `requirements.lock` pins the install surface, and `make install`
-generates the ignored campus intent model only when it is missing. No API key is
-needed for the offline test suite or the campus knowledge-base route.
-
-The default localhost page is the GAIA V2 frontend. The Flask pivot-pipeline
-assistant now has a separate, three-file multilingual frontend, available with:
+Use Python 3.12 and configure a hosted provider or local Ollama model in `.env`. The default workspace opens at http://127.0.0.1:8000.
 
 ```bash
-make run-legacy                       # three-file Flask UI -> http://localhost:5000
+cp -n .env.example .env
+make install
+make test
+make run
 ```
 
-For the no-build HTML/CSS/JavaScript frontend, use **port 5000**, not port 8000.
-Setup, API compatibility, memory-only history, and browser checks are documented
-in [docs/FLASK_FRONTEND.md](docs/FLASK_FRONTEND.md). No backend changes are needed.
+The optional Flask compatibility UI runs with `make run-legacy` on port 5000. FastAPI also serves the compatibility page at `/legacy`.
 
-## GAIA V2 — the general multilingual layer (FastAPI, port 8000)
+## Request routing
 
-The v2 layer turns the FYP baseline into a general-purpose assistant while
-preserving it as one route (`campus_kb`). Nothing in the graded pipeline
-was replaced — it became a component.
+| Route | Behavior |
+|---|---|
+| General | Sends the original message, response-language instruction and recent conversation context to the configured LLM. Educational questions use this same path. |
+| Translate | Explicit translation requests use the existing machine translation services and local cache. |
+| Document | Retrieves excerpts from the conversation’s uploaded files and asks the configured model for a grounded answer. |
+| Web | Searches for time-sensitive information and supplies returned sources to the model. |
 
-```bash
-cp .env.example .env                 # add LLM_API_KEY (free: console.groq.com)
-make run                              # -> http://localhost:8000
-```
-
-`http://localhost:8000/` now opens the redesigned **Polyglot AI** workspace. The
-explicit `/legacy` route is retained only for regression comparison.
-
-| Route | What handles it | Needs LLM key? |
-|---|---|---|
-| `general` | any question, any language (Groq: `qwen/qwen3.8-27b`, env-swappable) | yes |
-| `campus_kb` | FYP pivot pipeline (16 intents, TF-IDF+LogReg, measured) | no |
-| `translate` | "translate X into Y" — free MT with cache+fallback | no |
-| `document` | per-chat uploaded PDF/DOCX/TXT/Markdown/images; native-text + local page-level OCR; cross-language retrieval via `paraphrase-multilingual-MiniLM-L12-v2`; honest "not found" | yes |
-| `web` | recency questions via keyless DuckDuckGo, sources shown | yes |
-
-The Polyglot AI frontend makes the language-agnostic workflow visible without
+The Language Agnostic Chatbot frontend makes the language-agnostic workflow visible without
 claiming unsupported capabilities: per-message language detection,
 language-switch instructions ("answer in Hindi"), bounded conversation memory,
 SSE streaming, dark/light/system themes,
@@ -89,13 +33,30 @@ per-conversation sidebar (search/rename/delete/export, grouped by date),
 message actions (copy/regenerate/edit), document chips, sources,
 professional debug panel, settings, offline banner, mobile drawer,
 **voice input** (browser SpeechRecognition, BCP-47 language selection, editable
-no-auto-send transcript). Voice output/listen is not yet connected. Real-device
-voice testing is pending; see docs/VOICE_TEST_MATRIX.md.
+no-auto-send transcript). Completed replies offer Listen when browser speech synthesis is available. Playback uses a matching installed local voice and stops on a conversation switch or microphone start. Physical-device voice testing is pending. See docs/VOICE_TEST_MATRIX.md.
 Tested with real-browser Playwright smoke plus mocked V2 voice checks:
 `make test-browser` and `make test-v2-voice`.
-Plus the code-switching detection suite. Demo: docs/DEMO_SCRIPT.md.
+The offline test suite also covers code-switching detection.
 APIs: `/api/v1/{chat,conversations,documents,languages,intents,health}` —
 see docs/API.md. Real-device voice results remain untested.
+
+### Frontend workspace
+
+GAIA V2 opens in dark mode with a collapsible history sidebar and an anchored composer.
+Use the language control in the header to add an editable reply-language instruction to a draft.
+Open Reply details to inspect the current response. The panel shows service-reported detected and response language, route, returned sources, model,
+and measured server latency. Conversation history and search are browser-local
+because the current API does not expose account authentication or conversation
+listing.
+
+The knowledge base dialog uses the live document endpoints for upload, status,
+report preview, per-document deletion, and clearing the current conversation's
+sources. The frontend deliberately does not expose account controls, fake
+retrieval progress, invented source language, or unsupported response-language
+persistence.
+
+See [docs/FRONTEND_REDESIGN.md](docs/FRONTEND_REDESIGN.md) for the audit,
+architecture, capability boundaries, and verification report.
 
 Run the offline test suite: `make test`. It covers the core app, V2 RAG,
 SQLite restart/ownership boundaries, OCR parser behavior, synthetic image/PDF
@@ -115,7 +76,7 @@ language packs, structured reports, and measured fixture results.
 For a reproducible local setup:
 
 ```bash
-cp .env.example .env
+cp -n .env.example .env
 make install
 make test
 ./venv/bin/python scripts/eval_ocr.py --json
@@ -129,70 +90,30 @@ make lint
 make test                         # offline regression suite
 ```
 
-For a container deployment, the Docker build trains the small campus model inside
-the image, installs the local OCR system packages, and exposes a health check:
+### Providers, privacy and deployment
+
+Set `LLM_PROVIDER` to `groq`, `openrouter`, `openai` or `ollama`, and choose a model available on that provider. Cloud providers need `LLM_API_KEY`. Ollama needs a running local service and an installed model. Use `OPENAI_COMPAT_BASE_URL` only for an intentional endpoint override. Health reports configuration and OCR capabilities. A successful chat verifies model access.
+
+General chat sends recent conversation turns to the configured provider. Document chat also sends retrieved excerpts. Explicit translation requests can send the source text to Google and MyMemory. General multilingual chat goes directly to the configured chat provider. Web search sends the query to DuckDuckGo. SQLite stores bounded chat context, extracted text and vectors. Original uploads and the machine translation cache are separate files. Browser history is stored on the device. Configure access and retention for all four locations before handling sensitive data.
+
+Browser QA uses an optional development dependency and a browser installation.
 
 ```bash
-docker build -t language-agnostic-chatbot .
-docker run --rm --name gaia -p 8000:8000 --env-file .env \
-  -v "$PWD/data:/app/data" language-agnostic-chatbot
-curl -fsS http://127.0.0.1:8000/api/v1/health
+./venv/bin/python -m pip install playwright==1.63.0
+./venv/bin/python -m playwright install chromium
+make test-browser                     # with make run in another terminal
+make test-v2-voice                    # synthetic speech engine
 ```
 
-For a Linux container with Tesseract language packs:
+For deployment prerequisites, measured results and open release gates, see [deployment notes](docs/DEPLOYMENT.md), [final audit](FINAL_AUDIT_REPORT.md), [historical test results](TEST_RESULTS.md) and [feature matrix](FEATURE_MATRIX.md).
 
-```bash
-docker build -t language-agnostic-chatbot .
-docker run --rm -p 8000:8000 --env-file .env -v "$PWD/data:/app/data" language-agnostic-chatbot
-```
+## Project origins
 
-## Project structure
+Final-year project — B.Tech CSE (AI/ML), The NorthCap University, Gurugram.
 
-```
-app.py                 Flask app: /chat endpoint + UI
-config.py              Languages, threshold, paths — single source of truth
-src/
-  detection.py         Language detection (langdetect + short-text heuristics)
-  translation.py       Pivot translation wrapper (deep-translator)
-  classifier.py        TF-IDF + LogReg train/predict            (Phase 3)
-  pipeline.py          detect -> translate -> classify -> reply (Phase 4)
-data/
-  intents_en.json            English training set               (Phase 2)
-  test_multilingual.json     Human-written multilingual test set (Phase 2)
-scripts/               Training + evaluation scripts            (Phase 3/5)
-templates/index.html   Chat UI
-tests/test_core.py     Offline core tests
-archive/               Earlier Streamlit prototype ("Aikya") — not part of the
-                       submission; kept unmodified for reference only
-portfolio/             Personal portfolio site — unrelated to this project
-```
+| | |
+|---|---|
+| **Team** | Bhavesh Sardana (23csu070) · Dakksh Sharma (23csu081) · Avi (23csu061) |
+| **Supervisor** | Ms. Meghna Sharma |
 
-## Status (phased plan)
-
-- [x] 1. Audit & cleanup — repo scaffold, pinned deps, tests green
-- [x] 2. Dataset — 15 intents × 20 EN examples + 30×6 multilingual test set
-       (validator: `scripts/validate_data.py`; test translations pending fluent-speaker review)
-- [x] 3. Classifier — TF-IDF(uni) + LogReg(C=10.0), 16 intents/320 examples:
-       **CV acc 0.8125, macro F1 0.8138**
-       (`scripts/train.py` → `results/classifier_report.json`, `confusion_matrix.png`)
-- [x] 4. Robustness — threshold fallback (0.30, re-derived per retrain by
-       `scripts/tune_threshold.py`), MT retry+backoff, Google→MyMemory provider
-       fallback, disk cache; structured language metadata (script+confidence)
-- [x] 5. Evaluation (30 Sep 2026 runs) — detection **95.0%**; e2e per language:
-       en 96.7 · hi 90.0 · pa 86.7 · fr 73.3 · es 70.0 · de 53.3 (non-EN avg **74.7%**)
-       vs no-pivot baseline 6.7–23.3%; per-stage latency + error taxonomy in
-       `results/` and REPORT §5. Rerun: `scripts/eval_detection.py`,
-       `scripts/eval_e2e.py` (cache makes reruns fast)
-- [x] 6. UI — language/intent/confidence badges, typing state, localStorage history, mobile
-- [x] 7. Extension proof — Italian added via one line in `config.py`, zero retraining
-- [x] 8. Docs — `REPORT.md` (results tables), `PPT_OUTLINE.md`, `DEMO_SCRIPT.md`
-- [x] 9. Viva prep — `VIVA_PREP.md` (30 Q&A incl. "why not XLM-R")
-
-## Known limitations (documented, with fixes where possible)
-
-- Translation errors propagate into the classifier and back out to the user.
-- Code-mixed text (e.g. Hinglish) defeats both detection and translation.
-- Very short queries are ambiguous; low-confidence intents get a graceful
-  "I didn't understand" reply instead of a wrong answer.
-
-Each limitation gets a measured number in the final report, not hand-waving.
+The original project report, evaluation data and authorship records are preserved for historical reference. The historical intent-classifier experiments are outside the application startup, deployment image and request path. Current model documentation is in [docs/MODELS.md](docs/MODELS.md).

@@ -7,13 +7,13 @@ function load() {
   try {
     const saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {};
     return {
-      theme: ['light', 'dark', 'system'].includes(saved.theme) ? saved.theme : 'system',
+      theme: ['light', 'dark', 'system'].includes(saved.theme) ? saved.theme : 'dark',
       reduceMotion: saved.reduceMotion === true,
       sideCollapsed: saved.sideCollapsed === true,
       debug: saved.debug === true,
       speechLanguage: SPEECH_LANGUAGES.includes(saved.speechLanguage) ? saved.speechLanguage : 'auto',
     };
-  } catch { return { theme: 'system', reduceMotion: false, sideCollapsed: false, debug: false, speechLanguage: 'auto' }; }
+    } catch { return { theme: 'dark', reduceMotion: false, sideCollapsed: false, debug: false, speechLanguage: 'auto' }; }
 }
 
 let preferences = load();
@@ -25,7 +25,7 @@ function apply() {
     ? (colorQuery.matches ? 'dark' : 'light') : preferences.theme;
   document.documentElement.dataset.theme = resolvedTheme;
   const themeColor = document.querySelector('meta[name="theme-color"]');
-  if (themeColor) themeColor.content = resolvedTheme === 'dark' ? '#101318' : '#f5f4f0';
+  if (themeColor) themeColor.content = resolvedTheme === 'dark' ? '#0E0E14' : '#F7F6F9';
   document.documentElement.dataset.motion = reducedMotion() ? 'reduced' : 'full';
   document.documentElement.dataset.sidebar = preferences.sideCollapsed ? 'collapsed' : 'expanded';
   document.documentElement.dataset.debug = preferences.debug ? 'true' : 'false';
@@ -48,7 +48,7 @@ export function setPreferences(patch) {
 }
 
 export function resetPreferences() {
-  preferences = { theme: 'system', reduceMotion: false, sideCollapsed: false, debug: false, speechLanguage: 'auto' };
+  preferences = { theme: 'dark', reduceMotion: false, sideCollapsed: false, debug: false, speechLanguage: 'auto' };
   let cleared = true;
   try { localStorage.removeItem(KEY); } catch { cleared = false; }
   apply();

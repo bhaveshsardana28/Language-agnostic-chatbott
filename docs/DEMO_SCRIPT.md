@@ -1,5 +1,8 @@
 # 3-minute demo script — GAIA
 
+Historical record of the earlier implementation. For current behavior, see the [project README](../README.md).
+
+
 Practice against a fresh `New chat` (local history never leaks between runs).
 Hotspot your laptop Wi-Fi so venue Wi-Fi can't break the demo. Rehearse the
 Groq-free-tier warning: if you hit a rate limit mid-demo, say *"free tier —

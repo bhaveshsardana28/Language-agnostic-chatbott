@@ -1,5 +1,8 @@
 # Data documentation
 
+Historical record of the earlier implementation. For current behavior, see the [project README](../README.md).
+
+
 ## Training data — `data/intents_en.json`
 - **What:** 16 campus-domain intents × 20 English examples = 320 utterances,
   each intent with 4 safe response strings (the static KB).
@@ -32,3 +35,5 @@
 No downloaded corpora: with 20 examples/intent the marginal value of a big
 external dataset is small vs the mislabelling/domain-mismatch risk. Sources
 of all numbers are scripts, not screenshots.
+
+Reproducing the historical training charts requires the optional `matplotlib==3.11.2` package in the research environment. The application install excludes plotting and model training.

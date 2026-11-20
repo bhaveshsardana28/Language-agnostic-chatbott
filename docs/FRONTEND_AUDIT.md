@@ -235,9 +235,16 @@ or zero-violation claim is made.
 ## 4. Complete feature inventory and parity checklist
 
 At the Phase 0 audit every checkbox was intentionally open: each is a **new-UI
-acceptance gate**, not a statement that the old UI passed. Phase 3 now closes
-F01–F06 for the shell with the evidence in [PHASE_3_SHELL.md](PHASE_3_SHELL.md)
-and `shell-checks.json`. The original findings remain in the table. Preserve implemented behavior and intended
+acceptance gate**, not a statement that the old UI passed. Phase 3 closes F01–F06
+for the shell with the evidence in [PHASE_3_SHELL.md](PHASE_3_SHELL.md), and
+Phase 4 closes the transport/rendering gates documented in
+[PHASE_4_CHAT.md](PHASE_4_CHAT.md), the V2 multilingual metadata slice closes
+F24–F28 with the evidence in [PHASE_5_LANGUAGES.md](PHASE_5_LANGUAGES.md), and
+the local conversation lifecycle, document/source slice and V2 voice-input slice
+are documented in [PHASE_6_HISTORY.md](PHASE_6_HISTORY.md),
+[PHASE_6_DOCUMENTS.md](PHASE_6_DOCUMENTS.md) and
+[PHASE_7_VOICE_INPUT.md](PHASE_7_VOICE_INPUT.md).
+The original findings remain in the table. Preserve implemented behavior and intended
 behavior covered by existing tests, even where the present split broke it.
 Each row must eventually receive a test/screenshot/manual-evidence reference
 before Phase 11 sign-off. Shared startup blocker B1 applies to chat-dependent
@@ -253,49 +260,49 @@ rows. Paths below are relative to `static/js/` unless stated otherwise.
 | [x] F04 | Backend status, offline banner and Retry health check; `main.js:15–27,63–72` | Phase 3: live health + failure/timeout/offline/retry/stale-response fixtures; reports API reachability separately from provider configuration | 3, 4 |
 | [x] F05 | Multilingual greeting cycle (Hello, नमस्ते, ਸਤ ਸ੍ਰੀ ਅਕਾਲ, Hola, Bonjour, Hallo, Ciao); `chat.js:91–101` | Original: blocked. Phase 3: seven states in order, script labels, explicit pause, reduced motion/visibility handling | 3 |
 | [x] F06 | Six prompts: general, coding, Hindi, translation, documents, current info; `chat.js:34–41,77–88` | Original: zero cards. Phase 3: six selectable prompts populate/focus editable draft; actual sending remains Phase 4 | 3 |
-| [ ] F07 | New chat, restore current conversation, heading auto-title; `chat.js:104–125,287–299` | BROKEN startup; local IDs also break server memory (B3) | 3, 4, 6 |
-| [ ] F08 | Textarea auto-grow to 200 px, `dir=auto`, Enter send / Shift+Enter newline, Enter-send preference; `chat.js:366–375,462–465` | CODE, send handlers never bind | 4 |
-| [ ] F09 | Empty-input ignore, 4,000-character guard, count above 3,200, warning above 3,600, disable over limit | CODE; no explicit empty-input status; backend max can differ by env | 4 |
-| [ ] F10 | Send/Stop state and AbortController cancellation retaining partial answer; `chat.js:304–347` | CODE; no successful current UI stream | 4 |
-| [ ] F11 | Attach entry points in header and composer, restricted file picker; `documents.js:42–63`, template line 155 | CODE; picker accept is not content/size validation | 6 |
+| [x] F07 | New chat, restore current conversation, heading auto-title; `chat.js:104–125,287–299` | Phase 6: New chat preserves saved records; reload/row selection restores the current conversation and the first user message supplies an 80-character title | 3, 4, 6 |
+| [ ] F08 | Textarea auto-grow to 200 px, `dir=auto`, Enter send / Shift+Enter newline, Enter-send preference; `chat.js:366–375,462–465` | Phase 4: auto-grow, direction, Enter send and Shift+Enter are live; a persisted Enter-send preference remains later work | 4 |
+| [x] F09 | Empty-input ignore, 4,000-character guard, count above 3,200, warning above 3,600, disable over limit | Phase 4: 4,000-character counter/guard and empty-input handling are covered by the mock browser battery | 4 |
+| [x] F10 | Send/Stop state and AbortController cancellation retaining partial answer; `chat.js:304–347` | Phase 4: Stop/Escape cancellation retains partial text and blocks late deltas | 4 |
+| [x] F11 | Attach entry points in header and composer, restricted file picker; `documents.js:42–63`, template line 155 | Phase 6: V2 entry points open the document panel with a PDF/DOCX/TXT/MD picker and client-side size/type guards | 6 |
 
 ### Conversation, rendering and errors
 
 | Gate | Existing behavior and evidence | Current finding | Redesign phase |
 |---|---|---|---|
-| [ ] F12 | SSE meta/delta/error/done, textContent while streaming, final markdown; `api.js:102–164`, `chat.js:304–347` | API TEST/LIVE, UI BROKEN | 4 |
-| [ ] F13 | Generating placeholder in committed template; skeleton rows in current `paintMsg()`; streaming caret CSS | CODE; state class never switches thinking→streaming on assistant delta | 4 |
-| [ ] F14 | Conversation switch abort + ownership guard against cross-paint | CODE; `chat.js:115,343–345`; existing browser regression not reached | 4 |
-| [ ] F15 | Escape-first markdown: headings 1–3, bold/italic, inline code, lists, quotes, tables, rule, HTTP(S) links | BROKEN parser; `markdown.js`; reuse escape-first strategy with focused regression coverage | 4 |
-| [ ] F16 | Fenced/unclosed code, language label, syntax token colors, code copy, long-code scroll | BROKEN parser; duplicate code, escaped-quote tokenization and global copy lookup need review | 4 |
-| [ ] F17 | Distinct user/assistant bubbles, assistant timestamps and full-date tooltip, day separators | CODE; no user actions/timestamps mounted; no avatars in message rendering | 4 |
-| [ ] F18 | Copy assistant text with clipboard fallback + toast | CODE; inaccessible clipboard API path needs explicit fallback | 4 |
-| [ ] F19 | Regenerate / Retry replaces last assistant answer | CODE; acts on latest user regardless of clicked older message | 4 |
-| [ ] F20 | Edit and resend helper exists in both committed/current frontend | BROKEN reachability: user bubbles never call action renderer; preserve intent and implement usable action | 4 |
+| [x] F12 | SSE meta/delta/error/done, textContent while streaming, final markdown; `api.js:102–164`, `chat.js:304–347` | Phase 4: live stream frames are parsed and rendered with safe error recovery | 4 |
+| [ ] F13 | Generating placeholder in committed template; skeleton rows in current `paintMsg()`; streaming caret CSS | Phase 4: assistant skeleton, `aria-busy` and streamed replacement are live; streaming caret styling remains later work | 4 |
+| [x] F14 | Conversation switch abort + ownership guard against cross-paint | Phase 4: request ownership guards New chat, cancellation and late stream frames | 4 |
+| [x] F15 | Escape-first markdown: headings 1–3, bold/italic, inline code, lists, quotes, tables, rule, HTTP(S) links | Phase 4: audited renderer is covered against hostile HTML and unsafe link protocols | 4 |
+| [ ] F16 | Fenced/unclosed code, language label, syntax token colors, code copy, long-code scroll | Phase 4: fenced/unclosed code, language labels, escaped code and per-block copy are live; syntax highlighting remains a later visual enhancement | 4 |
+| [ ] F17 | Distinct user/assistant bubbles, assistant timestamps and full-date tooltip, day separators | Phase 4: distinct turns, timestamps and actions are live; day separators, full-date tooltip and avatars remain later work | 4 |
+| [x] F18 | Copy assistant text with clipboard fallback + toast | Phase 4: copy action and clipboard-unavailable fallback are covered | 4 |
+| [x] F19 | Regenerate / Retry replaces last assistant answer | Phase 4: Retry targets its own user turn and replaces the failed assistant answer without duplicating the user turn | 4 |
+| [x] F20 | Edit and resend helper exists in both committed/current frontend | Phase 4: user Edit returns the text to the composer for review and resend | 4 |
 | [ ] F21 | Near-bottom-only rAF streaming follow, jump-to-latest button, restored history scroll | CODE; finalization unconditionally scrolls bottom, so “never force-scroll” is too strong | 4 |
-| [ ] F22 | Empty reply becomes error + Retry; interrupted stream, network, rate-limit, missing-key friendly text | CODE; no timeout timer or missing-done detection; catch calls unbound `setOffline` | 4 |
-| [ ] F23 | Toast feedback and storage-full notice | CODE; `GAIA_TOAST` never exported, no live-region role on current toast, animationend cleanup fails under disabled motion | 4, 6, 10 |
+| [x] F22 | Empty reply becomes error + Retry; interrupted stream, network, rate-limit, missing-key friendly text | Phase 4: empty, HTTP, malformed, timeout and missing-done paths become safe recoverable states | 4 |
+| [x] F23 | Toast feedback and storage-full notice | Phase 6: existing copy/error toasts are joined by a non-blocking browser-history storage/quota notice, covered by the blocked-storage browser check | 4, 6, 10 |
 
 ### Languages and explainability
 
 | Gate | Existing behavior and evidence | Current finding | Redesign phase |
 |---|---|---|---|
-| [ ] F24 | Detection per message, explicit response-language instruction, mixed-script/Hinglish metadata | TEST/API; one fresh English→French detection mismatch observed | 5 |
-| [ ] F25 | Native + English language chips and confidence <0.5 dashed hint | CODE; uses detected input language, not independently verified output language | 5 |
-| [ ] F26 | Language-switch divider between changed assistant languages | Current loop scans past same-language reply and can repeat a divider; committed version stops at nearest reply | 5 |
-| [ ] F27 | `dir=auto` messages/composer, Noto Indic names in font stack | CODE; fonts are named, not bundled/loaded; script rendering unverified | 2, 5 |
-| [ ] F28 | Debug toggle (default off, persisted), per-reply inline cards | CODE; not a drawer. Shows language/confidence, secondary languages, code-switch, scripts, detection reason, route/reason, intent/confidence, model, latency, technical error | 5 |
-| [ ] F29 | Sources displayed from real `done.sources`; `chat.js:199–208` | CODE; document score omitted; debug omits full metadata and response_lang | 5, 6 |
+| [x] F24 | Detection per message, explicit response-language instruction, mixed-script/Hinglish metadata | Phase 5: V2 preserves server `language_meta` and `response_lang` per turn, including mixed-script and code-switch fields | 5 |
+| [x] F25 | Native + English language chips and confidence <0.5 dashed hint | Phase 5: user detection and assistant response chips use native + English labels; low-confidence detection gets a dashed, titled hint | 5 |
+| [x] F26 | Language-switch divider between changed assistant languages | Phase 5: one divider is inserted only when the nearest completed assistant response changes language | 5 |
+| [x] F27 | `dir=auto` messages/composer, Noto Indic names in font stack | Phase 5: turns and message bodies use `dir=auto`; script labels and existing Indic/RTL font fallbacks are surfaced in the turn header | 2, 5 |
+| [x] F28 | Debug toggle (default off, persisted), per-reply inline cards | Phase 5: persisted Settings toggle reveals safe inline Insights with language, confidence, scripts, routing, intent, model, latency and technical state | 5 |
+| [x] F29 | Sources displayed from real `done.sources`; `chat.js:199–208` | Phase 6: V2 renders safe document, web and note source cards, displays one-based chunks and preserves source metadata in history | 5, 6 |
 
 ### Documents, retrieval and web
 
 | Gate | Existing behavior and evidence | Current finding | Redesign phase |
 |---|---|---|---|
-| [ ] F30 | Upload PDF/DOCX/TXT/MD into active conversation, Processing/Ready/Failed chips | API TEST for TXT with fake embeddings; UI BROKEN; initial processing strip may stay hidden | 6 |
-| [ ] F31 | Per-chat document list, chunk counts, ready count/status | API TEST; module does not export `GAIA_DOCS`; refresh hooks disconnected | 6 |
-| [ ] F32 | Clear all documents for one conversation | API CODE; no per-document deletion endpoint; errors swallowed in old UI | 6 |
-| [ ] F33 | Delete chat deletes its server document session | API TEST; UI deletion has unbound `api` and faulty confirmation | 6 |
-| [ ] F34 | File types, empty/oversize/parse errors, 10 MiB backend limit | API TEST unsupported extension; other guards CODE; no frontend preflight or drag/drop/progress | 6 |
+| [x] F30 | Upload PDF/DOCX/TXT/MD into active conversation, Processing/Ready/Failed chips | Phase 6: V2 uploads into the active server conversation and covers Processing, Ready and Failed states | 6 |
+| [x] F31 | Per-chat document list, chunk counts, ready count/status | Phase 6: V2 lists the active server session's filenames/chunks and ready count on dialog open and after upload | 6 |
+| [x] F32 | Clear all documents for one conversation | Phase 6: confirmed Clear all documents calls the active server-session endpoint and empties the panel | 6 |
+| [x] F33 | Delete chat deletes its server document session | Phase 6: conversation deletion already uses the persisted server ID; document-source browser coverage confirms the same ID boundary | 6 |
+| [x] F34 | File types, empty/oversize/parse errors, 10 MiB backend limit | Phase 6: frontend allowlist/empty/size guards align with backend 415/413/422 handling; failed upload leaves no stale Ready row | 6 |
 | [ ] F35 | Document answers, cross-language retrieval path, grounding gate/not-found response, fallback note | TEST uses fake embeddings/lowered gate; real retrieval quality and PDF ingestion not newly tested | 6, 12 |
 | [ ] F36 | Web route and source title/URL, empty citations on search-tool failure | TEST with mocked search/LLM; no live web success claimed | 6, 12 |
 | [ ] F37 | Contextual memory follow-ups and context translation | API TEST with server-created ID; present UI's generated local IDs never create memory | 4, 11 |
@@ -304,15 +311,15 @@ rows. Paths below are relative to `static/js/` unless stated otherwise.
 
 | Gate | Existing behavior and evidence | Current finding | Redesign phase |
 |---|---|---|---|
-| [ ] F38 | Local history persists `{id,title,createdAt,updatedAt,messages}` and current ID in `gaia.store.v1` | CODE; malformed/stale store and server-restart cases need explicit handling | 6 |
-| [ ] F39 | Recency order; Today/Yesterday/Previous 7 days/Older groups | CODE; `sidebar.js:12–73` | 6 |
-| [ ] F40 | Title + message search, content-match snippets, no-results/no-history text | CODE; no highlighted matches | 6 |
-| [ ] F41 | Accessible-name conversation rows, mouse/Enter/Space navigation | CODE; nested buttons and hidden mobile actions need redesign | 6, 10 |
-| [ ] F42 | Rename dialog, trim, max 80 chars, Enter save, header sync | CODE; `sidebar.js:90–100` | 6 |
-| [ ] F43 | Per-chat Markdown export with roles, timestamps, language markers, sanitized filename | CODE; `sidebar.js:75–88` | 6 |
-| [ ] F44 | Delete confirmation, remove selected history, reset/open remaining chat | BROKEN current confirmation resolves false before true; earlier template opens remaining chat | 6 |
+| [x] F38 | Local history persists `{id,title,createdAt,updatedAt,messages}` and current ID in `gaia.store.v1` | Phase 6: V2-owned `gaia.history.v2` persists validated records, current ID and server ID; malformed and storage-failure paths are browser-tested; server restart remains an honest memory boundary | 6 |
+| [x] F39 | Recency order; Today/Yesterday/Previous 7 days/Older groups | Phase 6: saved records sort by `updatedAt` and render under Today, Yesterday, Previous 7 days or Older group headings | 6 |
+| [x] F40 | Title + message search, content-match snippets, no-results/no-history text | Phase 6: V2 sidebar search filters titles/messages, highlights matches and exposes a no-results state | 6 |
+| [x] F41 | Accessible-name conversation rows, mouse/Enter/Space navigation | Phase 6: rows are buttons with separate labeled rename/export/delete controls; mobile navigation uses the existing focus-managed drawer | 6, 10 |
+| [x] F42 | Rename dialog, trim, max 80 chars, Enter save, header sync | Phase 6: accessible rename dialog validates blank input, trims/caps titles and updates the active header and storage | 6 |
+| [x] F43 | Per-chat Markdown export with roles, timestamps, language markers, sanitized filename | Phase 6: selected local record downloads a bounded sanitized Markdown transcript without a network request | 6 |
+| [x] F44 | Delete confirmation, remove selected history, reset/open remaining chat | Phase 6: cancel is a no-op; confirmation removes local history, restores the next record or empty state, and attempts server cleanup by server ID | 6 |
 | [ ] F45 | Settings from sidebar/header: dark/light/system + OS updates, Enter-send, reduce motion | LIVE opens/closes/theme button; preference controls CODE | 2, 6 |
-| [ ] F46 | Speech language Auto + seven locales, auto-read off by default, rate 0.75/1/1.25/1.5 | CODE; voice and pitch selection/auto-send are new scope | 7, 8 |
+| [x] F46 | Speech language Auto + seven locales, auto-read off by default, rate 0.75/1/1.25/1.5 | Phase 7: V2 persists Auto plus seven recognition locales; speech output/rate controls remain Phase 8 | 7, 8 |
 | [ ] F47 | Privacy/about with provider/model/readiness from health | CODE; “conversations only in browser” omits server memory; “tested languages” overstates support | 6 |
 | [ ] F48 | Delete all local data, reset preferences/debug, delete server data | BROKEN confirmation; code deletes only current server chat, not every known conversation; mock flag separate key remains | 6 |
 | [ ] F49 | Pre-paint theme, OS and app reduced-motion preferences | CODE; body CSS disables animations, but timers/cleanup/hidden-tab behavior incomplete | 2, 10 |
@@ -321,11 +328,11 @@ rows. Paths below are relative to `static/js/` unless stated otherwise.
 
 | Gate | Existing behavior and evidence | Current finding | Redesign phase |
 |---|---|---|---|
-| [ ] F50 | SpeechRecognition feature detection and unsupported mic tooltip/disabled control | CODE; API presence does not certify locale recognition | 7 |
-| [ ] F51 | Tap mic, requesting permission until onstart, listening indicator/aria-pressed/placeholder | Fake-engine LIVE diagnostic only; no real microphone test | 7 |
-| [ ] F52 | Editable interim/final transcript, no auto-send, language Auto using last chat language | CODE; picks final OR interim, not both; current code assigns `store.lastLang` instead of stored data | 7 |
-| [ ] F53 | Permission denied/OS block/no mic/no speech/network messages | CODE; existing mocked suite checks some paths but did not reach them this run | 7 |
-| [ ] F54 | Cmd/Ctrl+Shift+M toggles mic; Escape stops recognition | Fake-engine Escape observed; requesting cancellation, hidden-tab stop and media-track release missing | 7 |
+| [x] F50 | SpeechRecognition feature detection and unsupported mic tooltip/disabled control | Phase 7: V2 detects SpeechRecognition and disables the control with an actionable explanation when unavailable | 7 |
+| [x] F51 | Tap mic, requesting permission until onstart, listening indicator/aria-pressed/placeholder | Phase 7: mocked-engine browser check covers requesting→listening, live status and aria-pressed | 7 |
+| [x] F52 | Editable interim/final transcript, no auto-send, language Auto using last chat language | Phase 7: interim/final text stays editable, never auto-sends, and Auto selects the latest detected V2 user language | 7 |
+| [x] F53 | Permission denied/OS block/no mic/no speech/network messages | Phase 7: mocked error state maps permission/service/audio/no-speech/network failures to actionable status | 7 |
+| [x] F54 | Cmd/Ctrl+Shift+M toggles mic; Escape stops recognition | Phase 7: keyboard toggle, Escape, submit, New chat, conversation changes and hidden-tab cleanup stop recognition | 7 |
 | [ ] F55 | Real AnalyserNode waveform implementation attempt | BROKEN hidden zero-width canvas; fake track never stopped; no silence timer/hold-to-talk | 7 |
 | [ ] F56 | Per-reply Listen/play/pause/resume, matching voice, honest missing-voice note | CODE; two independent speech engines in chat.js and voiceOutput.js; per-message Listen uses input detection language | 8 |
 | [ ] F57 | Stream-aware auto-read, clean text/skip code/read link label, configured rate | CODE; splits/queues incomplete first fragments, can skip later sentence additions; unclosed fences unsafe for speech | 8 |
@@ -567,12 +574,12 @@ evaluation/                           Phase 12 harness + held-out speaker data
 **Route plan without a backend edit:** serve `static/` with Python's built-in
 HTTP server on the already CORS-allowed port **5173**; new route
 `http://localhost:5173/v2/`, public API config `http://localhost:8000`.
-The old application remains `http://localhost:8000/`; Flask remains :5000.
-Only the public static directory is served by this preview command.
-The working tree's existing `/static` mount could also expose
-`/static/v2/index.html`, but this proposal does not require committing the
-pre-existing backend change. Adding `/v2` to FastAPI or switching `/` later
-would need explicit approval for that exact routing change.
+The new V2 application is now the FastAPI root at `http://localhost:8000/`;
+the old application is comparison-only at `/legacy`, and Flask remains :5000
+only when explicitly started in legacy mode.
+Only the public static directory is served by this preview command. The FastAPI
+server also exposes the same V2 page at `/` and keeps `/static/v2/index.html`
+as its direct asset entry point.
 
 `?mock=1` will select deterministic, delayed **clearly labelled simulated**
 frames in `api.js` and work with the backend off. Mock results must never be

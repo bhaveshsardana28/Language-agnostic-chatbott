@@ -48,12 +48,14 @@ def _unpatch_all():
 
 def test_health_and_catalog():
     r = client.get("/")
-    assert r.status_code == 200 and "Global Multilingual" in r.text  # GET / regression (starlette 1.7 sig)
+    assert r.status_code == 200 and 'id="welcome-title"' in r.text and "GAIA V2" in r.text  # default root is the V2 frontend
+    legacy = client.get("/legacy")
+    assert legacy.status_code == 200 and "Global Multilingual" in legacy.text
     h = client.get("/api/v1/health").json()
     assert h["status"] == "ok" and "llm_provider" in h
     assert "it" in client.get("/api/v1/languages").json()
     intents = client.get("/api/v1/intents").json()
-    assert "identity" in intents["campus_kb"] and "general" in intents["routes"]
+    assert intents == {"campus_kb": [], "routes": ["translate", "web", "document", "general"]}
     print("test_health_and_catalog OK")
 
 
@@ -111,20 +113,16 @@ def test_translate_route_and_context():
     print("test_translate_route_and_context OK")
 
 
-def test_campus_route_needs_no_llm():
-    def boom(messages, model=None):
-        raise AssertionError("LLM must not be called for campus KB route")
-        yield
-    llm.stream_chat = boom
+def test_education_questions_use_general_model():
+    _patch_llm("Consult the relevant institution.")
     try:
-        ev = _post("when are my exams")
-        assert ev[0]["route"] == "campus_kb"
-        delta = [e for e in ev if e["type"] == "delta"][0]
-        assert delta["intent"] == "exam_schedule"
-        assert delta["text"]
+        for prompt in ("When are my exams?", "How do university admissions work?", "Explain a Python class"):
+            events = _post(prompt)
+            assert events[0]["route"] == "general"
+            assert "Consult the relevant institution." in "".join(e.get("text", "") for e in events)
+            assert events[-1]["type"] == "done"
     finally:
         _unpatch_all()
-    print("test_campus_route_needs_no_llm OK")
 
 
 def test_memory_context_and_bounds():
@@ -241,7 +239,7 @@ def test_rag_flow_and_isolation():
         assert all(d["chunks"] >= 1 for d in docs)
         assert client.get(f"/api/v1/documents/{cid3}x").json()["documents"] == []
     finally:
-        rag._sessions.clear()
+        rag._read_index.cache_clear()
         rag._model = real_model
         rag.GROUND_THRESHOLD = real_gate
         _unpatch_all()
@@ -289,7 +287,7 @@ def main():
     test_general_route_stream_mocked()
     test_language_switch_per_message()
     test_translate_route_and_context()
-    test_campus_route_needs_no_llm()
+    test_education_questions_use_general_model()
     test_memory_context_and_bounds()
     test_limits_validation_and_llm_missing()
     test_conversation_delete()

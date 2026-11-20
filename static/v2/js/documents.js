@@ -214,7 +214,14 @@ export function initDocuments(chat) {
     previewMeta.textContent = '';
     render();
   }
+  function describeUploadLimit() {
+    const limit = globalThis.gaiaDocumentCapabilities?.max_upload_bytes || DEFAULT_MAX_UPLOAD_BYTES;
+    const mib = (limit / (1024 * 1024)).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    document.getElementById('document-size-limit').textContent = `Up to ${mib} MiB per file.`;
+  }
+  dialog.addEventListener('toggle', () => { if (dialog.open) describeUploadLimit(); });
   async function refresh() {
+    describeUploadLimit();
     const serverId = chat.getServerConversationId();
     if (!serverId) {
       clearView();
@@ -291,6 +298,7 @@ export function initDocuments(chat) {
         try {
           await refresh();
         } catch {
+          if (active?.owner !== owner) return;
           // The upload is already committed; a list refresh failure must not
           // misreport the document as failed or encourage a duplicate retry.
           records = records.filter(item => item !== record);
@@ -298,11 +306,13 @@ export function initDocuments(chat) {
           setStatus(`${file.name} is ready, but the document list could not refresh.`, 'ready');
         }
       }
+      if (active?.owner !== owner) return;
       if (record.status === 'ready') {
         setStatus(`${file.name} is ready.`, 'ready');
         toast('Document ready for this conversation.');
       }
     } catch (error) {
+      if (active?.owner !== owner) return;
       records = records.filter(item => item !== record);
       record.status = 'failed'; record.error = uploadError(error); record.file = file;
       records.unshift(record);
@@ -313,8 +323,8 @@ export function initDocuments(chat) {
         active = null;
         input.value = '';
         render();
+        document.dispatchEvent(new CustomEvent('v2documentstate', { detail: { processing: false } }));
       }
-      document.dispatchEvent(new CustomEvent('v2documentstate', { detail: { processing: false } }));
     }
   }
   async function removeRecord(record) {
@@ -443,7 +453,12 @@ export function initDocuments(chat) {
   });
   document.addEventListener('v2conversationchange', () => {
     previewSequence += 1;
-    if (active) { active = null; sequence += 1; }
+    if (active) {
+      active.controller.abort();
+      active = null;
+      sequence += 1;
+      document.dispatchEvent(new CustomEvent('v2documentstate', { detail: { processing: false } }));
+    }
     clearView('Choose a file to add context to this conversation.');
     if (dialog.open) refresh();
   });

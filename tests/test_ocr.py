@@ -189,8 +189,7 @@ def test_duplicate_upload_report_preview_and_workspace_boundary(tmp_path, monkey
     monkeypatch.setattr(settings, "GAIA_DB_PATH", str(tmp_path / "rag.db"))
     monkeypatch.setattr(settings, "DOCUMENT_STORAGE_DIR", str(tmp_path / "uploads"))
     storage.init_db()
-    memory._conversations.clear()
-    rag._sessions.clear()
+    rag._read_index.cache_clear()
     original_model = rag._model
     rag._model = StableEmbed()
     first = TestClient(app, raise_server_exceptions=False)
@@ -214,5 +213,4 @@ def test_duplicate_upload_report_preview_and_workspace_boundary(tmp_path, monkey
         assert denied.status_code == 403
     finally:
         rag._model = original_model
-        rag._sessions.clear()
-        memory._conversations.clear()
+        rag._read_index.cache_clear()

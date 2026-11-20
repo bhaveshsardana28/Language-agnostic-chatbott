@@ -26,6 +26,7 @@ function copyLanguageMeta(meta) {
 function copyDone(done) {
   if (!done || typeof done !== 'object') return undefined;
   const copy = {};
+  if (Number.isSafeInteger(done.reply_id)) copy.reply_id = done.reply_id;
   if (typeof done.model === 'string') copy.model = done.model;
   if (Number.isFinite(Number(done.latency_ms))) copy.latency_ms = Number(done.latency_ms);
   if (Array.isArray(done.sources)) copy.sources = done.sources.slice(0, 20).map(source => {
@@ -47,6 +48,7 @@ export function serializeMessage(message) {
   ['confidence', 'degraded'].forEach(key => {
     if (typeof meta[key] === 'number' || typeof meta[key] === 'boolean') cleanMeta[key] = meta[key];
   });
+  if (Number.isSafeInteger(meta.replace_reply)) cleanMeta.replace_reply = meta.replace_reply;
   if (meta.error === true) cleanMeta.error = true;
   const done = copyDone(meta.done);
   if (done) cleanMeta.done = done;

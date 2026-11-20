@@ -1,41 +1,43 @@
-/* Polyglot AI workspace tokens. Warm paper and graphite keep long answers calm;
-   indigo is reserved for actions, focus, language, and evidence. */
+/* Language Agnostic Chatbot tokens. Dark graphite surfaces keep the research
+   workspace quiet; violet and cyan are reserved for language and evidence. */
 :root {
-  color-scheme: light;
-  --color-page: #f5f4f0;
-  --color-surface: #fbfaf7;
-  --color-raised: #fffefa;
-  --color-soft: #eef0f3;
-  --color-ink: #1d2530;
-  --color-muted: #5f6b78;
-  --color-accent: #4357a6;
-  --color-action: #344b99;
-  --color-brand: #293f8f;
+  color-scheme: dark;
+  --color-page: #0e0e14;
+  --color-sidebar: #141419;
+  --color-surface: #191920;
+  --color-raised: #202028;
+  --color-soft: #25242e;
+  --color-ink: #f4f5f7;
+  --color-muted: #aaa8b7;
+  --color-accent: #b9a5f7;
+  --color-action: #b9a5f7;
+  --color-brand: #b9a5f7;
   --color-brand-deep: #17285f;
-  --color-on-action: #ffffff;
-  --color-border: #d8dce4;
-  --color-control-border: #5d6877;
-  --color-focus: #233e96;
-  --color-user: #eef0fb;
-  --color-chip: #e9edff;
-  --color-chip-ink: #30488f;
-  --color-danger: #b42318;
-  --color-success: #067647;
-  --color-warning: #a15c07;
-  --color-disabled: #edf0f2;
-  --color-disabled-ink: #586575;
-  --color-code: #eef1f5;
-  --color-selection: #dfe5ff;
-  --color-scrim: rgb(15 23 42 / 52%);
-  --shadow-paper: 0 1px 2px rgb(16 24 40 / 6%), 0 8px 20px rgb(16 24 40 / 4%);
-  --shadow-float: 0 18px 42px rgb(16 24 40 / 11%);
-  --shadow-hero: 0 24px 70px rgb(37 49 112 / 12%);
-  --shadow-dialog: 0 24px 64px rgb(16 24 40 / 24%);
+  --color-on-action: #0e0e14;
+  --color-border: #35333f;
+  --color-control-border: #768397;
+  --color-focus: #b0a7ff;
+  --color-user: #2d273c;
+  --color-chip: #24203e;
+  --color-chip-ink: #ddd9ff;
+  --color-danger: #ff817b;
+  --color-success: #6cd5a0;
+  --color-warning: #f0c674;
+  --color-disabled: #202631;
+  --color-disabled-ink: #97a4b7;
+  --color-code: #0d1118;
+  --color-selection: #312b5c;
+  --color-cyan: #65c9d8;
+  --color-scrim: rgb(3 5 8 / 72%);
+  --shadow-paper: 0 1px 2px rgb(0 0 0 / 26%), 0 10px 24px rgb(0 0 0 / 13%);
+  --shadow-float: 0 20px 46px rgb(0 0 0 / 34%);
+  --shadow-hero: 0 24px 70px rgb(0 0 0 / 34%);
+  --shadow-dialog: 0 24px 64px rgb(0 0 0 / 52%);
 
   --font-ui: 'DM Sans', 'Noto Sans Devanagari', 'Noto Sans Gurmukhi',
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-  --font-editorial: Georgia, 'Times New Roman', 'Noto Sans Devanagari',
-    'Noto Sans Gurmukhi', serif;
+  --font-editorial: 'DM Sans', 'Noto Sans Devanagari', 'Noto Sans Gurmukhi',
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
   --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
   --font-rtl: 'Geeza Pro', 'Noto Sans Arabic', 'FreeSerif', 'Segoe UI', Arial, sans-serif;
   --font-cjk: 'PingFang SC', 'Hiragino Sans', 'Yu Gothic', 'Malgun Gothic',
@@ -91,7 +93,11 @@
   --avatar-size: 32px;
   --brand-size: 32px;
   --rail-size: 76px;
-  --header-size: 68px;
+  --header-size: 64px;
+  --hero-ink: #faf8ff;
+  --hero-muted: #d2cde4;
+  --hero-accent: #c7adff;
+  --hero-base: #181427;
   --drawer-size: 360px;
   --dialog-size: 520px;
   --toast-size: 400px;
@@ -104,8 +110,9 @@
   --canvas-width: 820px;
   --page-width: 1440px;
   --sidebar-study: 200px;
-  --sidebar-size: 264px;
-  --shell-reading-size: 1160px;
+  --sidebar-size: 240px;
+  --intelligence-size: 320px;
+  --shell-reading-size: 920px;
   --shell-draft-max: 200px;
   --text-shell-hero: clamp(2rem, 3.2vw, 3rem);
   --text-shell-display: clamp(2.35rem, 4.4vw, 4rem);
@@ -146,34 +153,71 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --color-page: #101318;
-  --color-surface: #151a22;
-  --color-raised: #1c232d;
-  --color-soft: #222a34;
+  --color-page: #0e0e14;
+  --color-sidebar: #141419;
+  --color-surface: #191920;
+  --color-raised: #202028;
+  --color-soft: #25242e;
   --color-ink: #f4f7fb;
-  --color-muted: #aab4c1;
-  --color-accent: #9eafff;
-  --color-action: #405fb8;
-  --color-brand: #6d88f0;
-  --color-brand-deep: #b3c1ff;
-  --color-on-action: #ffffff;
-  --color-border: #2d3744;
-  --color-control-border: #7f8ea4;
-  --color-focus: #b8c6ff;
-  --color-user: #253454;
-  --color-chip: #26385f;
-  --color-chip-ink: #d4ddff;
-  --color-danger: #f18b82;
-  --color-success: #63d6a0;
-  --color-warning: #f2b86b;
-  --color-disabled: #27313d;
-  --color-disabled-ink: #a4afbe;
-  --color-code: #111821;
-  --color-selection: #2c477d;
+  --color-muted: #aaa8b7;
+  --color-accent: #b9a5f7;
+  --color-action: #b9a5f7;
+  --color-brand: #b9a5f7;
+  --color-brand-deep: #d1cbff;
+  --color-on-action: #0e0e14;
+  --color-border: #35333f;
+  --color-control-border: #768397;
+  --color-focus: #b0a7ff;
+  --color-user: #2d273c;
+  --color-chip: #24203e;
+  --color-chip-ink: #ddd9ff;
+  --color-danger: #ff817b;
+  --color-success: #6cd5a0;
+  --color-warning: #f0c674;
+  --color-disabled: #202631;
+  --color-disabled-ink: #97a4b7;
+  --color-code: #0d1118;
+  --color-selection: #312b5c;
+  --color-cyan: #65c9d8;
   --shadow-paper: 0 1px 2px rgb(0 0 0 / 24%), 0 8px 20px rgb(0 0 0 / 12%);
   --shadow-float: 0 18px 42px rgb(0 0 0 / 32%);
   --shadow-hero: 0 24px 70px rgb(0 0 0 / 34%);
   --shadow-dialog: 0 24px 64px rgb(0 0 0 / 52%);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --color-page: #f7f6f9;
+  --color-sidebar: #efedf3;
+  --color-surface: #fdfcfe;
+  --color-raised: #ffffff;
+  --color-soft: #edf0f4;
+  --color-ink: #18202b;
+  --color-muted: #595766;
+  --color-accent: #6255d8;
+  --color-action: #5b4fd1;
+  --color-brand: #5b4fd1;
+  --color-brand-deep: #32277f;
+  --color-on-action: #ffffff;
+  --color-border: #d9dee8;
+  --color-control-border: #747f90;
+  --color-focus: #4d42bb;
+  --color-user: #eeecff;
+  --color-chip: #eae8ff;
+  --color-chip-ink: #40369d;
+  --color-danger: #b42318;
+  --color-success: #087443;
+  --color-warning: #855800;
+  --color-disabled: #e5e9ef;
+  --color-disabled-ink: #5e6978;
+  --color-code: #eef1f5;
+  --color-selection: #dcd8ff;
+  --color-cyan: #087d8b;
+  --color-scrim: rgb(15 23 42 / 52%);
+  --shadow-paper: 0 1px 2px rgb(16 24 40 / 6%), 0 8px 20px rgb(16 24 40 / 4%);
+  --shadow-float: 0 18px 42px rgb(16 24 40 / 11%);
+  --shadow-hero: 0 24px 70px rgb(37 49 112 / 12%);
+  --shadow-dialog: 0 24px 64px rgb(16 24 40 / 24%);
 }
 
 .voice-mode {

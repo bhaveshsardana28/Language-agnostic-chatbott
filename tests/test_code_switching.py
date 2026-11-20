@@ -90,5 +90,9 @@ def main():
     return 0 if all_ok else 1
 
 
+def test_language_cases():
+    assert main() == 0
+
+
 if __name__ == "__main__":
     sys.exit(main())

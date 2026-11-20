@@ -164,7 +164,7 @@ class Frontend:
             route.abort("blockedbyclient")
 
     def open(self):
-        self.page.goto(ORIGIN + "/", wait_until="load")
+        self.page.goto(ORIGIN + "/", wait_until="load", timeout=10000)
 
     def payload(self, index=-1):
         request = self.requests[index]

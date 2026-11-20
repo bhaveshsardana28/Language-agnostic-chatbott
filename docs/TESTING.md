@@ -1,28 +1,30 @@
 # Testing guide
 
-## Commands (all real, all run before this doc was written)
+The working-tree verification and release decision are recorded in [the test results](../TEST_RESULTS.md).
+
+## Commands
 
 ```bash
 cd ~/language_agnostic_chatbot
 make test                    # core + V2/RAG + persistence + OCR — offline, mocked where needed
-make test-browser            # default V2 route + keyless campus smoke
+make test-browser            # default V2 route + configured-provider chat smoke
 make test-v2-voice           # V2 SpeechRecognition state machine — fake engine only
-python -m pytest -q          # full pytest suite when pytest is installed
-python scripts/eval_rag_multilingual.py --json  # 10-case retrieval benchmark
-python scripts/eval_ocr.py --json               # CER/WER synthetic OCR fixtures
+./venv/bin/python -m pytest -q tests          # full pytest suite when pytest is installed
+./venv/bin/python scripts/eval_rag_multilingual.py --json  # 10-case retrieval benchmark
+./venv/bin/python scripts/eval_ocr.py --json               # CER/WER synthetic OCR fixtures
 ```
 
 ## What each suite actually proves
 
 | Suite | Covers | Never claims |
 |---|---|---|
-| `tests/test_core.py` (10) | FYP pivot pipeline, classifier gate, Flask contract | — |
+| `tests/test_core.py` | language detection, cached translation and Flask compatibility contract | — |
 | `tests/test_v2.py` (11) | FastAPI routes, router decisions, SSE frames, RAG plumbing (fake embeddings), session isolation, web fallback, docs endpoint | live LLM behavior |
 | `tests/test_rag_qa.py` | document overview/precision/refusal, prompt grounding, pages/tables, atomic ingestion | live provider generation |
 | `tests/test_persistence.py` | SQLite restart recovery, serialized embeddings, workspace ownership boundary | multi-node database behavior |
 | `tests/test_ocr.py` | signatures, page-aware native/mixed extraction, duplicate/report authorization, local image/PDF OCR, rotated and low-contrast synthetic fixtures | handwriting and uninstalled language packs |
 | `tests/test_code_switching.py` (26) | mixed-script/Hinglish detection incl. all spec cases | languages beyond the 7 tested |
-| `tests/test_browser.py` | default V2 route and keyless campus reply | real mic/speakers, real Safari/iOS |
+| `tests/test_browser.py` | default V2 route and configured-provider arithmetic reply | real mic/speakers, real Safari/iOS |
 | `scripts/verify_shell.py` | V2 responsive shell, prompts, themes, drawer, health and page-load privacy boundary | real speech recognition |
 | `scripts/verify_voice_input.py` | V2 locale setting, requesting/listening, interim/final transcript, keyboard/Escape, errors and no-audio boundary using a fake engine | real mic, locale quality, Safari/iOS |
 
@@ -30,13 +32,13 @@ python scripts/eval_ocr.py --json               # CER/WER synthetic OCR fixtures
 
 1. Real-device Safari (scroll, dvh, keyboard-open composer) — see README.
 2. Voice — fill docs/VOICE_TEST_MATRIX.md (engines are mocked in CI).
-3. Live Groq rate-limit UX (the message exists; force it by spamming).
+3. Validate rate-limit handling with a synthetic upstream 429. Use an ordinary authorized live request to verify provider access.
 4. Theme paint-flash timing (logic verified; sub-100 ms timing is visual).
 5. Handwriting, complex tables, photographs with severe perspective distortion,
    and languages whose Tesseract packs are not installed. The synthetic quality
    run reports CER/WER rather than claiming a universal accuracy percentage.
 
-## Phase-11 audit results (axe-core 4.10.2, real runs — 30 Sep 2026)
+## Historical Phase-11 audit results (axe-core 4.10.2, real runs — 30 Sep 2026)
 
 **Accessibility — axe: CLEAN (0 violations)** on welcome screen, active chat
 with messages, and settings modal, after fixing 5 real findings:

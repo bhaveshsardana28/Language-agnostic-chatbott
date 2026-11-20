@@ -1,5 +1,8 @@
 # Evaluation — how every number is produced
 
+Historical record of the earlier implementation. For current behavior, see the [project README](../README.md).
+
+
 Rule: no number appears in REPORT/PPT/screens that isn't written by one of
 these scripts into `results/`. Pins: `requirements.txt`; Python 3.12.7.
 

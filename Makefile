@@ -1,22 +1,21 @@
-.PHONY: help install bootstrap-model run run-v2 run-legacy test test-v2-voice lint clean
+PYTHON ?= python3.12
+
+.PHONY: help install run run-v2 run-legacy test test-v2-voice lint clean
 
 help:
-	@echo "Language-Agnostic Chatbot (pivot translation + single English intent model)"
+	@echo "GAIA V2 multilingual AI chatbot"
 	@echo ""
 	@echo "  make install   create venv and install dependencies"
-	@echo "  make bootstrap-model  build the local campus intent model if missing"
 	@echo "  make run       start the new GAIA V2 app on http://localhost:8000"
 	@echo "  make run-legacy start the original Flask app on http://localhost:5000"
 	@echo "  make test      run core tests (offline)"
 	@echo "  make clean     remove caches and logs"
 
 install:
-	python3 -m venv venv
-	./venv/bin/pip install -r requirements.lock
-	@$(MAKE) bootstrap-model
-
-bootstrap-model:
-	@if [ -f models/intent_classifier.joblib ]; then echo "intent model already present"; else ./venv/bin/python scripts/train.py >/dev/null; echo "intent model generated"; fi
+	@test -x ./venv/bin/python || $(PYTHON) -m venv venv
+	@./venv/bin/python -c 'import sys; assert sys.version_info[:2] == (3, 12), "GAIA requires a Python 3.12 virtual environment"'
+	./venv/bin/python -m pip install pip==26.2.1
+	./venv/bin/python -m pip install -r requirements.lock
 
 run:
 	./venv/bin/python app.py
@@ -28,7 +27,7 @@ run-legacy:
 	./venv/bin/python app.py --legacy
 
 test:
-	./venv/bin/python -m pytest -q tests/test_core.py tests/test_v2.py tests/test_code_switching.py tests/test_rag_qa.py tests/test_persistence.py tests/test_ocr.py
+	./venv/bin/python -m pytest -q tests
 
 test-browser:
 	./venv/bin/python tests/test_browser.py

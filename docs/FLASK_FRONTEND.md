@@ -58,14 +58,11 @@ requests. These three pieces must be on the same origin. `CONFIG` at the top of
 - Auto-detect sends `language: null`. Selecting a language sends its code and
   localizes the greeting, draft suggestions and placeholder. The surrounding
   interface remains English. Suggestions fill the draft; they never auto-send.
-- The supplied response contract uses `detected_language` and `confidence`.
-  The existing Flask implementation instead returns `lang`; its language score
-  comes from `language_meta.confidence`. Its top-level `confidence` is an intent
-  score and is never mislabelled as detection confidence. Missing or invalid
-  metadata is not invented. Scores are backend estimates, not guarantees.
-- The existing Flask handler ignores the requested `language` field and always
-  auto-detects. The frontend sends it correctly but does not pretend to force
-  backend language selection. Backend behavior has not been changed.
+- Flask reports the detected input language in `lang` and the detector’s estimate
+  in `language_meta.confidence`. The legacy intent fields return `null` and
+  `0.0` for compatibility.
+- The Flask handler honors a supported `language` field when choosing the reply
+  language. Auto-detection still runs on the original input.
 - There is no browser storage or cookie access in this frontend. Refresh clears
   messages, draft and theme preference. Messages still go to the server; this
   does not assert anything about server/provider logging or retention.
@@ -103,7 +100,7 @@ Manual messages:
 
 | Language | Message |
 |---|---|
-| English | When is the library open? |
+| English | Why is the sky blue? |
 | Hindi | पुस्तकालय कब खुलता है? |
 | Punjabi | ਲਾਇਬ੍ਰੇਰੀ ਕਦੋਂ ਖੁੱਲ੍ਹਦੀ ਹੈ? |
 | Spanish | ¿Cuándo abre la biblioteca? |

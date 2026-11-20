@@ -147,7 +147,7 @@ def test_document_qa_broad_specific_absent_and_prompt_context():
         assert "couldn't find" in absent_text
         assert len(captured) == before  # retrieval gate rejects unsupported content before generation
     finally:
-        rag._sessions.clear()
+        rag._read_index.cache_clear()
         rag._model, rag.GROUND_THRESHOLD = real_model, real_threshold
         llm.stream_chat, settings.LLM_API_KEY = real_stream, real_key
 
@@ -215,7 +215,7 @@ def test_upload_failure_is_atomic_and_empty_file_is_rejected():
         assert failed.status_code == 422
         assert not rag.has_session(cid)
     finally:
-        rag._sessions.clear()
+        rag._read_index.cache_clear()
         rag._model = real_model
 
 
@@ -236,5 +236,5 @@ def test_document_sessions_are_isolated_and_fresh_upload_is_queryable():
         assert other[0]["route"] == "general"
         assert rag.has_session(first)
     finally:
-        rag._sessions.clear()
+        rag._read_index.cache_clear()
         rag._model, llm.stream_chat, settings.LLM_API_KEY = real_model, real_stream, real_key

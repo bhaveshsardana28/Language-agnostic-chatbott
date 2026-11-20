@@ -58,6 +58,7 @@ def trap(page, selector):
 
 def context_setup(context):
     context.add_init_script("""if (!sessionStorage.getItem('seeded')) {
+      localStorage.setItem('gaia.redesign.v2', JSON.stringify({theme:'system'}));
       localStorage.setItem('gaia.store.v1', 'legacy untouched'); sessionStorage.setItem('seeded', 'yes');
     }
     window.mediaCalls = 0;
@@ -77,7 +78,7 @@ def layout_and_interactions(browser, origin, capture):
         page.on('console', lambda msg: errors.append(msg.text) if msg.type == 'error' else None)
         page.on('response', lambda res: failed.append(res.url) if res.status >= 400 else None)
         page.on('request', lambda req: requests.append((req.method, req.url)))
-        for width, height in ((360, 800), (768, 900), (1024, 900), (1440, 1000)):
+        for width, height in ((320, 700), (360, 800), (375, 812), (768, 900), (1024, 900), (1440, 1000)):
             page.set_viewport_size({'width': width, 'height': height})
             page.goto(origin + '/v2/index.html')
             try:
@@ -151,7 +152,7 @@ def layout_and_interactions(browser, origin, capture):
             # A single sidebar node is reparented; opening settings closes nav first.
             if width < 1024:
                 toggle.click()
-            page.get_by_role('button', name='Appearance settings', exact=True).click()
+            page.get_by_role('button', name='Workspace settings', exact=True).click()
             expect(page.locator('#navigation-drawer')).to_be_hidden()
             expect(page.locator('#settings-dialog')).to_be_visible()
             trap(page, '#settings-dialog')
@@ -203,7 +204,7 @@ def layout_and_interactions(browser, origin, capture):
         expect(page.locator('html')).to_have_attribute('data-theme', other)
         expect(page.locator('html')).to_have_attribute('data-sidebar', 'collapsed')
         # In-app reduction is exercised on the actual shell as well as the component lab.
-        page.get_by_role('button', name='Appearance settings', exact=True).click()
+        page.get_by_role('button', name='Workspace settings', exact=True).click()
         page.locator('#reduce-motion').check()
         page.keyboard.press('Escape')
         expect(page.locator('#settings-dialog')).to_be_hidden()
@@ -278,12 +279,17 @@ def connection_cases(browser, origin, capture):
     expect(page.locator('#offline-banner')).to_be_hidden()
     passed('health: API reachability is separate from provider readiness')
 
+    def retry_connection():
+        if not page.locator('.service-menu').evaluate('menu => menu.open'):
+            page.locator('.service-menu summary').click()
+        retry.click()
+
     mode['value'] = 'invalid'
-    retry.click()
+    retry_connection()
     expect(page.locator('#offline-banner')).to_be_visible()
     expect(status).to_have_text('Service unavailable')
     mode['value'] = 'hold'
-    retry.click()
+    retry_connection()
     expect(status).to_have_text('Checking service…')
     expect(page.locator('#offline-banner')).to_be_visible()
     expect(retry).to_be_disabled()
@@ -294,7 +300,7 @@ def connection_cases(browser, origin, capture):
     expect(status).to_have_text('Service unavailable')
     passed('health: malformed response rejected, retry retains warning, timeout cannot be overwritten by stale success')
     mode['value'] = 'ok'
-    retry.click()
+    retry_connection()
     expect(status).to_have_text('API reachable')
     expect(page.locator('#offline-banner')).to_be_hidden()
     draft = page.locator('#message-input')
@@ -309,15 +315,15 @@ def connection_cases(browser, origin, capture):
     expect(status).to_have_text('API reachable')
     expect(page.locator('#offline-banner')).to_be_hidden()
     mode['value'] = 'failure'
-    retry.click()
+    retry_connection()
     expect(status).to_have_text('Service unavailable')
     mode['value'] = 'ok'
-    retry.click()
+    retry_connection()
     expect(status).to_have_text('API reachable')
     passed('health: browser offline/online and failed-fetch/retry recovery retain the draft')
 
     mode['value'] = 'hold'
-    retry.click()
+    retry_connection()
     expect(status).to_have_text('Checking service…')
     page.evaluate("Object.defineProperty(document, 'hidden', {configurable:true, get:() => true}); document.dispatchEvent(new Event('visibilitychange'));")
     expect(status).to_have_text('Service check paused')

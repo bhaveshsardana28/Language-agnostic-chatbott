@@ -1,0 +1,16 @@
+{
+  "phase": 7,
+  "environment": {
+    "platform": "macOS-27.0.1-arm64-arm-64bit"
+  },
+  "scope": "V2 mocked SpeechRecognition input, locale selection, transcript editing, errors and privacy boundary",
+  "passed_groups": [
+    "settings: speech locale persists with Auto and seven explicit locale options",
+    "transcript: interim and final speech stay editable in the composer without auto-send",
+    "controls: Escape and Ctrl+Shift+M start/stop recognition safely",
+    "errors/privacy: permission error is actionable, recognition returns idle and no audio API is requested",
+    "auto locale: latest detected Hindi user language selects hi-IN for the next voice turn",
+    "unsupported: microphone control disables with an explanation and page load stays permission-free"
+  ],
+  "real_microphone": false
+}

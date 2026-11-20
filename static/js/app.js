@@ -17,39 +17,39 @@ const CONFIG = Object.freeze({
 const LANGUAGES = {
   en: {
     name: "English", native: "English", greeting: "Hello. नमस्ते. Hola.",
-    subtitle: "A question about campus? Start in your language. We'll meet you there.",
+    subtitle: "What would you like to explore? Ask in your language.",
     placeholder: "Ask a question in your language…",
-    prompts: ["When is the library open?", "When are my exams?", "How do I pay my fees?", "Where can I find my timetable?"]
+    prompts: ["Why is the sky blue?", "Help me plan my week.", "How do I write a clear email?", "Explain recursion with an example."]
   },
   hi: {
     name: "Hindi", native: "हिन्दी", greeting: "नमस्ते। कुछ पूछिए।",
-    subtitle: "कैंपस के बारे में कोई सवाल? अपनी भाषा में पूछिए।",
+    subtitle: "क्या जानना चाहेंगे? अपनी भाषा में पूछिए।",
     placeholder: "अपना सवाल यहाँ लिखिए…",
-    prompts: ["पुस्तकालय कब खुलता है?", "मेरी परीक्षाएँ कब हैं?", "मैं फीस कैसे भरूँ?", "मुझे समय सारणी कहाँ मिलेगी?"]
+    prompts: ["आसमान नीला क्यों है?", "मेरा सप्ताह व्यवस्थित करने में मदद करें।", "एक छोटा ईमेल कैसे लिखूँ?", "मुझे एक कहानी सुनाइए।"]
   },
   pa: {
     name: "Punjabi", native: "ਪੰਜਾਬੀ", greeting: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ। ਗੱਲ ਕਰੀਏ।",
-    subtitle: "ਕੈਂਪਸ ਬਾਰੇ ਕੋਈ ਸਵਾਲ? ਆਪਣੀ ਭਾਸ਼ਾ ਵਿੱਚ ਪੁੱਛੋ।",
+    subtitle: "ਤੁਸੀਂ ਕੀ ਜਾਣਨਾ ਚਾਹੁੰਦੇ ਹੋ? ਆਪਣੀ ਭਾਸ਼ਾ ਵਿੱਚ ਪੁੱਛੋ।",
     placeholder: "ਆਪਣਾ ਸਵਾਲ ਇੱਥੇ ਲਿਖੋ…",
-    prompts: ["ਲਾਇਬ੍ਰੇਰੀ ਕਦੋਂ ਖੁੱਲ੍ਹਦੀ ਹੈ?", "ਮੇਰੀਆਂ ਪ੍ਰੀਖਿਆਵਾਂ ਕਦੋਂ ਹਨ?", "ਮੈਂ ਫੀਸ ਕਿਵੇਂ ਭਰਾਂ?", "ਮੈਨੂੰ ਸਮਾਂ ਸਾਰਣੀ ਕਿੱਥੇ ਮਿਲੇਗੀ?"]
+    prompts: ["ਅਸਮਾਨ ਨੀਲਾ ਕਿਉਂ ਹੈ?", "ਮੇਰਾ ਹਫ਼ਤਾ ਯੋਜਨਾਬੱਧ ਕਰਨ ਵਿੱਚ ਮਦਦ ਕਰੋ।", "ਇੱਕ ਛੋਟੀ ਈਮੇਲ ਕਿਵੇਂ ਲਿਖਾਂ?", "ਮੈਨੂੰ ਇੱਕ ਕਹਾਣੀ ਸੁਣਾਓ।"]
   },
   es: {
     name: "Spanish", native: "Español", greeting: "Hola. Hablemos.",
-    subtitle: "¿Una pregunta sobre el campus? Hazla en tu idioma.",
+    subtitle: "¿Qué te gustaría explorar? Pregunta en tu idioma.",
     placeholder: "Escribe tu pregunta aquí…",
-    prompts: ["¿Cuándo abre la biblioteca?", "¿Cuándo son mis exámenes?", "¿Cómo pago las tasas?", "¿Dónde encuentro mi horario?"]
+    prompts: ["¿Por qué el cielo es azul?", "Ayúdame a planificar mi semana.", "¿Cómo escribo un correo claro?", "Cuéntame una historia corta."]
   },
   fr: {
     name: "French", native: "Français", greeting: "Bonjour. Parlons ensemble.",
-    subtitle: "Une question sur le campus ? Posez-la dans votre langue.",
+    subtitle: "Que souhaitez-vous explorer ? Posez votre question dans votre langue.",
     placeholder: "Écrivez votre question ici…",
-    prompts: ["Quand la bibliothèque ouvre-t-elle ?", "Quand ont lieu mes examens ?", "Comment payer mes frais ?", "Où trouver mon emploi du temps ?"]
+    prompts: ["Pourquoi le ciel est-il bleu ?", "Aidez-moi à planifier ma semaine.", "Comment écrire un courriel clair ?", "Racontez-moi une histoire courte."]
   },
   de: {
     name: "German", native: "Deutsch", greeting: "Hallo. Reden wir miteinander.",
-    subtitle: "Eine Frage zum Campus? Stelle sie in deiner Sprache.",
+    subtitle: "Was möchtest du erkunden? Frag in deiner Sprache.",
     placeholder: "Schreibe deine Frage hier…",
-    prompts: ["Wann öffnet die Bibliothek?", "Wann sind meine Prüfungen?", "Wie bezahle ich meine Gebühren?", "Wo finde ich meinen Stundenplan?"]
+    prompts: ["Warum ist der Himmel blau?", "Hilf mir, meine Woche zu planen.", "Wie schreibe ich eine klare E-Mail?", "Erzähl mir eine kurze Geschichte."]
   }
 };
 
@@ -167,6 +167,7 @@ function normalizeReply(data) {
   const rawConfidence = canonical ? data[fields.confidence] : data[fields.legacyMetadata]?.[fields.confidence];
   return {
     reply: data[fields.reply],
+    responseLanguage: typeof data.response_language === "string" ? data.response_language : null,
     language: typeof rawLanguage === "string" && /^[a-z]{2,3}(?:-[a-z0-9]{2,8})*$/i.test(rawLanguage)
       ? rawLanguage.toLowerCase() : null,
     confidence: typeof rawConfidence === "number" && Number.isFinite(rawConfidence) &&
@@ -198,7 +199,7 @@ async function runTurn(turn) {
   try {
     const data = await requestReply(turn.payload, request.controller.signal);
     if (state.request !== request) return;
-    showResponse(turn, renderMessage("assistant", data.reply, data, data.language));
+    showResponse(turn, renderMessage("assistant", data.reply, data, data.responseLanguage || data.language));
   } catch {
     // Clear-chat invalidates the request before aborting; stale results vanish.
     if (state.request !== request) return;

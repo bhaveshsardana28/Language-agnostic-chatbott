@@ -32,6 +32,7 @@ OPENAI_COMPAT_BASE_URL = os.getenv(
 )
 
 MAX_MESSAGE_CHARS = int(os.getenv("MAX_MESSAGE_CHARS", "4000"))
+LLM_MAX_OUTPUT_TOKENS = int(os.getenv("LLM_MAX_OUTPUT_TOKENS", "1024"))
 MEMORY_TURNS = int(os.getenv("MEMORY_TURNS", "10"))
 GAIA_DB_PATH = os.getenv("GAIA_DB_PATH", os.path.join("data", "gaia.db"))
 SQLITE_TIMEOUT = float(os.getenv("SQLITE_TIMEOUT", "5"))
@@ -56,6 +57,8 @@ WORKSPACE_COOKIE_SECURE = os.getenv("WORKSPACE_COOKIE_SECURE", "0").lower() in {
 
 def llm_ready() -> tuple[bool, str]:
     """(can-we-call-an-llm, human-readable reason if not)."""
+    if LLM_PROVIDER not in {"ollama", "groq", "openrouter", "openai"}:
+        return False, "unsupported LLM provider"
     if LLM_PROVIDER == "ollama":
         return True, ""
     if not LLM_API_KEY:

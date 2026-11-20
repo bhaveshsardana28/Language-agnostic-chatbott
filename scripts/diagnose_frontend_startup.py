@@ -25,7 +25,7 @@ def main():
 
     try:
         syntax = subprocess.run(
-            ["node", "--check", "static/js/markdown.js"],
+            ["node", "--check", "static/v2/js/markdown.js"],
             capture_output=True, text=True, check=False,
         )
         report("JavaScript syntax exit", syntax.returncode)
@@ -36,16 +36,16 @@ def main():
     with httpx.Client(timeout=30) as client:
         health = client.get(base + "/api/v1/health")
         report("Health", {"http_status": health.status_code, **health.json()})
-        asset = client.get(base + "/static/js/markdown.js")
+        asset = client.get(base + "/static/v2/js/markdown.js")
         report("Markdown asset", {"status": asset.status_code, "bytes": len(asset.content)})
         cid = client.post(base + "/api/v1/conversations").json()["conversation_id"]
         try:
             response = client.post(base + "/api/v1/chat", json={
-                "message": "when are my exams", "conversation_id": cid,
+                "message": "What is 19 plus 23? Answer in digits.", "conversation_id": cid,
             })
             frames = [json.loads(frame[5:].strip()) for frame in response.text.split("\n\n")
                       if frame.startswith("data:")]
-            report("Direct campus request", {
+            report("Direct general request", {
                 "status": response.status_code,
                 "frame_types": [frame["type"] for frame in frames],
                 "route": frames[0].get("route") if frames else None,
@@ -63,21 +63,17 @@ def main():
         page.on("request", lambda request: requests.append(request.url)
                 if request.method == "POST" and "/api/v1/chat" in request.url else None)
         page.goto(base)
-        page.wait_for_selector("#welcome.show")
-        page.fill("#input", "when are my exams")
-        page.press("#input", "Enter")
-        page.wait_for_timeout(1500)
+        page.wait_for_selector("#welcome")
+        page.fill("#message-input", "What is 19 plus 23? Answer in digits.")
+        page.press("#message-input", "Enter")
+        page.wait_for_selector('.chat-message--assistant[aria-busy="false"]')
         report("Browser", browser.version)
         report("Page errors", errors)
         report("Chat POSTs after Enter", requests)
         report("DOM state", page.evaluate("""() => ({
-            md: typeof window.md,
-            esc: typeof window.esc,
-            speechText: typeof window.speechText,
-            suggestions: document.querySelectorAll('.welcome__card').length,
-            allMessages: document.querySelectorAll('.msg').length,
-            oldSelector: document.querySelectorAll('.msg.assistant .bubble').length,
-            splitSelector: document.querySelectorAll('.msg--assistant .msg__bubble').length
+            suggestions: document.querySelectorAll('[data-prompt]').length,
+            userMessages: document.querySelectorAll('.chat-message--user').length,
+            assistantMessages: document.querySelectorAll('.chat-message--assistant').length
         })"""))
         browser.close()
 

@@ -1,39 +1,62 @@
-"""Pivot translation with a provider fallback chain.
+"""Bounded HTTPS requests to the Google Translate mobile page and MyMemory."""
+import html
+import re
 
-Primary: deep-translator GoogleTranslator (free, no key, best quality).
-Fallback: deep-translator MyMemoryTranslator (free, no key, separate quota)
-          — kicks in when Google rate-limits (it does; seen live in Phase 5).
-TranslateError propagates up only when ALL providers fail; the pipeline
-turns that into a degraded-graceful reply.
-"""
+import requests
+from bs4 import BeautifulSoup
 
-from typing import Optional
-
-from deep_translator import GoogleTranslator, MyMemoryTranslator
-
-# MyMemory wants locale codes, not bare ISO-639-1.
-_MYMEMORY_CODES = {"en": "en-US", "hi": "hi-IN", "pa": "pa-IN", "es": "es-ES",
-                   "fr": "fr-FR", "de": "de-DE", "it": "it-IT"}
+_TIMEOUT = (3, 8)
+_LOCALES = {"en": "en-US", "hi": "hi-IN", "pa": "pa-IN", "es": "es-ES",
+            "fr": "fr-FR", "de": "de-DE", "it": "it-IT"}
+_LITERAL = re.compile(r"```[\s\S]*?```|`[^`\n]+`|https?://[^\s<>]+")
 
 
-def translate_text(text: str, target_lang: str, source_lang: Optional[str] = None) -> str:
-    """Translate `text` to `target_lang`. Raises the last exception if all
-    providers fail; pipeline.translate_safe handles that."""
-    if not text:
+def _google(text, source, target):
+    response = requests.get("https://translate.google.com/m",
+                            params={"sl": source, "tl": target, "q": text}, timeout=_TIMEOUT)
+    response.raise_for_status()
+    element = BeautifulSoup(response.text, "html.parser").select_one("div.result-container, div.t0")
+    return element.get_text(strip=True) if element else ""
+
+
+def _mymemory(text, source, target):
+    if source == "auto" or len(text.encode("utf-8")) > 500:
         return ""
-    errors = []
-    # Google first (better for our language pairs)
-    try:
-        return GoogleTranslator(source=source_lang or "auto", target=target_lang).translate(text)
-    except Exception as exc:
-        errors.append(f"google: {exc}")
-    # MyMemory fallback (`auto` not supported -> skip detect step, use source)
-    if source_lang and source_lang != "auto":
-        try:
-            return MyMemoryTranslator(
-                source=_MYMEMORY_CODES.get(source_lang, source_lang),
-                target=_MYMEMORY_CODES.get(target_lang, target_lang),
-            ).translate(text)
-        except Exception as exc:
-            errors.append(f"mymemory: {exc}")
-    raise RuntimeError(" | ".join(errors) if errors else "no translation provider available")
+    pair = f"{_LOCALES.get(source, source)}|{_LOCALES.get(target, target)}"
+    response = requests.get("https://api.mymemory.translated.net/get",
+                            params={"q": text, "langpair": pair}, timeout=_TIMEOUT)
+    response.raise_for_status()
+    data = response.json()
+    if str(data.get("responseStatus")) != "200" or data.get("quotaFinished"):
+        return ""
+    return html.unescape(data["responseData"]["translatedText"])
+
+
+def translate_text(text: str, target_lang: str, source_lang: str | None = None) -> str:
+    if not text or source_lang == target_lang or _LITERAL.fullmatch(text):
+        return text
+    # Keep literals outside machine translation. A provider can transliterate
+    # placeholder tokens and silently corrupt otherwise valid code.
+    parts = _LITERAL.split(text)
+    literals = _LITERAL.findall(text)
+    if len(parts) > 16:
+        raise ValueError("too many separate translation segments")
+    result = []
+    for index, part in enumerate(parts):
+        if part.strip():
+            for provider in (_google, _mymemory):
+                try:
+                    translated = provider(part.strip(), source_lang or "auto", target_lang)
+                    if translated:
+                        result.append(part[:len(part)-len(part.lstrip())] + translated.strip()
+                                      + part[len(part.rstrip()):])
+                        break
+                except (requests.RequestException, ValueError, TypeError, KeyError):
+                    continue
+            else:
+                raise RuntimeError("translation services unavailable")
+        else:
+            result.append(part)
+        if index < len(literals):
+            result.append(literals[index])
+    return "".join(result)

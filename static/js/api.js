@@ -42,11 +42,6 @@
       { type: 'delta', text: 'Esta es una respuesta de traducción simulada.' },
       { type: 'done', latency_ms: 98, model: 'mt:en', sources: [] }
     ],
-    campus_kb: [
-      { type: 'meta', conversation_id: 'mock-1', language_meta: { language: 'en', language_name: 'English', script: 'Latn', confidence: 0.99, secondary_languages: [], code_switched: false, mixed_script: false, scripts: { Latn: 1 }, detection_reason: 'mock' }, route: 'campus_kb', reason: 'matched intent', response_lang: 'en' },
-      { type: 'delta', text: 'Campus KB answer: The exam schedule is available on the student portal.', intent: 'exam_schedule', confidence: 0.92 },
-      { type: 'done', latency_ms: 45, model: 'tfidf+logreg (pivot)', sources: [] }
-    ],
     error: [
       { type: 'meta', conversation_id: 'mock-1', language_meta: { language: 'en', language_name: 'English', script: 'Latn', confidence: 0.99, secondary_languages: [], code_switched: false, mixed_script: false, scripts: { Latn: 1 }, detection_reason: 'mock' }, route: 'general', reason: 'mock error', response_lang: 'en' },
       { type: 'error', message: 'This is a mocked error for testing.' }
@@ -105,7 +100,6 @@
         let frames = mockFrames.general;
         const lower = message.toLowerCase();
         if (lower.includes('translate') || lower.includes('traduce') || lower.includes('traducir')) frames = mockFrames.translate;
-        else if (lower.includes('exam') || lower.includes('schedule') || lower.includes('campus')) frames = mockFrames.campus_kb;
         else if (lower.includes('error') || lower.includes('fail')) frames = mockFrames.error;
 
         const stream = mockSSE(frames, signal);

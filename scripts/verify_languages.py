@@ -71,7 +71,7 @@ def run_checks(browser, origin, capture):
     expect(page.locator('.chat-message--assistant .chat-insights')).to_be_hidden()
     passed('metadata: native/English language labels, script label, confidence boundary and auto direction')
 
-    page.get_by_role('button', name='Appearance settings', exact=True).click()
+    page.get_by_role('button', name='Workspace settings', exact=True).click()
     settings = page.locator('#settings-dialog')
     expect(settings).to_be_visible()
     expect(page.locator('#show-insights')).not_to_be_checked()

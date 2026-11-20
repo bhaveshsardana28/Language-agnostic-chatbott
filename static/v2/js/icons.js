@@ -2,7 +2,11 @@
 export function initIcons() {
   document.body.insertAdjacentHTML('afterbegin', `
   <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" hidden>
-     <symbol id="i-gaia" viewBox="0 0 32 32"><path d="M22 6h-7a7 7 0 1 0 7 7V6m0 7v11c0 5-10 6-14 2M15 6h11"/></symbol>
+    <symbol id="i-gaia" viewBox="0 0 32 32"><g stroke="currentColor" fill="none" stroke-width="1.9"><circle cx="16" cy="16" r="9"/><ellipse cx="16" cy="16" rx="15" ry="5" transform="rotate(-36 16 16)"/><path d="M11 23c4-1 10-7 12-12"/></g></symbol>
+    <symbol id="i-workspace" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8m-4-4v4"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3c1 6 3 8 9 9-6 1-8 3-9 9-1-6-3-8-9-9 6-1 8-3 9-9Z"/></symbol>
+    <symbol id="i-compare" viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="14" rx="2"/><path d="M14 7h5a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5"/></symbol>
+     <symbol id="i-lac" viewBox="0 0 32 32"><path d="M8 7v18h14"/><path d="M24 8a8 8 0 1 0 0 16"/><path d="M8 13h8"/></symbol>
      <symbol id="i-polyglot" viewBox="0 0 32 32"><path d="M5 9h10a6 6 0 0 1 0 12H5M27 23H17a6 6 0 0 1 0-12h10"/><path d="M11 9v12m10-10v12"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4zM8 9h8m-8 3h5"/></symbol>
@@ -25,7 +29,8 @@ export function initIcons() {
      <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 20V4M5 11l7-7 7 7"/></symbol>
      <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
     <symbol id="i-sound" viewBox="0 0 24 24"><path d="m11 5-5 4H3v6h3l5 4zM16 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol>
-    <symbol id="i-sidebar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></symbol>
+     <symbol id="i-sidebar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></symbol>
+     <symbol id="i-panel" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16M18 8h1M18 12h1M18 16h1"/></symbol>
     <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></symbol>
     <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 4 12 8-12 8z"/></symbol>
     <symbol id="empty-chat" viewBox="0 0 168 168"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M24 29h91v69H60l-22 19V98H24z"/><path d="M69 69h73v58h-17v15l-20-15H69z"/><path d="M42 49h38m-38 14h55m-12 23h37m-37 14h26"/><circle cx="119" cy="28" r="9"/><path d="M119 24v8m-4-4h8"/></g></symbol>

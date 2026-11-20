@@ -2,7 +2,7 @@
 
 python scripts/verify_chat.py [--capture] [--live http://localhost:8000]
 Mock mode uses the actual page at /v2/?mock=1 and never calls /api/v1/chat.
-The optional live run uses the keyless campus route only.
+The optional live run uses the general model route only.
 """
 import argparse
 from functools import partial
@@ -67,7 +67,11 @@ def mock_stream(browser, origin, capture):
     expect(send).to_be_disabled()
     input_box.fill('Show me a Python example')
     expect(send).to_be_enabled()
+    input_box.dispatch_event('keydown', {'key': 'Enter', 'isComposing': True})
+    expect(page.locator('.chat-message--user')).to_have_count(0)
     input_box.press('Enter')
+    input_box.press('Enter')
+    expect(page.locator('.chat-message--user')).to_have_count(1)
     expect(page.locator('#conversation-view')).to_be_visible()
     expect(page.locator('.chat-message--user')).to_contain_text('Show me a Python example')
     expect(page.locator('.chat-message--assistant[aria-busy="true"]')).to_be_visible()
@@ -75,11 +79,32 @@ def mock_stream(browser, origin, capture):
     expect(page.locator('.chat-message--assistant')).to_contain_text('Hello')
     expect(page.locator('.code-block')).to_be_visible()
     expect(page.locator('.code-language')).to_have_text('python')
-    expect(page.locator('.chat-route')).to_have_text('general')
+    expect(page.locator('.chat-route')).to_have_text('General')
     expect(page.locator('.chat-message--assistant a')).to_have_count(0)
     assert not chat_requests, chat_requests
     assert page.evaluate('window.mediaCalls') == 0
     assert not errors, errors
+    page.evaluate("""async () => {
+      const {renderMarkdown} = await import('./js/markdown.js');
+      const record = document.querySelector('.chat-message--assistant').cloneNode(false);
+      record.id = 'long-layout-fixture';
+      const body = document.createElement('div');
+      body.className = 'chat-message-body';
+      body.dir = 'auto';
+      body.innerHTML = renderMarkdown(['مرحبا · ਪੰਜਾਬੀ · हिंदी', '```text', 'x'.repeat(1300),
+        '```', '| Language | Term |', '| --- | --- |', '| ਪੰਜਾਬੀ | ' + 'y'.repeat(380) + ' |'].join('\\n'));
+      record.append(body);
+      document.querySelector('#message-log').append(record);
+    }""")
+    for width in (320, 375, 425, 768, 1024, 1280, 1440):
+        page.set_viewport_size({'width': width, 'height': 850})
+        assert page.evaluate("""() => {
+          const main = document.querySelector('#main-content');
+          const pre = document.querySelector('#long-layout-fixture pre');
+          return main.scrollWidth <= main.clientWidth && pre.scrollWidth > pre.clientWidth;
+        }"""), width
+    page.locator('#long-layout-fixture').evaluate('element => element.remove()')
+    passed('mixed-script reply, long code and table stay inside the chat at seven widths')
     screenshot(page, 'mock-1440-code', capture)
     page.get_by_role('button', name='Copy code block').click()
     expect(page.locator('#toast-region')).to_contain_text('Code block copied')
@@ -116,9 +141,11 @@ def mock_stream(browser, origin, capture):
       const module = await import('./js/markdown.js');
       return {
         html: module.renderMarkdown('<script>alert(1)</script>\\n\\n[x](javascript:alert(2))\\n\\n[ok](https://example.com)'),
+        literal: module.renderMarkdown('`**literal** [text](https://example.com)`'),
         plain: module.plainText('**bold** and `code`'),
       };
     }""")
+    assert '<code>**literal** [text](https://example.com)</code>' in result['literal']
     assert '<script>' not in result['html'] and 'href="javascript:' not in result['html']
     assert 'rel="noopener noreferrer"' in result['html'] and result['plain'] == 'bold and code'
     passed('renderer: hostile HTML escaped, javascript links rejected, HTTPS links constrained and plain text extracted')
@@ -172,7 +199,7 @@ def error_stream(browser, origin, capture):
     context.close()
 
 
-def live_campus(browser, base, capture):
+def live_general(browser, base, capture):
     context = browser.new_context(viewport={'width': 1024, 'height': 900}, reduced_motion='reduce')
     context.add_init_script("localStorage.setItem('gaia.store.v1', 'legacy untouched');")
     page = context.new_page()
@@ -180,23 +207,24 @@ def live_campus(browser, base, capture):
     page.on('request', lambda req: requests.append(req) if req.url.endswith('/api/v1/chat') else None)
     page.goto(base.rstrip('/') + '/static/v2/index.html')
     expect(page.locator('#service-status')).to_have_text('API reachable')
-    page.locator('#message-input').fill('when are my exams')
+    page.locator('#message-input').fill('What is 19 plus 23? Answer in digits.')
     page.locator('#message-input').press('Enter')
     expect(page.locator('.chat-message--assistant[aria-busy="false"]')).to_be_visible(timeout=30000)
-    expect(page.locator('.chat-message--assistant')).to_contain_text(re.compile('exam', re.IGNORECASE))
+    expect(page.locator('.chat-message--assistant')).to_contain_text('42')
     assert requests and json.loads(requests[0].post_data)['conversation_id'] in (None, '')
     cid = json.loads(requests[0].post_data).get('conversation_id')
-    # A second keyless campus turn proves the browser now carries the server-issued ID.
-    page.locator('#message-input').fill('when is the date sheet published')
+    # A second general model turn proves the browser now carries the server-issued ID.
+    page.locator('#message-input').fill('What is twice that answer? Reply in digits.')
     page.locator('#message-input').press('Enter')
     expect(page.locator('.chat-message--assistant[aria-busy="false"]')).to_have_count(2, timeout=30000)
+    expect(page.locator('.chat-message--assistant').last).to_contain_text('84')
     assert len(requests) >= 2
     second_cid = json.loads(requests[1].post_data).get('conversation_id')
     assert second_cid and second_cid != cid
     # First request had no ID; the response-assigned server ID is used for turn two.
-    screenshot(page, 'light-1024-live-campus', capture)
+    screenshot(page, 'light-1024-live-general', capture)
     assert page.evaluate("localStorage.getItem('gaia.store.v1')") == 'legacy untouched'
-    passed(f'LIVE campus: two SSE replies rendered; second request carried server conversation ID {second_cid}')
+    passed(f'LIVE general: two SSE replies rendered; second request carried server conversation ID {second_cid}')
     context.close()
     return True
 
@@ -213,13 +241,13 @@ def main():
             browser = pw.chromium.launch()
             mock_stream(browser, origin, args.capture)
             error_stream(browser, origin, args.capture)
-            live = live_campus(browser, args.live, args.capture) if args.live else None
+            live = live_general(browser, args.live, args.capture) if args.live else None
             browser.close()
     finally:
         server.shutdown(); server.server_close()
     print(f'\n{len(PASSED)} Phase 4 check groups passed; {len(SHOTS)} screenshots; live: {bool(live)}.')
     report = {'phase': 4, 'environment': {'platform': platform.platform(), 'python': platform.python_version()},
-              'scope': 'chat transport, mock stream, rendering, cancellation and keyless campus smoke',
+              'scope': 'chat transport, mock stream, rendering, cancellation and general model smoke',
               'passed_groups': PASSED, 'screenshots': SHOTS, 'live': bool(live)}
     if args.capture: (ROOT / 'docs/chat-checks.json').write_text(json.dumps(report, indent=2) + '\n')
 

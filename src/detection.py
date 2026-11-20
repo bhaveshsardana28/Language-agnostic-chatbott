@@ -45,7 +45,7 @@ _HI_STRONG = {
     "kitne", "kitni", "kyun", "kyu", "kahan", "kaun", "hoon", "ho", "raha",
     "rahe", "rahi", "gaya", "gayi", "lagta", "matlab", "zaroor", "seekhna",
     "seekhni", "seekhne", "sikhna", "sikhni", "samajh", "samajhna", "yaar",
-    "bhai", "accha", "thik", "theek", "banda", "dosti", "shukriya",
+    "batao", "kaunsa", "kaunsi", "bhai", "accha", "thik", "theek", "banda", "dosti", "shukriya",
 }
 _HI_WEAK = {
     "hai", "hain", "mein", "main", "kya", "kar", "karna", "karne", "karo",
@@ -61,7 +61,7 @@ _PA_STRONG = {"mainu", "tainu", "kihda", "kitho", "kithon", "assi", "tussi",
 _EN_EVIDENCE = {
     "the", "is", "are", "am", "was", "what", "how", "when", "where", "which",
     "who", "this", "that", "these", "those", "my", "your", "you", "we",
-    "they", "don", "t", "can", "will", "need", "want", "new", "time",
+    "they", "don", "t", "can", "will", "need", "want", "new", "time", "word",
     "language", "know", "start", "learn", "good", "bad", "please", "thanks",
     "but", "not", "just", "like", "get", "make", "help", "improve",
 }
@@ -159,6 +159,8 @@ def detect_meta(text: str) -> dict:
         return m
 
     scripts = _scripts_of(stripped)
+    if not scripts:
+        return _meta(None, 0.0, [], False, False, {}, "no language-bearing characters")
     tokens = _tokenize(stripped)
 
     # Non-Latin scripts are decisive: people code-switch INTO Latin (tech

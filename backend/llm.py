@@ -35,18 +35,22 @@ def stream_chat(messages: List[Dict[str, str]], model: str | None = None) -> Ite
 
 def _stream_ollama(messages, model) -> Iterator[str]:
     url = f"{settings.OLLAMA_BASE_URL}/api/chat"
-    payload = {"model": model, "messages": messages, "stream": True}
+    payload = {"model": model, "messages": messages, "stream": True,
+               "options": {"num_predict": settings.LLM_MAX_OUTPUT_TOKENS}}
     with requests.post(url, json=payload, stream=True, timeout=_TIMEOUT) as r:
         r.raise_for_status()
         for line in r.iter_lines():
             if not line:
                 continue
             obj = json.loads(line)
-            if obj.get("done"):
-                break
+            if obj.get("error"):
+                raise RuntimeError("LLM provider reported a stream error")
             chunk = obj.get("message", {}).get("content", "")
             if chunk:
                 yield chunk
+            if obj.get("done"):
+                return
+        raise RuntimeError("LLM stream interrupted")
 
 
 def _stream_openai_compat(messages, model) -> Iterator[str]:
@@ -54,19 +58,26 @@ def _stream_openai_compat(messages, model) -> Iterator[str]:
         raise RuntimeError(f"LLM_API_KEY missing for provider {settings.LLM_PROVIDER}")
     url = f"{settings.OPENAI_COMPAT_BASE_URL}/chat/completions"
     headers = {"Authorization": f"Bearer {settings.LLM_API_KEY}"}
-    payload = {"model": model, "messages": messages, "temperature": 0.7, "stream": True}
+    payload = {"model": model, "messages": messages, "stream": True,
+               "max_completion_tokens": settings.LLM_MAX_OUTPUT_TOKENS}
     with requests.post(url, json=payload, headers=headers, stream=True, timeout=_TIMEOUT) as r:
         if r.status_code >= 400:
-            raise RuntimeError(f"LLM HTTP {r.status_code}: {r.text[:200]}")
+            raise RuntimeError(f"LLM HTTP {r.status_code}")
         for line in r.iter_lines():
             if not line or not line.startswith(b"data:"):
                 continue
             data = line[5:].strip()
             if data == b"[DONE]":
-                break
+                return
             try:
-                delta = json.loads(data)["choices"][0]["delta"].get("content")
+                event = json.loads(data)
+                if event.get("error"):
+                    raise RuntimeError("LLM provider reported a stream error")
+                if not event.get("choices") and "usage" in event:
+                    continue
+                delta = event["choices"][0]["delta"].get("content")
             except (KeyError, IndexError, json.JSONDecodeError):
-                continue  # malformed chunk: skip, never crash a stream
+                raise RuntimeError("LLM provider sent an invalid frame") from None
             if delta:
                 yield delta
+        raise RuntimeError("LLM stream interrupted")

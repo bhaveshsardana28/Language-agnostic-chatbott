@@ -16,7 +16,8 @@ export function initWelcome() {
   const script = document.getElementById('greeting-script');
   const pause = document.getElementById('greeting-pause');
   let index = 0, timer, epoch = 0, paused = false;
-  const canRotate = () => !paused && !reducedMotion() && !document.hidden && !document.querySelector('dialog[open]');
+  const welcome = greeting.closest('.shell-welcome');
+  const canRotate = () => !welcome?.hidden && !paused && !reducedMotion() && !document.hidden && !document.querySelector('dialog[open]');
 
   function schedule() {
     if (canRotate()) timer = setTimeout(advance, tokenTime('--greeting-interval'));
@@ -51,6 +52,7 @@ export function initWelcome() {
   document.addEventListener('visibilitychange', sync);
   document.addEventListener('preferenceschange', sync);
   const observer = new MutationObserver(sync);
+  if (welcome) observer.observe(welcome, { attributes: true, attributeFilter: ['hidden'] });
   document.querySelectorAll('dialog').forEach(dialog => observer.observe(dialog, { attributes: true, attributeFilter: ['open'] }));
   window.addEventListener('pagehide', () => { epoch++; clearTimeout(timer); });
   window.addEventListener('pageshow', event => { if (event.persisted) sync(); });

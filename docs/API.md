@@ -2,7 +2,7 @@
 
 Two apps live in this repo:
 
-- **FYP pivot system** — Flask, port 5000 (below; the graded baseline)
+- **Compatibility interface** — Flask, port 5000
 - **GAIA v2 layer** — FastAPI, port 8000 (this section's SSE/chat/document API)
 
 Base (dev): `http://localhost:8000`. V2 uses an `HttpOnly` `gaia_workspace`
@@ -25,12 +25,12 @@ LIMITATIONS.md before deploying anywhere).
 | `/api/v1/chat/{cid}` | DELETE | delete conversation memory AND its documents |
 | `/api/v1/health` | GET | status, provider, model, llm_ready, storage and OCR capability |
 | `/api/v1/languages` | GET | supported languages |
-| `/api/v1/intents` | GET | campus KB intents + router routes |
+| `/api/v1/intents` | GET | active routes and the empty legacy `campus_kb` array |
 
 `POST /api/v1/chat` body: `{"message": "...", "conversation_id": "..."}`.
 SSE frames (`data: {json}`):
-- `meta`: `conversation_id`, `language_meta {language, language_name, script, confidence}`, `route` (general/campus_kb/translate/document/web), `response_lang`, `reason`
-- `delta` ×N: `text` (+ `intent`/`confidence` on campus route)
+- `meta`: `conversation_id`, `language_meta {language, language_name, script, confidence}`, `route` (general/translate/document/web), `response_lang`, `reason`
+- `delta` ×N: `text`
 - `error` (optional): localized safe message, never a stack trace
 - `done`: `latency_ms`, `model`, `sources[]` (document: name+document_id+chunk+optional page+score+retrieved excerpt; web: title+url)
 
@@ -44,49 +44,22 @@ calibrated document-level probability.
 Language rules: detection per message; reply in the latest message's language
 unless the user instructs otherwise ("answer in Hindi", "hindi mein", "auf Deutsch").
 
-## FYP — Flask (app.py, port 5000)
+## Stateless JSON compatibility interface
 
-## GET `/api/v1/health`
-```json
-{"status": "ok", "model": "models/intent_classifier.joblib", "languages": 7}
-```
+Flask’s `GET /api/v1/health` returns `status`, the configured generator’s `model` name and the number of supported `languages`. Its languages endpoint returns the language map. Its intents endpoint returns an empty JSON array. FastAPI keeps the original object shape on its intents endpoint, with `campus_kb: []` and the four active routes.
 
-## GET `/api/v1/languages`
-```json
-{"en": "English", "hi": "Hindi", "pa": "Punjabi", "es": "Spanish", "fr": "French", "de": "German", "it": "Italian"}
-```
-
-## GET `/api/v1/intents`
-```json
-["admission_info", "attendance", ..., "identity", ..., "transport"]
-```
-
-## POST `/chat`
-Request:
-```json
-{"message": "Wann sind die Prüfungen?"}
-```
-Response (all fields real and measured; nothing fabricated):
-```json
-{
-  "lang": "de",
-  "language_meta": {"language": "de", "language_name": "German", "script": "Latn", "confidence": 1.0},
-  "english": "Wann sind die Prüfungen? (translated)",
-  "intent": "exam_schedule",
-  "confidence": 0.5411,
-  "reply": "...German reply...",
-  "degraded": false,
-  "timings": {"detect_ms": 2.0, "translate_in_ms": 980.5, "classify_ms": 1.4, "respond_ms": 890.2, "total_ms": 2590.9}
-}
-```
-Notes:
-- `intent` is `"fallback"` (with localized polite reply) when confidence < 0.30,
-  and `null` + `degraded: true` when detection/MT failed.
-- On outbound-MT failure the reply degrades to English with `degraded: true`.
-- `timings` cover every pipeline stage; `respond_ms` includes outbound MT.
-- `GET /` serves the chat UI. History is client-side (localStorage) only.
+Flask and FastAPI both accept `POST /chat` with a string `message` and an optional supported `language`. The result includes the detected `lang`, `language_meta`, `response_language`, provider-generated `reply`, `degraded`, and measured `timings`. For compatibility, `intent` is null and top-level `confidence` is 0.0. Language detection confidence remains available in `language_meta.confidence`. The `english` field contains the input for English messages and an empty string otherwise. No English pivot is required for generation. Provider failures return a degraded reply. V2 streaming errors use the existing SSE error event.
 
 Errors: `400 {"error": "empty message"}` on blank input, `403` when a
 conversation belongs to another workspace, `413` for oversized uploads or
 page limits, `415` for unsupported/corrupt signatures, and `422` for readable
 but empty/failed extraction. The error payload includes a stable `code`.
+
+### Request and streaming limits
+
+Chat accepts a JSON object with a string message and an optional conversation ID.
+Malformed JSON, invalid Unicode and invalid field types receive HTTP 400. Oversized chat bodies receive 413. The local worker admits up to 16 simultaneous V2 chat requests and two uploads. At capacity it returns 429 with Retry-After. The file limit defaults to 10 MiB, with an additional 64 KiB allowance for the multipart envelope. On a stream error the client receives an error event followed by completion metadata. Failed provider output is excluded from subsequent model context.
+
+The FastAPI compatibility page at `/legacy` uses the same JSON `POST /chat` contract as Flask. In that contract `lang` identifies the input, `language` in the request selects the reply language, and `response_language` in the response identifies the delivered language.
+
+A successful V2 completion can carry a numeric `reply_id`. To regenerate the last answer, send its ID as `replace_reply` together with the same question and conversation ID. The server excludes that turn from generation context, then replaces it atomically on success. A stale revision receives HTTP 409 if already stale at admission or a stream error if it changes during generation.

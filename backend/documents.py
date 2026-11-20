@@ -508,7 +508,9 @@ def _ocr_pdf_pages(data: bytes, page_numbers: list[int]) -> dict[int, OCRResult]
             requested_scale = max(1.0, min(float(settings.OCR_DPI) / 72.0, 4.0))
             page_area = max(float(page.rect.width * page.rect.height), 1.0)
             max_scale = (settings.MAX_RENDER_PIXELS / page_area) ** 0.5
-            scale = max(0.5, min(requested_scale, max_scale))
+            scale = min(requested_scale, max_scale)
+            if scale < 0.5:
+                raise InvalidDocument("PDF page exceeds the safe rendering limit")
             pixmap = page.get_pixmap(matrix=fitz.Matrix(scale, scale), alpha=False)
             with Image.open(io.BytesIO(pixmap.tobytes("png"))) as image:
                 results[number] = _run_ocr(image, pytesseract, Image)

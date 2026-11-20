@@ -1,0 +1,20 @@
+{
+  "phase": 6,
+  "environment": {
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "python": "3.12.7"
+  },
+  "scope": "V2 document upload/status/list/clear and done.sources rendering",
+  "passed_groups": [
+    "empty: documents before chat show an honest empty state without a list request",
+    "upload: pre-chat upload creates one server conversation, uses its ID and reaches Ready",
+    "sources: document chunk numbering, score, note text and safe HTTPS links render from done.sources",
+    "restore: local history restores source cards and the active document list reloads by server ID",
+    "clear: confirmation calls the per-conversation delete endpoint and empties the panel",
+    "failure: rejected ingestion becomes Failed without leaving a stale Ready row",
+    "narrow: document controls stack below 448px without horizontal overflow or overlap"
+  ],
+  "screenshots": [
+    "docs/screenshots/phase6/light-1440-documents.png"
+  ]
+}

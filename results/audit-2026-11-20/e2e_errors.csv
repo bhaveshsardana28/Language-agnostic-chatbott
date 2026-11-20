@@ -1,0 +1,46 @@
+id,lang,gold,pred,conf,text,english
+1,de,greet,TRANSLATION_FAILED,0.0,Hallo; guten Morgen,Hallo; guten Morgen
+2,fr,greet,TRANSLATION_FAILED,0.0,salut; j'ai besoin d'aide,salut; j'ai besoin d'aide
+3,de,goodbye,TRANSLATION_FAILED,0.0,okay danke; tschüss,okay danke; tschüss
+3,fr,goodbye,fallback,0.0981,d'accord merci; au revoir,d'accord merci; au revoir
+3,hi,goodbye,thanks,0.4421,ठीक है धन्यवाद; अलविदा,Okay; thank you. Goodbye.
+3,pa,goodbye,thanks,0.4421,ਠੀਕ ਹੈ ਧੰਨਵਾਦ; ਅਲਵਿਦਾ,Okay; thank you. Goodbye.
+4,de,goodbye,TRANSLATION_FAILED,0.0,bis morgen,bis morgen
+4,hi,goodbye,fallback,0.2892,कल मिलते हैं,i will be meet tomorrow
+5,hi,thanks,thanks,0.8588,आपकी मदद के लिए बहुत-बहुत धन्यवाद,Thank you very much for your help.
+8,es,timetable,TRANSLATION_FAILED,0.0,¿cuándo empieza mi próxima clase?,¿cuándo empieza mi próxima clase?
+12,de,results,fallback,0.0981,wann werden die Ergebnisse bekannt gegeben?,wann werden die Ergebnisse bekannt gegeben?
+15,de,hostel,fallback,0.2664,wie bewerbe ich mich um ein Zimmer im Wohnheim?,How do I apply for a room in the dormitory?
+15,es,hostel,fallback,0.2664,¿cómo solicito una habitación en la residencia?,How do I apply for a room in the residence hall?
+15,fr,hostel,fallback,0.2495,comment demander une chambre en résidence universitaire ?,How do I apply for a room in a university residence?
+16,de,hostel,fallback,0.1566,wie sind die Öffnungszeiten des Wohnheimtores?,What are the opening hours for the dormitory gate?
+16,es,hostel,fallback,0.2197,¿cuál es el horario de entrada a la residencia?,What is the check-in time for the residence?
+16,fr,hostel,exam_schedule,0.3895,quels sont les horaires d'ouverture de la résidence ?,What are the opening hours of the residence?
+21,fr,placements,fallback,0.2969,quelles entreprises viennent recruter sur le campus ?,Which companies come to recruit on campus?
+22,de,placements,fallback,0.291,wann beginnt das Campus-Recruiting für die Abschlussjahrgänge?,When does campus recruiting start for final-year students?
+22,es,placements,fallback,0.1953,¿cuándo empiezan las prácticas para los estudiantes de último año?,When do internships start for senior students?
+22,fr,placements,fallback,0.2365,quand commencent les recrutements pour les étudiants de dernière année ?,When does recruitment start for final-year students?
+23,de,events_clubs,fallback,0.1628,wie kann ich einem Hochschulverein beitreten?,How can I join a university association?
+24,de,events_clubs,exam_schedule,0.7645,wann ist das Hochschulfest?,When is the university festival?
+24,es,events_clubs,exam_schedule,0.7645,¿cuándo es el festival de la universidad?,When is the university festival?
+24,fr,events_clubs,exam_schedule,0.3408,quand a lieu la fête de l'université ?,When is the university party?
+25,es,transport,TRANSLATION_FAILED,0.0,¿qué ruta de autobús va a la universidad?,¿qué ruta de autobús va a la universidad?
+26,de,transport,fallback,0.2116,wie komme ich mit der U-Bahn zum Campus?,How do I get to campus by subway?
+26,es,transport,fallback,0.2116,¿cómo llego al campus en metro?,How do I get to campus by subway?
+26,fr,transport,fallback,0.2116,comment rejoindre le campus en métro ?,How do I get to campus by subway?
+28,de,admission_info,fallback,0.1984,wann beginnen die diesjährigen Zulassungen?,When do this year's admissions start?
+28,es,admission_info,admission_info,0.4714,¿cuándo abren las admisiones de este año?,When do admissions open this year?
+28,fr,admission_info,TRANSLATION_FAILED,0.0,quand ouvrent les admissions cette année ?,quand ouvrent les admissions cette année ?
+28,hi,admission_info,TRANSLATION_FAILED,0.0,इस साल के लिए एडमिशन कब शुरू होंगे,इस साल के लिए एडमिशन कब शुरू होंगे
+28,pa,admission_info,TRANSLATION_FAILED,0.0,ਇਸ ਸਾਲ ਲਈ ਦਾਖਲੇ ਕਦੋਂ ਸ਼ੁਰੂ ਹੋਣਗੇ,ਇਸ ਸਾਲ ਲਈ ਦਾਖਲੇ ਕਦੋਂ ਸ਼ੁਰੂ ਹੋਣਗੇ
+29,de,food_canteen,TRANSLATION_FAILED,0.0,gibt es eine Mensa auf dem Campus?,gibt es eine Mensa auf dem Campus?
+29,es,food_canteen,TRANSLATION_FAILED,0.0,¿hay una cafetería en el campus?,¿hay una cafetería en el campus?
+29,fr,food_canteen,TRANSLATION_FAILED,0.0,y a-t-il une cantine sur le campus ?,y a-t-il une cantine sur le campus ?
+29,hi,food_canteen,TRANSLATION_FAILED,0.0,क्या कैंपस में कैंटीन है,क्या कैंपस में कैंटीन है
+29,pa,food_canteen,TRANSLATION_FAILED,0.0,ਕੀ ਕੈਂਪਸ ਵਿੱਚ ਕੈਂਟੀਨ ਹੈ,ਕੀ ਕੈਂਪਸ ਵਿੱਚ ਕੈਂਟੀਨ ਹੈ
+30,de,food_canteen,TRANSLATION_FAILED,0.0,wann gibt es Abendessen in der Wohnheim-Mensa?,wann gibt es Abendessen in der Wohnheim-Mensa?
+30,en,food_canteen,hostel,0.6159,what time does the hostel mess serve dinner,what time does the hostel mess serve dinner
+30,es,food_canteen,TRANSLATION_FAILED,0.0,¿a qué hora sirve la cena el comedor de la residencia?,¿a qué hora sirve la cena el comedor de la residencia?
+30,fr,food_canteen,TRANSLATION_FAILED,0.0,à quelle heure le dîner est-il servi au réfectoire ?,à quelle heure le dîner est-il servi au réfectoire ?
+30,hi,food_canteen,TRANSLATION_FAILED,0.0,हॉस्टल मेस में रात का खाना कितने बजे मिलता है,हॉस्टल मेस में रात का खाना कितने बजे मिलता है
+30,pa,food_canteen,TRANSLATION_FAILED,0.0,ਹਾਸਟਲ ਮੈੱਸ ਵਿੱਚ ਰਾਤ ਦਾ ਖਾਣਾ ਕਿੰਨੇ ਵਜੇ ਮਿਲਦਾ ਹੈ,ਹਾਸਟਲ ਮੈੱਸ ਵਿੱਚ ਰਾਤ ਦਾ ਖਾਣਾ ਕਿੰਨੇ ਵਜੇ ਮਿਲਦਾ ਹੈ

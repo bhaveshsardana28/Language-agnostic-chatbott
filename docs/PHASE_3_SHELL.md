@@ -1,8 +1,9 @@
 # Phase 3 — Common Ground application shell
 
 **Completed 11 October 2026, ready for phase approval.** Entry:
-`http://localhost:8000/static/v2/index.html`. The Phase 2 workbench remains at
-`/static/v2/components.html` and the existing assistant remains at `/`.
+`http://localhost:8000/`. The Phase 2 workbench remains at
+`/static/v2/components.html`; the previous assistant is comparison-only at
+`/legacy`.
 
 ## Delivered
 
@@ -26,12 +27,14 @@
 - Document and voice entry-point dialogs clearly identify their later-phase
   integration; no file picker, microphone or speech engine is activated.
 
-The shell deliberately identifies itself as **Phase 3**. Send is disabled.
-Enter/Shift+Enter edit the draft; no chat request, server conversation ID,
-fabricated reply or mock chat is created. New chat resets the current in-tab
-draft and focuses the composer. Drafts are not stored across reload. Conversation
+The shell deliberately identifies itself as **Phase 3**. At the Phase 3 snapshot,
+Send was disabled and Enter/Shift+Enter edited the draft; no chat request, server
+conversation ID, fabricated reply or mock chat was created. The later Phase 4
+composer now sends on Enter while preserving Shift+Enter for editing. New chat
+resets the current in-tab draft and focuses the composer. Drafts are not stored across reload. Conversation
 restoration and automatic conversation titles remain open under F07, for
 Phases 4/6. History, uploads and actual voice are not certified by this shell.
+The subsequent Phase 4 chat work is documented in [PHASE_4_CHAT.md](PHASE_4_CHAT.md).
 
 ## Implementation
 
@@ -43,7 +46,7 @@ Phases 4/6. History, uploads and actual voice are not certified by this shell.
 | `static/v2/js/main.js` | Explicit ES-module boot |
 | `static/v2/js/shell.js` | Sidebar placement/persistence, draft sizing, prompt and entry-point wiring |
 | `static/v2/js/welcome.js` | Seven-state greeting cycle and motion/visibility lifecycle |
-| `static/v2/js/api.js` | Live HTTP boundary; currently only `GET /api/v1/health` |
+| `static/v2/js/api.js` | Phase 3 live HTTP boundary; Phase 4 adds the conversation creation contract |
 | `static/v2/js/connection.js` | Reachability state, retry, timeout, abort and request ownership |
 | `static/v2/js/icons.js` | Shared original inline SVG sprite |
 | `static/v2/js/appearance.js` | Shared appearance controls for both V2 pages |
@@ -206,9 +209,9 @@ source venv/bin/activate
 python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
-Open **http://localhost:8000/static/v2/index.html**. If the correct FastAPI server
-is already running, reuse it. The original assistant remains
-**http://localhost:8000/**; the component workbench is
+Open **http://localhost:8000/**. If the correct FastAPI server is already running,
+reuse it. The original assistant is comparison-only at
+**http://localhost:8000/legacy**; the component workbench is
 **http://localhost:8000/static/v2/components.html**.
 
 Terminal 2, with the previously approved Playwright/Chromium tools available:
@@ -246,5 +249,5 @@ navigation; select each starter; switch themes; enable Reduce motion; inspect
 the document/voice notices; use Check service and observe an unavailable state
 with the backend stopped. The draft should remain editable throughout.
 
-**Stop after Phase 3 approval review. Phase 4 chat/API/mock implementation has
-not begun.**
+**Phase 3 approval snapshot.** The shell remains the Phase 3 foundation; Phase 4
+chat/API/mock work is tracked separately in [PHASE_4_CHAT.md](PHASE_4_CHAT.md).

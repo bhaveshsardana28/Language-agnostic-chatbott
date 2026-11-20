@@ -237,7 +237,7 @@ python tests/test_code_switching.py
 python tests/test_browser.py
 ```
 
-The old app is **http://localhost:8000/** and still has the audited startup
+The old app is **http://localhost:8000/legacy** and still has the audited startup
 failure. The Flask baseline remains **http://localhost:5000/** when started
 with `python app.py`. Both endpoints remain independent of this gallery.
 

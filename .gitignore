@@ -17,3 +17,8 @@ portfolio/node_modules/
 logs/
 models/
 cache/
+.opencode/
+
+.vercel/
+.env.local
+.env.*.local

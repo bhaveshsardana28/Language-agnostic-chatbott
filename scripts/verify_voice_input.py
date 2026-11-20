@@ -43,6 +43,13 @@ class FakeRecognition {
   }
   emitError(error) { this.onerror?.({ error }); setTimeout(() => this.onend?.(), 0); }
 }
+window.spoken = [];
+Object.defineProperty(window, 'speechSynthesis', {configurable:true, value:{
+  getVoices: () => [{localService:true, lang:'hi-IN'}],
+  speak: utterance => window.spoken.push(utterance),
+  cancel: () => { window.playbackCancelled = true; }
+}});
+window.SpeechSynthesisUtterance = class { constructor(text) { this.text = text; } };
 window.fakeRecognitionInstances = [];
 window.fakeRecognitionStarts = 0;
 window.fakeRecognitionStops = 0;
@@ -73,7 +80,7 @@ def supported_flow(browser, origin):
     expect(page.locator('#voice-input-status')).to_contain_text('ready')
 
     page.locator('#sidebar-toggle').click()
-    page.get_by_role('button', name='Appearance settings', exact=True).click()
+    page.get_by_role('button', name='Workspace settings', exact=True).click()
     page.locator('#speech-language').select_option('hi-IN')
     expect(page.locator('#speech-language')).to_have_value('hi-IN')
     page.get_by_role('button', name='Done', exact=True).click()
@@ -93,6 +100,9 @@ def supported_flow(browser, origin):
     page.evaluate("window.fakeRecognitionInstances.at(-1).emitResults([{text:'नमस्ते GAIA', isFinal:true}])")
     expect(page.locator('#message-input')).to_have_value('नमस्ते GAIA')
     assert not requests
+    page.evaluate("window.fakeRecognitionInstances.at(-1).onspeechend()")
+    expect(mic).to_have_attribute('data-state', 'processing')
+    expect(page.locator('#voice-input-status')).to_contain_text('Finishing transcription')
     passed('transcript: interim and final speech stay editable in the composer without auto-send')
 
     page.keyboard.press('Escape')
@@ -116,14 +126,38 @@ def supported_flow(browser, origin):
     assert page.evaluate('window.mediaCalls') == 0
     passed('errors/privacy: permission error is actionable, recognition returns idle and no audio API is requested')
 
+    for code, expected in [('audio-capture', 'No microphone'), ('no-speech', 'No speech'), ('network', 'could not reach')]:
+        mic.click()
+        page.evaluate("code => window.fakeRecognitionInstances.at(-1).emitError(code)", code)
+        expect(mic).to_have_attribute('data-state', 'idle')
+        expect(page.locator('#voice-input-status')).to_contain_text(expected)
+    page.clock.install()
+    page.evaluate("window.SpeechRecognition.prototype.start = function() {}")
+    mic.click()
+    page.clock.fast_forward(21000)
+    expect(mic).to_have_attribute('data-state', 'idle')
+    expect(page.locator('#voice-input-status')).to_contain_text('did not start')
+    page.evaluate("window.SpeechRecognition.prototype.start = function() { setTimeout(() => this.onstart?.(), 100) }")
+    page.clock.resume()
+    passed('recognition: silent input, missing device, network failure and stalled startup recover')
+
     # Auto uses the latest detected user language rather than the explicit setting.
     page.locator('#sidebar-toggle').click()
     page.get_by_role('button', name='New chat', exact=True).click()
     page.locator('#message-input').fill('मुझे कुछ नया सिखाओ।')
     page.locator('#message-input').press('Enter')
     expect(page.locator('.chat-message--assistant[aria-busy="false"]')).to_be_visible(timeout=10000)
+    listen = page.get_by_role('button', name='Read reply aloud')
+    assert page.evaluate('window.spoken.length') == 0
+    listen.click()
+    expect(listen).to_have_attribute('aria-pressed', 'true')
+    assert page.evaluate("window.spoken[0].lang === 'hi-IN' && window.spoken[0].text.length > 0")
+    listen.click()
+    expect(listen).to_have_attribute('aria-pressed', 'false')
+    assert page.evaluate('window.playbackCancelled')
+    passed('playback: explicit local Hindi voice, no autoplay, cancel returns control to idle')
     page.locator('#sidebar-toggle').click()
-    page.get_by_role('button', name='Appearance settings', exact=True).click()
+    page.get_by_role('button', name='Workspace settings', exact=True).click()
     page.locator('#speech-language').select_option('auto')
     page.get_by_role('button', name='Done', exact=True).click()
     mic.click()

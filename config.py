@@ -1,7 +1,5 @@
-"""Central configuration — single source of truth for the pivot chatbot."""
+"""Application languages and paths for the historical evaluation tools."""
 
-# The 6 supported languages. English is the pivot: every user message is
-# translated to English, classified once, and the reply translated back.
 SUPPORTED_LANGS = {
     "en": "English",
     "hi": "Hindi",
@@ -9,13 +7,11 @@ SUPPORTED_LANGS = {
     "es": "Spanish",
     "fr": "French",
     "de": "German",
-    # Phase 7: Italian added as the live "zero new training data" demo.
-    # The intent model never saw a single Italian example.
     "it": "Italian",
 }
 PIVOT_LANG = "en"
 
-# Below this classifier confidence, reply with a graceful fallback
+# Historical evaluation only. Below this classifier confidence, reply with a graceful fallback
 # instead of a wrong answer. Tuned by scripts/tune_threshold.py on
 # out-of-fold predictions (sweep balances kept-correct vs rejected-wrong).
 # (was 0.125 for the C=1.0 model; re-derived 30 Sep 2026 against the
