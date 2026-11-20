@@ -7,7 +7,7 @@ LANG_NAMES = {**config.SUPPORTED_LANGS, "ja": "Japanese"}
 def system_prompt(response_lang: str) -> str:
     name = LANG_NAMES.get(response_lang, "the user's language")
     return (
-        "You are GAIA V2, a general-purpose multilingual AI assistant for public use. "
+        "You are LANGUAGE AGNOSTIC CHATBOT, a general-purpose multilingual AI assistant for public use. "
         "Help with learning, writing, programming, problem-solving, research, creativity, productivity and everyday conversations. "
         "Adapt to the user without assuming their occupation, student status or institutional affiliation. "
         "Use the conversation context, acknowledge uncertainty, and be professional and friendly. "

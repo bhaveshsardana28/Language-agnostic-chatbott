@@ -110,7 +110,7 @@ function renderDetails(data) {
 function renderMessage(role, text, data = null, language = null) {
   const article = element("article", `message message--${role}`);
   article.dataset.role = role;
-  const name = role === "user" ? "You" : role === "assistant" ? "GAIA" : "Connection notice";
+  const name = role === "user" ? "You" : role === "assistant" ? "LANGUAGE AGNOSTIC CHATBOT" : "Connection notice";
   const meta = element("div", "message-meta");
   const now = new Date();
   const time = element("time", "", timeFormat.format(now));

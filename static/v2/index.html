@@ -4,18 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="GAIA V2 — grounded multilingual answers across conversations and documents.">
+  <meta name="description" content="LANGUAGE AGNOSTIC CHATBOT — grounded multilingual answers across conversations and documents.">
   <meta name="theme-color" content="#0E0E14">
-  <title>GAIA V2 · Multilingual workspace</title>
+  <title>LANGUAGE AGNOSTIC CHATBOT · Multilingual workspace</title>
   <link rel="icon" href="./assets/brand/favicon.svg" type="image/svg+xml">
   <script src="./js/theme-init.js"></script>
-  <link rel="stylesheet" href="./css/tokens.css?v=gaia-20261120">
-  <link rel="stylesheet" href="./css/base.css?v=gaia-20261120">
-  <link rel="stylesheet" href="./css/components.css?v=gaia-20261120">
-  <link rel="stylesheet" href="./css/layout.css?v=gaia-20261120">
-  <link rel="stylesheet" href="./css/shell.css?v=gaia-20261120">
-  <link rel="stylesheet" href="./css/chat.css?v=gaia-20261120">
-  <link rel="stylesheet" href="./css/motion.css?v=gaia-20261120">
+  <link rel="stylesheet" href="./css/tokens.css?v=chatbot-20261121">
+  <link rel="stylesheet" href="./css/base.css?v=chatbot-20261121">
+  <link rel="stylesheet" href="./css/components.css?v=chatbot-20261121">
+  <link rel="stylesheet" href="./css/layout.css?v=chatbot-20261121">
+  <link rel="stylesheet" href="./css/shell.css?v=chatbot-20261121">
+  <link rel="stylesheet" href="./css/chat.css?v=chatbot-20261121">
+  <link rel="stylesheet" href="./css/motion.css?v=chatbot-20261121">
   <script type="module" src="./js/main.js"></script>
 </head>
 <body>
@@ -25,7 +25,7 @@
     <div id="sidebar-dock">
          <aside id="app-sidebar" class="app-sidebar" aria-label="Workspace navigation">
           <div class="sidebar-brand">
-            <div class="sidebar-brand-row"><span class="brand" aria-label="GAIA V2"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-gaia"/></svg></span><span class="sidebar-label"><b>GAIA <small>V2</small></b></span></span><button class="icon-button icon-button--quiet sidebar-collapse-button" id="sidebar-collapse" type="button" aria-label="Collapse sidebar" aria-controls="app-sidebar" aria-expanded="true" title="Collapse sidebar"><svg class="icon" aria-hidden="true"><use href="#i-sidebar"/></svg></button></div>
+            <div class="sidebar-brand-row"><span class="brand" aria-label="LANGUAGE AGNOSTIC CHATBOT"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-gaia"/></svg></span><span class="sidebar-label"><b>LANGUAGE AGNOSTIC CHATBOT</b></span></span><button class="icon-button icon-button--quiet sidebar-collapse-button" id="sidebar-collapse" type="button" aria-label="Collapse sidebar" aria-controls="app-sidebar" aria-expanded="true" title="Collapse sidebar"><svg class="icon" aria-hidden="true"><use href="#i-sidebar"/></svg></button></div>
           </div>
          <nav class="sidebar-nav" aria-label="Workspace">
            <button class="button button--primary sidebar-action" id="new-chat" data-new-chat aria-label="New chat" title="New chat"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span class="sidebar-label">New chat</span></button>
@@ -74,9 +74,9 @@
           <div class="welcome-copy">
             <img class="welcome-orbit" src="./assets/brand/gaia-orbit.webp" width="864" height="660" alt="" fetchpriority="high">
             <div class="welcome-words">
-              <div class="greeting-line"><span class="sr-only">Welcome to GAIA.</span><span id="greeting" aria-hidden="true" lang="en">Hello.</span><span id="greeting-script" aria-hidden="true">Latin</span><button class="icon-button icon-button--quiet" id="greeting-pause" aria-label="Pause greeting rotation" aria-pressed="false" title="Pause greeting rotation"><svg class="icon" aria-hidden="true"><use href="#i-pause"/></svg></button></div>
+              <div class="greeting-line"><span class="sr-only">Welcome to LANGUAGE AGNOSTIC CHATBOT.</span><span id="greeting" aria-hidden="true" lang="en">Hello.</span><span id="greeting-script" aria-hidden="true">Latin</span><button class="icon-button icon-button--quiet" id="greeting-pause" aria-label="Pause greeting rotation" aria-pressed="false" title="Pause greeting rotation"><svg class="icon" aria-hidden="true"><use href="#i-pause"/></svg></button></div>
               <h1 id="welcome-title">Think in your<br><em>own language.</em></h1>
-              <p class="welcome-intro">Ask GAIA a question, translate a thought, or find answers in your documents.</p>
+              <p class="welcome-intro">Ask a question, translate a thought, or find answers in your documents.</p>
             </div>
           </div>
           <section class="shell-starters" aria-labelledby="starter-title"><h2 id="starter-title">Start with a prompt</h2>
@@ -100,7 +100,7 @@
         <form class="composer shell-composer" id="composer-form">
             <label for="message-input">Message</label>
             <div class="composer-attachments" id="composer-attachments" aria-label="Attached files" hidden></div>
-            <textarea class="textarea" id="message-input" dir="auto" rows="1" placeholder="Message GAIA in any language…" aria-describedby="shell-scope draft-note message-count"></textarea>
+            <textarea class="textarea" id="message-input" dir="auto" rows="1" placeholder="Type a message in any language…" aria-describedby="shell-scope draft-note message-count"></textarea>
             <div class="composer-context" id="composer-context" role="status" aria-live="polite" hidden><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg><span id="composer-context-text"></span><button class="button button--quiet" type="button" data-shell-open="documents-dialog">Manage sources</button></div>
            <div class="composer-tools"><div class="menu-anchor composer-attach-anchor"><button class="icon-button icon-button--quiet" id="attach-menu-button" type="button" aria-haspopup="menu" aria-controls="attach-menu" aria-expanded="false" aria-label="Attach files" title="Attach files"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button><div class="menu composer-attach-menu" id="attach-menu" role="menu" hidden><button class="attach-menu-item" type="button" role="menuitem" data-attach-action="upload"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg><span><strong>Add photos &amp; files</strong><small>Upload from computer</small></span></button><button class="attach-menu-item" type="button" role="menuitem" data-attach-action="browse"><svg class="icon" aria-hidden="true"><use href="#i-library"/></svg><span><strong>Add from library</strong><small>Browse and search your files</small></span></button></div></div><button class="icon-button icon-button--quiet voice-input-button" id="voice-input-button" type="button" aria-label="Start voice input" title="Start voice input"><svg class="icon" aria-hidden="true"><use href="#i-voice"/></svg></button><span class="field-note" id="draft-note">Draft stays in this tab.</span><span class="field-note" id="message-count">0 / 4,000</span><button class="button button--primary" id="send-button" type="submit" disabled aria-describedby="shell-scope message-count">Send <svg class="icon" aria-hidden="true"><use href="#i-send"/></svg></button></div>
             <p class="field-note voice-input-status" id="voice-input-status" role="status" aria-live="polite"></p>

@@ -10,7 +10,7 @@ import { loadHistory, newConversation, saveHistory, serializeMessage, titleFromM
 const messageLimit = () => globalThis.gaiaDocumentCapabilities?.max_message_chars || 4000;
 const STREAM_TIMEOUT = 30000;
 const mock = new URLSearchParams(location.search).get('mock') === '1';
-const ASSISTANT_NAME = 'GAIA';
+const ASSISTANT_NAME = 'LANGUAGE AGNOSTIC CHATBOT';
 const LANGUAGE_NAMES = Object.freeze({
   en: { native: 'English', english: 'English', script: 'Latin' },
   hi: { native: 'हिन्दी', english: 'Hindi', script: 'Devanagari' },
@@ -845,7 +845,7 @@ export function initChat() {
     }
     assistant = addMessage('assistant', '', { pending: true, replace_reply: replaceReply });
     assistant.sourceUser = userMessage;
-    document.getElementById('generation-status').textContent = 'GAIA is preparing a reply.';
+    document.getElementById('generation-status').textContent = `${ASSISTANT_NAME} is preparing a reply.`;
     assistant.article.setAttribute('aria-busy', 'true');
      assistant.body.innerHTML = `<div class="thinking-lines" aria-hidden="true"><span></span><span></span><span></span></div><span class="sr-only">${ASSISTANT_NAME} is preparing a reply</span>`;
     setSendButton('Stop', true); send.disabled = false;

@@ -251,7 +251,7 @@ def test_general_routing_preserves_original_message(monkeypatch, message):
     assert [event["type"] for event in events] == ["meta", "delta", "done"]
     assert events[0]["route"] == "general" and events[1]["text"] == "Model answer"
     assert calls[-1] == {"role": "user", "content": message}
-    assert "GAIA V2" in calls[0]["content"]
+    assert "LANGUAGE AGNOSTIC CHATBOT" in calls[0]["content"]
 
 
 def test_legacy_translation_respects_requested_language(monkeypatch):

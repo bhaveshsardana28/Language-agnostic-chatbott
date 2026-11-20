@@ -87,7 +87,7 @@
     m.el.querySelector('#set-delete-all').addEventListener('click', () => { m.close(); deleteAllData(); });
 
     api.health().then(h => {
-      m.el.querySelector('#settings-about').innerHTML = `<b>Global Multilingual AI Assistant</b> v2.0<br>
+      m.el.querySelector('#settings-about').innerHTML = `<b>LANGUAGE AGNOSTIC CHATBOT</b> v2.0<br>
         Multilingual chat · cross-language RAG · translation · web search<br>
         Provider: <b>${window.esc(h.llm_provider)}</b> · Model: <b>${window.esc(h.llm_model)}</b> · LLM ready: ${h.llm_ready ? 'yes' : 'no'}<br>
         Tested languages: English, Hindi, Punjabi, Spanish, French, German, Italian`;

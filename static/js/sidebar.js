@@ -74,7 +74,7 @@
 
   function exportConv(c) {
     const lines = [`# ${c.title}`, '', ...c.messages.map(m => {
-      const who = m.role === 'user' ? '**You**' : '**GAIA**';
+      const who = m.role === 'user' ? '**You**' : '**LANGUAGE AGNOSTIC CHATBOT**';
       const when = m.ts ? ` _(${new Date(m.ts).toLocaleString()})_` : '';
       const lang = m.meta?.language_meta?.language ? ` _[${m.meta.language_meta.language}]_` : '';
       return `${who}${when}${lang}:\n\n${m.content}`;

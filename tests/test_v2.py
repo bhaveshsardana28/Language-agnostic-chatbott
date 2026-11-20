@@ -48,9 +48,9 @@ def _unpatch_all():
 
 def test_health_and_catalog():
     r = client.get("/")
-    assert r.status_code == 200 and 'id="welcome-title"' in r.text and "GAIA V2" in r.text  # default root is the V2 frontend
+    assert r.status_code == 200 and 'id="welcome-title"' in r.text and "<title>LANGUAGE AGNOSTIC CHATBOT · Multilingual workspace</title>" in r.text  # default root is the V2 frontend
     legacy = client.get("/legacy")
-    assert legacy.status_code == 200 and "Global Multilingual" in legacy.text
+    assert legacy.status_code == 200 and "<title>LANGUAGE AGNOSTIC CHATBOT</title>" in legacy.text
     h = client.get("/api/v1/health").json()
     assert h["status"] == "ok" and "llm_provider" in h
     assert "it" in client.get("/api/v1/languages").json()
