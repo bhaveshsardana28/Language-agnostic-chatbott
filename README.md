@@ -113,7 +113,7 @@ Final-year project — B.Tech CSE (AI/ML), The NorthCap University, Gurugram.
 
 | | |
 |---|---|
-| **Team** | Bhavesh Sardana (23csu070) · Dakksh Sharma (23csu081) · Avi (23csu061) |
+| **Team** | Bhavesh Sardana (23csu070) · Dakksh Sharma (23csu081) · Ayush (23csu065) · Avi (23csu061) |
 | **Supervisor** | Ms. Meghna Sharma |
 
 The original project report, evaluation data and authorship records are preserved for historical reference. The historical intent-classifier experiments are outside the application startup, deployment image and request path. Current model documentation is in [docs/MODELS.md](docs/MODELS.md).
