@@ -1,6 +1,6 @@
-# GAIA V2 – A Language-Agnostic, General-Purpose AI Chatbot
+# LANGUAGE AGNOSTIC CHATBOT
 
-GAIA V2 is a multilingual AI assistant for everyday questions, learning, writing, programming, research and document-based conversations. People can switch languages within a chat or request a particular reply language.
+LANGUAGE AGNOSTIC CHATBOT is a general-purpose multilingual AI assistant for everyday questions, learning, writing, programming, research and document-based conversations. People can switch languages within a chat or request a particular reply language.
 
 ## Quick start
 
@@ -24,7 +24,7 @@ The optional Flask compatibility UI runs with `make run-legacy` on port 5000. Fa
 | Document | Retrieves excerpts from the conversation’s uploaded files and asks the configured model for a grounded answer. |
 | Web | Searches for time-sensitive information and supplies returned sources to the model. |
 
-The Language Agnostic Chatbot frontend makes the language-agnostic workflow visible without
+The frontend makes the language-agnostic workflow visible without
 claiming unsupported capabilities: per-message language detection,
 language-switch instructions ("answer in Hindi"), bounded conversation memory,
 SSE streaming, dark/light/system themes,
@@ -42,7 +42,7 @@ see docs/API.md. Real-device voice results remain untested.
 
 ### Frontend workspace
 
-GAIA V2 opens in dark mode with a collapsible history sidebar and an anchored composer.
+The workspace opens in dark mode with a collapsible history sidebar and an anchored composer.
 Use the language control in the header to add an editable reply-language instruction to a draft.
 Open Reply details to inspect the current response. The panel shows service-reported detected and response language, route, returned sources, model,
 and measured server latency. Conversation history and search are browser-local
